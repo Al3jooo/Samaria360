@@ -169,7 +169,7 @@ describe('Detalle de un servicio (WF-06)', () => {
     expect(within(horarios).getByText('No disponible')).toHaveClass('solo-lector')
     expect(screen.getByText('Accesibilidad')).toHaveTextContent('Accesibilidad —No disponible')
     expect(screen.queryByRole('list', { name: 'Accesibilidad' })).not.toBeInTheDocument()
-    // El encabezado y el pie (fuera de WF-06) sí conservan «Próximamente».
+    // Ningún elemento usa «Próximamente» desde DEC-270.
     const ficha = screen.getByRole('article', { name: 'Mirador Gourmet' })
     expect(within(ficha).queryByText(/Próximamente|Sin información/)).not.toBeInTheDocument()
   })

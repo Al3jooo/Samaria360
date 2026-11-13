@@ -9,7 +9,7 @@ import {
   IconoRayo,
   IconoSobre,
 } from '../../shared/components/Iconos'
-import { BotonProximamente } from '../../shared/components/Proximamente'
+import { AccionNoDisponible } from '../../shared/components/BotonNoDisponible'
 import { RUTA_POLITICA_PRIVACIDAD, RUTA_TERMINOS } from '../../shared/rutasLegales'
 import { destinoTrasLogin } from './destinoTrasLogin'
 import { esEstadoTrasRegistro } from './estadoAcceso'
@@ -160,7 +160,7 @@ export function LoginPage() {
               {errorDeCampo('contrasena')}
             </div>
 
-            <BotonProximamente className="enlace-olvido">{t('login.olvido')}</BotonProximamente>
+            <AccionNoDisponible className="enlace-olvido">{t('login.olvido')}</AccionNoDisponible>
 
             <p className="aviso-intentos">
               <IconoRayo />
