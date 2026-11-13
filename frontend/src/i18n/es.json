@@ -58,6 +58,8 @@
     "correoPlaceholder": "nombre@correo.com",
     "contrasena": "Contraseña",
     "contrasenaPlaceholder": "Mínimo 8 caracteres",
+    "mostrarContrasena": "Mostrar contraseña",
+    "ocultarContrasena": "Ocultar contraseña",
     "olvido": "¿Olvidaste tu contraseña?",
     "avisoIntentos": "3 intentos fallidos bloquearán la cuenta por 15 minutos.",
     "boton": "Iniciar sesión",

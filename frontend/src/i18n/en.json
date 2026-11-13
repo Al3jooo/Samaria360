@@ -58,6 +58,8 @@
     "correoPlaceholder": "name@email.com",
     "contrasena": "Password",
     "contrasenaPlaceholder": "At least 8 characters",
+    "mostrarContrasena": "Show password",
+    "ocultarContrasena": "Hide password",
     "olvido": "Forgot your password?",
     "avisoIntentos": "3 failed attempts will lock the account for 15 minutes.",
     "boton": "Sign in",

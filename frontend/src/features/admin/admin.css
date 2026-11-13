@@ -25,6 +25,8 @@
   margin-bottom: var(--espacio-5);
   border-bottom: 1px solid var(--color-borde);
   overflow-x: auto;
+  /* Como en perfil.css: sin esto asoma una barra vertical de 1 px junto a las pestañas (recorrido del 2026-11-13). */
+  overflow-y: hidden;
 }
 
 .pestanas-cuentas [role='tab'] {
@@ -127,7 +129,15 @@
   overflow-wrap: anywhere;
 }
 
+.tabla-cuentas td[data-columna='registrado'] {
+  /* Una fecha no se parte («17/10/202|6»). */
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
 .tabla-cuentas th {
+  /* Los encabezados no se parten a mitad de palabra («Nom|bre»); las celdas sí pueden (correos largos). */
+  overflow-wrap: normal;
   background: var(--color-arena);
   color: var(--color-tinta);
   font-size: var(--texto-sm);
@@ -498,8 +508,10 @@
   flex: 0 1 20rem;
 }
 
-/* El select ocupa el control, como en WF-18 (prestador.css). */
-.admin-servicios .campo__control select {
+/* El select ocupa el control, como en WF-18 (prestador.css). También en WF-12, donde se veía con el estilo nativo del
+   navegador dentro de la caja (recorrido del 2026-11-13). */
+.admin-servicios .campo__control select,
+.admin-cuentas .campo__control select {
   flex: 1;
   min-width: 0;
   padding: var(--espacio-3) 0;
@@ -509,7 +521,8 @@
   font: inherit;
 }
 
-.admin-servicios .campo__control select:focus {
+.admin-servicios .campo__control select:focus,
+.admin-cuentas .campo__control select:focus {
   outline: none;
 }
 

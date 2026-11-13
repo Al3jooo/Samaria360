@@ -39,7 +39,7 @@ export function TablaCuentas({
         {filas.map((fila) => (
           <tr key={fila.id} role="row">
             {columnas.map((columna) => (
-              <td key={columna.clave} role="cell" data-etiqueta={columna.titulo}>
+              <td key={columna.clave} role="cell" data-etiqueta={columna.titulo} data-columna={columna.clave}>
                 {fila.celdas[columna.clave]}
               </td>
             ))}

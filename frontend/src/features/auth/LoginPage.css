@@ -149,6 +149,36 @@
   outline: none;
 }
 
+/* Mostrar u ocultar la contraseña: área táctil de 44 px (WCAG 2.5.5) y foco visible propio, distinto del del campo. */
+.campo__ver {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-right: calc(var(--espacio-3) * -1);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radio-sm);
+  background: transparent;
+  color: var(--color-tinta-suave);
+  cursor: pointer;
+}
+
+.campo__ver:hover {
+  color: var(--color-mar-700);
+}
+
+.campo__ver:focus-visible {
+  outline: 2px solid var(--color-mar-700);
+  outline-offset: -2px;
+  color: var(--color-mar-700);
+}
+
+.campo__ver[aria-pressed='true'] {
+  color: var(--color-mar-700);
+}
+
 .campo__control:has(input[aria-invalid='true']) {
   border-color: var(--color-error);
   color: var(--color-error);
