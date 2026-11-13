@@ -13,6 +13,8 @@ export function aRechazoRegistro(error: unknown): RechazoRegistro {
   if (!(error instanceof ApiError)) return { campos: {}, general: 'GENERICO' }
   if (servicioNoDisponible(error)) return { campos: {}, general: 'SERVICIO_NO_DISPONIBLE' }
   if (error.codigo === ERROR_RED) return { campos: {}, general: ERROR_RED }
+  // 429 del gateway: límite de tasa por conexión (DEC-271).
+  if (error.codigo === 'DEMASIADAS_SOLICITUDES') return { campos: {}, general: 'DEMASIADAS_SOLICITUDES' }
   if (error.codigo === 'POLITICAS_NO_ACEPTADAS') return { campos: { aceptoPoliticas: 'POLITICAS_NO_ACEPTADAS' }, general: null }
   if (error.codigo === 'RNT_YA_REGISTRADO') return { campos: { rnt: 'RNT_YA_REGISTRADO' }, general: null }
   if (error.codigo === 'DATOS_INVALIDOS') {

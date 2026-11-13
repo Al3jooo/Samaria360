@@ -17,6 +17,8 @@ const CODIGOS_CON_MENSAJE = new Set([
   'CUENTA_PENDIENTE_VALIDACION',
   'CUENTA_RECHAZADA',
   'DATOS_INVALIDOS',
+  // 429 del gateway: límite de tasa por conexión (DEC-271).
+  'DEMASIADAS_SOLICITUDES',
   ERROR_RED,
 ])
 

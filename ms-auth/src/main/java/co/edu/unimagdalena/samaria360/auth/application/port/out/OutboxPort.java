@@ -30,4 +30,12 @@ public interface OutboxPort {
 
     /** Devuelve a la cola, sin contar un intento, las reclamadas que no se llegaron a entregar. */
     void liberar(Destino destino, List<EntregaPendiente> entregas, Instant ahora);
+
+    /**
+     * Borra los eventos que ya llegaron a todos sus destinos y cuya última entrega es anterior a {@code limite}, con sus
+     * entregas (retención del outbox). Un evento con alguna entrega pendiente no se toca.
+     *
+     * @return cuántos eventos se borraron
+     */
+    int purgarEntregados(Instant limite);
 }
