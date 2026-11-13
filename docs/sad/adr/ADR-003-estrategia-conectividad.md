@@ -25,7 +25,7 @@ Establecer una estrategia de conectividad en tres niveles:
 - **Desacoplamiento:** el bróker de mensajes (RabbitMQ) garantiza que operaciones secundarias (logs de auditoría en
   `ms-analytics` o envío de correos) no bloqueen el tiempo de respuesta al turista cuando hace una reserva.
 
-**Negativas:** el documento fuente no las incluye en la parte transcrita; quedan pendientes de texto.
+**Negativas:** el SAD del proyecto solo registra consecuencias positivas para esta decisión (confirmado por el equipo el 2026-11-13).
 
 ## Estado en el prototipo (Construcción)
 
