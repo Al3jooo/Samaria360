@@ -1,7 +1,14 @@
 import { useState, type FormEvent } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Link, Navigate, useLocation } from 'react-router-dom'
-import { IconoCandado, IconoEntrar, IconoRayo, IconoSobre } from '../../shared/components/Iconos'
+import {
+  IconoCandado,
+  IconoEntrar,
+  IconoOjo,
+  IconoOjoTachado,
+  IconoRayo,
+  IconoSobre,
+} from '../../shared/components/Iconos'
 import { BotonProximamente } from '../../shared/components/Proximamente'
 import { RUTA_POLITICA_PRIVACIDAD, RUTA_TERMINOS } from '../../shared/rutasLegales'
 import { destinoTrasLogin } from './destinoTrasLogin'
@@ -27,6 +34,8 @@ export function LoginPage() {
   // El estado del formulario vive aquí y cambiar de idioma no desmonta el componente (RNF08).
   const [correo, setCorreo] = useState(() => trasRegistro?.correo ?? '')
   const [contrasena, setContrasena] = useState('')
+  // Mejora de diseño (2026-11-13): ver la contraseña escrita. Se vuelve a ocultar al enviar el formulario.
+  const [verContrasena, setVerContrasena] = useState(false)
   const [camposVacios, setCamposVacios] = useState<Set<Campo>>(new Set())
   const [error, setError] = useState<ErrorInicioSesion | null>(null)
   const [enviando, setEnviando] = useState(false)
@@ -55,6 +64,7 @@ export function LoginPage() {
       return
     }
     setError(null)
+    setVerContrasena(false)
     setEnviando(true)
     try {
       await iniciarSesion(correo.trim(), contrasena)
@@ -126,7 +136,7 @@ export function LoginPage() {
                 <input
                   id="contrasena"
                   name="contrasena"
-                  type="password"
+                  type={verContrasena ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder={t('login.contrasenaPlaceholder')}
                   value={contrasena}
@@ -134,6 +144,18 @@ export function LoginPage() {
                   aria-invalid={camposVacios.has('contrasena') || undefined}
                   aria-describedby={camposVacios.has('contrasena') ? 'contrasena-error' : undefined}
                 />
+                {/* Botón de alternancia: nombre fijo y aria-pressed, para que el lector de pantalla diga si está activo. */}
+                <button
+                  type="button"
+                  className="campo__ver"
+                  aria-label={t('login.mostrarContrasena')}
+                  aria-pressed={verContrasena}
+                  aria-controls="contrasena"
+                  title={t(verContrasena ? 'login.ocultarContrasena' : 'login.mostrarContrasena')}
+                  onClick={() => setVerContrasena((visible) => !visible)}
+                >
+                  {verContrasena ? <IconoOjoTachado /> : <IconoOjo />}
+                </button>
               </div>
               {errorDeCampo('contrasena')}
             </div>

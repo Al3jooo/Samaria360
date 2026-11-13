@@ -104,6 +104,7 @@ Vista única de los 64 RF y los 8 RNF del SRS (`docs/srs/`), con su estado en el
 | WF-01 | Texto introductorio | Iniciar sesión | RF15 | — | `features/auth/LoginPage.tsx` | Implementado |
 | WF-01 | Campo «Correo electrónico» | Iniciar sesión | RF15 | `POST /login` | `features/auth/LoginPage.tsx` | Implementado |
 | WF-01 | Campo «Contraseña» | Iniciar sesión | RF15, RNF05 | `POST /login` | `features/auth/LoginPage.tsx` | Implementado |
+| WF-01 | Botón con un ojo para mostrar u ocultar la contraseña escrita (no está en WF-01): botón de alternancia con nombre fijo «Mostrar contraseña», `aria-pressed` y `aria-controls`; área táctil de 44 px; al enviar, la contraseña vuelve a ocultarse. Pedido del equipo (2026-11-13) | Iniciar sesión | RF15 | — | `features/auth/LoginPage.tsx`, `LoginPage.css`, `shared/components/Iconos.tsx` (`inicioSesion.test.tsx`) | Mejora de diseño |
 | WF-01 | Enlace «¿Olvidaste tu contraseña?» | Recuperar contraseña | RF34 | — | `features/auth/LoginPage.tsx` | Deshabilitado |
 | WF-01 | Recuadro «3 intentos fallidos bloquearán la cuenta por 15 minutos» | Iniciar sesión | RF15 | — | `features/auth/LoginPage.tsx` | Implementado |
 | WF-01 | Botón «Iniciar sesión» | Iniciar sesión | RF15 | `POST /login`, `GET /me` | `features/auth/LoginPage.tsx`, `features/auth/SesionProvider.tsx` | Implementado |

@@ -43,6 +43,9 @@
   display: flex;
   gap: var(--espacio-2);
   overflow-x: auto;
+  /* Sin esto, overflow-x: auto vuelve auto también el eje vertical y la línea de la pestaña activa (1 px) asoma una
+     barra de desplazamiento vertical junto a las pestañas (recorrido visual del 2026-11-13). */
+  overflow-y: hidden;
 }
 
 .pestanas-perfil [role='tab'] {

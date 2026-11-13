@@ -142,6 +142,34 @@ describe('Inicio de sesión (RF15)', () => {
     expect(fetchSimulado).not.toHaveBeenCalled()
   })
 
+  // Mejora de diseño (2026-11-13): el ojo muestra y oculta la contraseña; al enviar vuelve a ocultarse.
+  it('el botón «Mostrar contraseña» alterna la visibilidad y la oculta otra vez al enviar', async () => {
+    simularFetch({ [LOGIN]: () => respuestaProblema(401, 'CREDENCIALES_INVALIDAS') })
+    const { usuario } = renderApp('/login')
+
+    const contrasena = screen.getByLabelText('Contraseña')
+    const ojo = screen.getByRole('button', { name: 'Mostrar contraseña' })
+    expect(contrasena).toHaveAttribute('type', 'password')
+    expect(ojo).toHaveAttribute('aria-pressed', 'false')
+    expect(ojo).toHaveAttribute('aria-controls', 'contrasena')
+
+    await usuario.type(contrasena, 'abc')
+    await usuario.click(ojo)
+    expect(contrasena).toHaveAttribute('type', 'text')
+    expect(ojo).toHaveAttribute('aria-pressed', 'true')
+    expect(contrasena).toHaveValue('abc')
+
+    await usuario.click(ojo)
+    expect(contrasena).toHaveAttribute('type', 'password')
+
+    await usuario.click(ojo)
+    await usuario.type(screen.getByLabelText('Correo electrónico'), 'a@b.co')
+    await usuario.click(screen.getByRole('button', { name: 'Iniciar sesión' }))
+    expect(await screen.findByText('Correo o contraseña incorrectos.')).toBeInTheDocument()
+    expect(contrasena).toHaveAttribute('type', 'password')
+    expect(ojo).toHaveAttribute('aria-pressed', 'false')
+  }, 15_000)
+
   // CU Registrarse (RF01, RF02): «Registrarse» dejó de estar deshabilitado y lleva a /registro (WF-02, WF-03). La
   // recuperación de contraseña (RF34) sigue pendiente.
   it('«Registrarse» lleva al registro y ¿Olvidaste tu contraseña? sigue deshabilitado', () => {
