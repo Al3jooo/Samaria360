@@ -224,7 +224,7 @@ Siempre a través de los tokens `var(--color-…)`; nunca hex sueltos en los com
 | `--color-superficie` | `#FFFFFF` | Tarjetas, menús, campos; texto sobre mar-700, mar-900 y atardecer | — |
 | `--color-borde` | `#E2D9CA` | Separadores y contornos decorativos de tarjetas | Borde de campos (no llega a 3:1) |
 | `--color-borde-campo` | `#7C8D91` | Borde de campos de formulario | Texto |
-| `--color-deshabilitado` | `#5C6D71` | Elementos deshabilitados («No disponible», DEC-22, y los «Próximamente» que quedan), placeholder | Elementos activos |
+| `--color-deshabilitado` | `#5C6D71` | Elementos deshabilitados («No disponible», DEC-22 y DEC-270), placeholder | Elementos activos |
 | `--color-mar-900` | `#073B44` | Fondo del pie, avatar, títulos destacados | Botones de acción |
 | `--color-mar-700` | `#0B6574` | Enlaces, pestaña e idioma activos, navegación activa, **foco** | Botón principal (es del atardecer) |
 | `--color-mar-500` | `#1497A6` | **Solo decorativo**: olas, ilustraciones | Texto o bordes con significado |
@@ -233,8 +233,8 @@ Siempre a través de los tokens `var(--color-…)`; nunca hex sueltos en los com
 | `--color-atardecer-700` | `#A83A17` | Hover y estado activo del CTA | — |
 | `--color-atardecer-500` | `#E2603A` | **Solo decorativo**: sol, degradados, anillo del avatar abierto | Texto |
 | `--color-sol-400` | `#F4B740` | Anillo del avatar, **foco sobre fondos oscuros**, ilustraciones | Texto sobre fondos claros |
-| `--color-sol-100` | `#FDF1D6` | Fondo de la insignia «Próximamente», selección de texto | — |
-| `--color-cafe-700` | `#6A3E1E` | Texto de la insignia «Próximamente» | — |
+| `--color-sol-100` | `#FDF1D6` | Fondo de los avisos del Administrador, selección de texto | — |
+| `--color-cafe-700` | `#6A3E1E` | Texto café sobre sol (avisos del Administrador) | — |
 | `--color-sierra-700` | `#2E6A4E` | Ilustraciones; reservado para estados de éxito futuros | — |
 | `--color-error` | `#B42318` | Mensajes y bordes de error | Decoración |
 | `--color-error-fondo` | `#FDECEA` | Fondo del mensaje de error | — |
@@ -348,7 +348,7 @@ Con tinte del mar (`rgb(7 59 68 / …)`), nunca gris puro.
 | Aviso informativo | `.aviso-intentos` | arena-200 con borde izquierdo atardecer-600 e icono. |
 | Mensaje de error | `.login__error` | Región `aria-live` siempre presente; el contenido es error sobre error-fondo con borde izquierdo. |
 | Fuera de alcance (pantallas nuevas) | `BotonNoDisponible` + `.boton-no-disponible` (`shared/components/`, `estilos.css`) | Estado único de DEC-22: borde discontinuo `--color-borde-campo`, color deshabilitado, `aria-disabled` (sigue enfocable), sin acción y «No disponible» solo para lectores de pantalla. Nunca `disabled`. WF-06 y WF-12. |
-| Fuera de alcance (pantallas anteriores) | `BotonProximamente` + `.insignia-proximamente` | `aria-disabled` (sigue siendo enfocable), color deshabilitado e insignia sol-100 / café-700. Se conserva en WF-01, WF-04, WF-05 y los elementos comunes hasta que el equipo unifique (pendiente en `docs/trazabilidad.md`). |
+| Fuera de alcance (todas las pantallas) | `BotonNoDisponible` (botón con borde discontinuo) y `AccionNoDisponible` (texto con subrayado discontinuo) | `aria-disabled` (sigue siendo enfocable), sin acción y «No disponible» solo para lectores de pantalla (DEC-22, DEC-270). |
 | Carga | `.estado-carga` | `role="status"` y `aria-busy`, con indicador giratorio decorativo. |
 | Botón secundario | `.boton-secundario` (en `estilos.css`, como `.boton-principal`) | Píldora con borde mar-700 sobre superficie: acciones de apoyo (Reintentar, Quitar filtros). |
 | Chip de filtro | `.chip` | mar-900 sobre mar-100, removible; `aria-label` que diga qué filtro quita. |
