@@ -18,7 +18,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # En un PR, un push nuevo cancela la ejecución vieja (mismo grupo). En main cada ejecución tiene su propio grupo y
+  # corre completa: una ejecución cancelada o descartada en main deja el badge del README en «failing» (2026-11-13).
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: true
 
 jobs:
