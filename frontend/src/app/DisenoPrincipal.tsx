@@ -35,7 +35,7 @@ export function DisenoPrincipal() {
       <main id="contenido" className="contenido" tabIndex={-1}>
         <Outlet />
       </main>
-      <PiePagina />
+      <PiePagina esGestor={sesion.estado === 'autenticado' && sesion.usuario.rol === 'Gestor'} />
     </div>
   )
 }
