@@ -36,3 +36,11 @@ describe('Content-Security-Policy de nginx', () => {
     expect(csp.get('frame-ancestors')).toEqual(["'none'"])
   })
 })
+
+describe('Permissions-Policy de nginx', () => {
+  const politica = /add_header Permissions-Policy "([^"]+)" always;/.exec(seguridad)?.[1]
+
+  it('permite la geolocalización solo al propio origen (WF-05, RF38) y niega cámara, micrófono y pagos (DEC-266)', () => {
+    expect(politica?.split(/,\s*/)).toEqual(['geolocation=(self)', 'camera=()', 'microphone=()', 'payment=()'])
+  })
+})
