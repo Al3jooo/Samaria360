@@ -253,6 +253,8 @@ class AdminCuentasApiIntegracionTest {
         MvcResult sesion = login("rz" + marca.toLowerCase() + "@hotel.test");
         assertThat(sesion.getResponse().getStatus()).isEqualTo(403);
         assertThat(JsonPath.<String>read(cuerpo(sesion), "$.codigo")).isEqualTo("CUENTA_RECHAZADA");
+        // DEC-273: con la contraseña correcta, el prestador recibe la justificación.
+        assertThat(JsonPath.<String>read(cuerpo(sesion), "$.motivo")).isEqualTo("El RNT no está vigente");
     }
 
     @Test

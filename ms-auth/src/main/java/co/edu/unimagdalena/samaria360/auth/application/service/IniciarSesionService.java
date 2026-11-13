@@ -10,6 +10,7 @@ import co.edu.unimagdalena.samaria360.auth.application.port.out.TokenProviderPor
 import co.edu.unimagdalena.samaria360.auth.application.port.out.UsuarioRepositoryPort;
 import co.edu.unimagdalena.samaria360.auth.domain.exception.CredencialesInvalidasException;
 import co.edu.unimagdalena.samaria360.auth.domain.exception.CuentaBloqueadaException;
+import co.edu.unimagdalena.samaria360.auth.domain.exception.CuentaRechazadaException;
 import co.edu.unimagdalena.samaria360.auth.domain.exception.InicioSesionException;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Correo;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Usuario;
@@ -87,6 +88,10 @@ public class IniciarSesionService implements IniciarSesionUseCase {
             // La contraseña era correcta: no es un intento fallido, pero tampoco un acceso.
             politica.reiniciarIntentos(usuario);
             usuarios.guardar(usuario);
+            if (accesoNegado instanceof CuentaRechazadaException) {
+                // DEC-273: con la contraseña correcta, el prestador ve la justificación de su rechazo (RF28).
+                throw new CuentaRechazadaException(usuarios.buscarMotivoRechazo(usuario.getId()).orElse(null));
+            }
             throw accesoNegado;
         }
 

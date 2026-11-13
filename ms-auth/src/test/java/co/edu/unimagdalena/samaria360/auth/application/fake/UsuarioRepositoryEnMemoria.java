@@ -43,6 +43,18 @@ public class UsuarioRepositoryEnMemoria implements UsuarioRepositoryPort {
         return Optional.ofNullable(validaciones.get(id));
     }
 
+    private final java.util.Map<UUID, String> motivos = new java.util.HashMap<>();
+
+    /** Precarga la justificación del rechazo de un prestador (DEC-273). */
+    public void motivoRechazo(UUID id, String motivo) {
+        motivos.put(id, motivo);
+    }
+
+    @Override
+    public Optional<String> buscarMotivoRechazo(UUID id) {
+        return Optional.ofNullable(motivos.get(id));
+    }
+
     @Override
     public Optional<Usuario> buscarPorCorreo(String correo) {
         return usuarios.values().stream()
