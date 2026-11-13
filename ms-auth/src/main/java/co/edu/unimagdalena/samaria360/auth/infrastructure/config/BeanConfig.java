@@ -30,6 +30,7 @@ import co.edu.unimagdalena.samaria360.auth.application.service.GestionarPerfilSe
 import co.edu.unimagdalena.samaria360.auth.application.service.IniciarSesionService;
 import co.edu.unimagdalena.samaria360.auth.application.service.RegistrarPrestadorService;
 import co.edu.unimagdalena.samaria360.auth.application.service.RegistrarTuristaService;
+import co.edu.unimagdalena.samaria360.auth.application.service.PurgarOutboxService;
 import co.edu.unimagdalena.samaria360.auth.application.service.RelevarCuentasService;
 import co.edu.unimagdalena.samaria360.auth.application.service.VerificarSesionService;
 import co.edu.unimagdalena.samaria360.auth.domain.service.PoliticaAcceso;
@@ -37,11 +38,14 @@ import co.edu.unimagdalena.samaria360.auth.domain.service.PoliticaAdministradore
 import co.edu.unimagdalena.samaria360.auth.domain.service.PoliticaBloqueo;
 import co.edu.unimagdalena.samaria360.auth.domain.service.PoliticaReintento;
 import co.edu.unimagdalena.samaria360.auth.domain.service.PoliticaSesion;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import java.time.Duration;
 
 /** Registra como beans las clases de domain y application, que no llevan anotaciones de Spring. */
 @Configuration
@@ -183,6 +187,13 @@ public class BeanConfig {
     public GestionarPerfilUseCase gestionarPerfilUseCase(GestionarPerfilService servicio,
                                                          PlatformTransactionManager transacciones) {
         return new GestionarPerfilTransaccional(servicio, new TransactionTemplate(transacciones));
+    }
+
+    /** Retención del outbox (DEC-272): {@code samaria360.outbox.purga.retencion}, 30 días por defecto. */
+    @Bean
+    public PurgarOutboxService purgarOutboxService(OutboxPort outbox, RelojPort reloj,
+                                                   @Value("${samaria360.outbox.purga.retencion:P30D}") Duration retencion) {
+        return new PurgarOutboxService(outbox, reloj, retencion);
     }
 
     @Bean
