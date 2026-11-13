@@ -288,9 +288,10 @@ CU [«Actualizar datos comerciales»](../../casos-de-uso/CU-actualizar-datos-com
 | `CREDENCIALES_INVALIDAS` | 401 | Login con un correo inexistente o una contraseña incorrecta (el mismo mensaje) |
 | `NO_AUTENTICADO` | 401 | Sin token, vencido, inválido o de servicio (`rol = SERVICIO`) |
 | `CUENTA_INACTIVA` | 403 | Login con la contraseña correcta o `/me`, con la cuenta no Activa (RF22, RF62) |
-| `CUENTA_PENDIENTE_VALIDACION`, `CUENTA_RECHAZADA` | 403 | Login de un prestador sin validar o rechazado, con la contraseña correcta (D3) |
+| `CUENTA_PENDIENTE_VALIDACION`, `CUENTA_RECHAZADA` | 403 | Login de un prestador sin validar o rechazado, con la contraseña correcta (D3); `CUENTA_RECHAZADA` lleva `motivo`, la justificación del Administrador (DEC-273) |
 | `RNT_YA_REGISTRADO` | 409 | Registro de un prestador con un RNT que ya existe |
 | `CUENTA_BLOQUEADA` | 423 | Login de una cuenta bloqueada por intentos; lleva `bloqueadoHasta` (RF15) |
+| `DEMASIADAS_SOLICITUDES` | 429 | Lo responde el **api-gateway**, no ms-auth: más de 10 logins por minuto o 5 registros cada 10 minutos desde la misma conexión; lleva `Retry-After` (DEC-271) |
 | `SESION_INVALIDADA` | 401 | `ver` menor que `version_cuenta`: la cuenta cambió después de iniciar sesión |
 | `ACCESO_DENEGADO` | 403 | El rol no es Administrador (`/admin/**`), no es Turista (`/perfil`) o no es Prestador (`/prestador/perfil`) |
 | `CUENTA_NO_ENCONTRADA` | 404 | No existe, o es de otro rol (en el cambio de rol: no existe) |

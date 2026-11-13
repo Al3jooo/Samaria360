@@ -5,7 +5,7 @@
 **Imágenes de los wireframes propuestos por arquitectura (13/11/2026, DEC-268).** WF-01 a WF-10 los dibujó el equipo de diseño. Los nuevos (WF-12 `_004` a `_006`, WF-13 a WF-26, WF-06 para atractivos y `WF-05-06-11-cambios-turista`) tienen un `.png` con el mismo nombre que su `.puml`, dibujado por arquitectura en el mismo estilo de boceto (escala de grises, sin identidad visual) a partir del `.puml` y de la pantalla implementada. Un `.png` con varias láminas muestra la pantalla, sus estados y sus diálogos; las notas en recuadro punteado son anotaciones, no elementos de la pantalla. El equipo los validó el 2026-11-13 (DEC-269).
 
 **Reglas:**
-- **Trazabilidad:** toda pantalla del prototipo corresponde a un wireframe de esta carpeta. Si un elemento queda fuera del alcance de la iteración, se muestra deshabilitado («Próximamente») y se lista como pendiente en `docs/trazabilidad.md`.
+- **Trazabilidad:** toda pantalla del prototipo corresponde a un wireframe de esta carpeta. Si un elemento queda fuera del alcance de la iteración, se muestra deshabilitado («No disponible» para lectores de pantalla, sin texto visible de estado; DEC-22, DEC-270) y se lista como pendiente en `docs/trazabilidad.md`.
 - **Guía, no plano:** los wireframes fijan la estructura, el contenido y el orden de los elementos. El diseño visual es libre dentro de la identidad «Santa Marta» (`frontend/src/app/estilos.css`).
 - **Fuente de requisitos:** si un wireframe contradice el SRS (`docs/srs/especificacion de requisitos.pdf`), manda el SRS y la diferencia se anota en la trazabilidad. Ejemplo: los wireframes dicen «aforo» donde el SRS dice «afluencia» (RF39).
 

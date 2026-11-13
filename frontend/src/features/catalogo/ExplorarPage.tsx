@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { BotonProximamente } from '../../shared/components/Proximamente'
+import { AccionNoDisponible } from '../../shared/components/BotonNoDisponible'
 import { useSesion } from '../auth/useSesion'
 import { AvisoFavoritos } from '../favoritos/AvisoFavoritos'
 import { useFavoritos } from '../favoritos/useFavoritos'
@@ -256,12 +256,12 @@ export function ExplorarPage() {
                   {t('explorar.ordenes.Distancia')}
                 </button>
               )}
-              <BotonProximamente className="orden__opcion" etiquetaVisible={false}>
+              <AccionNoDisponible className="orden__opcion">
                 {t('explorar.ordenes.Afluencia')}
-              </BotonProximamente>
-              <BotonProximamente className="orden__opcion" etiquetaVisible={false}>
+              </AccionNoDisponible>
+              <AccionNoDisponible className="orden__opcion">
                 {t('explorar.ordenes.Calificacion')}
-              </BotonProximamente>
+              </AccionNoDisponible>
               {ORDENES_DISPONIBLES.map((orden) => (
                 <button
                   key={orden}

@@ -58,9 +58,20 @@ spring:
                 allowed-methods: [GET, POST, PUT, PATCH, DELETE, OPTIONS]
                 # Idempotency-Key e Idempotent-Replayed: reservar es idempotente por clave (ms-booking, D6).
                 allowed-headers: [Authorization, Content-Type, X-Correlation-Id, Idempotency-Key]
-                exposed-headers: [X-Correlation-Id, Idempotent-Replayed, Location]
+                exposed-headers: [X-Correlation-Id, Idempotent-Replayed, Location, Retry-After]
                 allow-credentials: false # el token va en la cabecera Authorization, no en cookies
                 max-age: 3600
+
+# Límite de tasa del login y del registro por dirección del cliente (DEC-271, mitigación de ADR-006). Al pasarlo, 429
+# DEMASIADAS_SOLICITUDES con Retry-After. El bloqueo de RF15 (3 intentos por cuenta) sigue en ms-auth.
+samaria360:
+  limite-tasa:
+    login:
+      maximo: 10
+      ventana: 1m
+    registro:
+      maximo: 5
+      ventana: 10m
 
 management:
   endpoints:

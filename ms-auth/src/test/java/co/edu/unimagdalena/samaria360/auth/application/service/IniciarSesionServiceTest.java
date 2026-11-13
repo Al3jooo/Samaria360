@@ -158,6 +158,25 @@ class IniciarSesionServiceTest {
         assertThat(tokens.llamadas()).isZero();
     }
 
+    @Test
+    void unPrestadorRechazadoConContrasenaCorrectaRecibeLaJustificacionDelRechazo() {
+        repositorio.agregarPrestador(prestador(0, null), EstadoValidacion.Rechazado);
+        repositorio.motivoRechazo(ID, "El RNT no está vigente");
+
+        assertThatThrownBy(() -> servicio.iniciarSesion(new ComandoInicioSesion(CORREO, CONTRASENA)))
+                .isInstanceOfSatisfying(CuentaRechazadaException.class,
+                        e -> assertThat(e.getMotivo()).contains("El RNT no está vigente"));
+    }
+
+    @Test
+    void conLaContrasenaIncorrectaUnPrestadorRechazadoNoRevelaElMotivo() {
+        repositorio.agregarPrestador(prestador(0, null), EstadoValidacion.Rechazado);
+        repositorio.motivoRechazo(ID, "El RNT no está vigente");
+
+        assertThatThrownBy(() -> servicio.iniciarSesion(new ComandoInicioSesion(CORREO, "incorrecta")))
+                .isInstanceOf(CredencialesInvalidasException.class);
+    }
+
     @ParameterizedTest
     @EnumSource(value = EstadoValidacion.class, names = {"Pendiente", "Rechazado"})
     void unPrestadorNoValidadoConContrasenaIncorrectaEsUnIntentoFallido(EstadoValidacion validacion) {

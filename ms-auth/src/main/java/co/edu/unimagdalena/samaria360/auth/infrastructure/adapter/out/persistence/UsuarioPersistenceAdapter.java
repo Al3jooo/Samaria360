@@ -50,6 +50,11 @@ public class UsuarioPersistenceAdapter implements UsuarioRepositoryPort {
     }
 
     @Override
+    public Optional<String> buscarMotivoRechazo(UUID id) {
+        return repositorio.buscarMotivoRechazo(id).filter(motivo -> !motivo.isBlank());
+    }
+
+    @Override
     public OptionalLong buscarVersionCuenta(UUID id) {
         return repositorio.buscarVersionCuenta(id).map(OptionalLong::of).orElseGet(OptionalLong::empty);
     }

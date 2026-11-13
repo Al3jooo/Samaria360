@@ -72,7 +72,10 @@ public class ManejadorErrores extends ResponseEntityExceptionHandler {
     /** Contraseña correcta, prestador Rechazado (RF28, decisión D3). El modelo no guarda el motivo: mensaje genérico. */
     @ExceptionHandler(CuentaRechazadaException.class)
     ProblemDetail cuentaRechazada(CuentaRechazadaException ex) {
-        return Problemas.crear(HttpStatus.FORBIDDEN, CodigoError.CUENTA_RECHAZADA, ex.getMessage());
+        ProblemDetail problema = Problemas.crear(HttpStatus.FORBIDDEN, CodigoError.CUENTA_RECHAZADA, ex.getMessage());
+        // DEC-273: la justificación del Administrador (RF28), solo después de verificar la contraseña.
+        ex.getMotivo().ifPresent(motivo -> problema.setProperty("motivo", motivo));
+        return problema;
     }
 
     /** Registro (RF01, RF02): un código por campo, con los nombres JSON de la API. El frontend los traduce (RF03). */

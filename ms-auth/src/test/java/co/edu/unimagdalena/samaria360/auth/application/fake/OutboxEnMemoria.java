@@ -101,6 +101,15 @@ public class OutboxEnMemoria implements OutboxPort {
         liberadas.forEach(entrega -> buscar(destino, entrega).proximoIntento = ahora);
     }
 
+    /** Último límite pedido a {@link #purgarEntregados}; la regla real se prueba contra PostgreSQL. */
+    public Instant limitePurga;
+
+    @Override
+    public int purgarEntregados(Instant limite) {
+        limitePurga = limite;
+        return 0;
+    }
+
     private Entrega buscar(Destino destino, EntregaPendiente entrega) {
         return entregas.stream().filter(e -> e.destino == destino && e.idEvento == entrega.idEvento())
                 .findFirst().orElseThrow();

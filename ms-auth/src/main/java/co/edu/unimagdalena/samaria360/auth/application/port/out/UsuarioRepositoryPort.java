@@ -23,6 +23,9 @@ public interface UsuarioRepositoryPort {
     /** Estado de validación si el usuario es prestador (RF02, RF28); vacío para los demás roles. */
     Optional<EstadoValidacion> buscarEstadoValidacion(UUID id);
 
+    /** Justificación del rechazo del prestador ({@code prestador.motivo_rechazo}, RF28); vacío si no hay (DEC-273). */
+    Optional<String> buscarMotivoRechazo(UUID id);
+
     /** {@code usuario.version_cuenta}; vacío si el usuario no existe (DEC-29). */
     OptionalLong buscarVersionCuenta(UUID id);
 

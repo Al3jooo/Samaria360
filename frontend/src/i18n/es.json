@@ -1,6 +1,5 @@
 {
   "comun": {
-    "proximamente": "Próximamente",
     "cargando": "Cargando…",
     "saltarAlContenido": "Saltar al contenido",
     "cerrarAviso": "Cerrar aviso",
@@ -152,12 +151,14 @@
     "ayudaCategorias": "Elige al menos una."
   },
   "errores": {
+    "DEMASIADAS_SOLICITUDES": "Hubo demasiados intentos desde esta conexión. Espera unos minutos e inténtalo de nuevo.",
     "CREDENCIALES_INVALIDAS": "Correo o contraseña incorrectos.",
     "CUENTA_BLOQUEADA": "Tu cuenta está bloqueada por 3 intentos fallidos. Podrás intentarlo de nuevo a las {{hora}}.",
     "CUENTA_BLOQUEADA_SIN_HORA": "Tu cuenta está bloqueada temporalmente por intentos fallidos. Inténtalo de nuevo en unos minutos.",
     "CUENTA_INACTIVA": "Tu cuenta no está activa. Comunícate con el administrador de la plataforma.",
     "CUENTA_PENDIENTE_VALIDACION": "Tu cuenta está en revisión por el administrador. Podrás iniciar sesión cuando sea validada.",
     "CUENTA_RECHAZADA": "El administrador rechazó la solicitud de tu cuenta. Comunícate con la plataforma para más información.",
+    "CUENTA_RECHAZADA_MOTIVO": "El administrador rechazó la solicitud de tu cuenta. Motivo: «{{motivo}}». Comunícate con la plataforma para más información.",
     "DATOS_INVALIDOS": "Revisa los datos: escribe un correo electrónico válido y tu contraseña.",
     "ERROR_RED": "No fue posible conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
     "SERVICIO_NO_DISPONIBLE": "El servicio no está disponible por el momento. Inténtalo de nuevo en unos minutos.",

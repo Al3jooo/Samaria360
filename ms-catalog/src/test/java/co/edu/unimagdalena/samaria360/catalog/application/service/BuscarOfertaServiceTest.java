@@ -172,10 +172,10 @@ class BuscarOfertaServiceTest {
     }
 
     @Test
-    void elTextoNoDistingueMayusculasPeroSiTildes() {
+    void elTextoNoDistingueMayusculasNiTildes() {
         assertThat(ids(servicio.buscar(criterios("CAFÉ", null, null, null, null, Set.of())))).containsExactly("s2");
-        // Comportamiento actual documentado (pendiente para el SAD): sin tilde no coincide.
-        assertThat(ids(servicio.buscar(criterios("cafe", null, null, null, null, Set.of())))).isEmpty();
+        // DEC-274: sin tilde también coincide.
+        assertThat(ids(servicio.buscar(criterios("cafe", null, null, null, null, Set.of())))).containsExactly("s2");
     }
 
     @Test

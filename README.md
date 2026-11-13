@@ -1,10 +1,10 @@
 # Samaria360
 
-[![ms-auth](https://github.com/Al3jooo/SM_Tours_Aplication/actions/workflows/ms-auth.yml/badge.svg)](https://github.com/Al3jooo/SM_Tours_Aplication/actions/workflows/ms-auth.yml)
-[![ms-catalog](https://github.com/Al3jooo/SM_Tours_Aplication/actions/workflows/ms-catalog.yml/badge.svg)](https://github.com/Al3jooo/SM_Tours_Aplication/actions/workflows/ms-catalog.yml)
-[![ms-booking](https://github.com/Al3jooo/SM_Tours_Aplication/actions/workflows/ms-booking.yml/badge.svg)](https://github.com/Al3jooo/SM_Tours_Aplication/actions/workflows/ms-booking.yml)
-[![api-gateway](https://github.com/Al3jooo/SM_Tours_Aplication/actions/workflows/api-gateway.yml/badge.svg)](https://github.com/Al3jooo/SM_Tours_Aplication/actions/workflows/api-gateway.yml)
-[![frontend](https://github.com/Al3jooo/SM_Tours_Aplication/actions/workflows/frontend.yml/badge.svg)](https://github.com/Al3jooo/SM_Tours_Aplication/actions/workflows/frontend.yml)
+[![ms-auth](https://github.com/Al3jooo/Samaria360/actions/workflows/ms-auth.yml/badge.svg)](https://github.com/Al3jooo/Samaria360/actions/workflows/ms-auth.yml)
+[![ms-catalog](https://github.com/Al3jooo/Samaria360/actions/workflows/ms-catalog.yml/badge.svg)](https://github.com/Al3jooo/Samaria360/actions/workflows/ms-catalog.yml)
+[![ms-booking](https://github.com/Al3jooo/Samaria360/actions/workflows/ms-booking.yml/badge.svg)](https://github.com/Al3jooo/Samaria360/actions/workflows/ms-booking.yml)
+[![api-gateway](https://github.com/Al3jooo/Samaria360/actions/workflows/api-gateway.yml/badge.svg)](https://github.com/Al3jooo/Samaria360/actions/workflows/api-gateway.yml)
+[![frontend](https://github.com/Al3jooo/Samaria360/actions/workflows/frontend.yml/badge.svg)](https://github.com/Al3jooo/Samaria360/actions/workflows/frontend.yml)
 
 Plataforma de turismo de Santa Marta. Proyecto Capstone Design — Arquitectura de Software, Universidad del Magdalena.
 

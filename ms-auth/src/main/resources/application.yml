@@ -18,9 +18,9 @@ spring:
     password: ${AUTH_DB_PASSWORD:${POSTGRES_PASSWORD}}
   task:
     scheduling:
-      # Uno por destino del relevo: un destino caído no retrasa al otro.
+      # Uno por destino del relevo (un destino caído no retrasa al otro) y uno para la purga del outbox (DEC-272).
       pool:
-        size: 2
+        size: 3
   jpa:
     open-in-view: false
     hibernate:
@@ -41,6 +41,10 @@ samaria360:
   outbox:
     habilitado: true
     cada: PT1S
+    # Retención (DEC-272): cada hora se borran los eventos ya entregados a todos sus destinos hace más de 30 días.
+    purga:
+      cada: PT1H
+      retencion: P30D
     destinos:
       ms-catalog: ${CATALOG_INTERNO_URI:http://localhost:8082}
       ms-booking: ${BOOKING_INTERNO_URI:http://localhost:8083}
