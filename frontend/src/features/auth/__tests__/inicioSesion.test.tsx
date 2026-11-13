@@ -107,6 +107,18 @@ describe('Inicio de sesión (RF15)', () => {
     ).toBeInTheDocument()
   })
 
+  // DEC-271: el gateway responde 429 DEMASIADAS_SOLICITUDES al pasar el límite de tasa por conexión.
+  it('un 429 del gateway muestra el aviso de demasiados intentos', async () => {
+    simularFetch({ [LOGIN]: () => respuestaProblema(429, 'DEMASIADAS_SOLICITUDES') })
+    const { usuario } = renderApp('/login')
+
+    await llenarYEnviar(usuario, 'a@b.co', 'x')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Hubo demasiados intentos desde esta conexión. Espera unos minutos e inténtalo de nuevo.',
+    )
+  }, 15_000)
+
   it('un 500 muestra el mensaje genérico (defecto del servidor, no una caída)', async () => {
     simularFetch({ [LOGIN]: () => respuestaProblema(500, 'ERROR_INTERNO') })
     const { usuario } = renderApp('/login')

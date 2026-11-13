@@ -152,6 +152,7 @@
     "ayudaCategorias": "Choose at least one."
   },
   "errores": {
+    "DEMASIADAS_SOLICITUDES": "Too many attempts from this connection. Wait a few minutes and try again.",
     "CREDENCIALES_INVALIDAS": "Incorrect email or password.",
     "CUENTA_BLOQUEADA": "Your account is locked after 3 failed attempts. You can try again at {{hora}}.",
     "CUENTA_BLOQUEADA_SIN_HORA": "Your account is temporarily locked after failed attempts. Try again in a few minutes.",
