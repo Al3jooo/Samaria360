@@ -10,7 +10,7 @@ Este documento nace con la iteración «Contenido público» (RF26, RF47, RF40; 
 - la **gestión de atractivos** del Gestor, su **ficha pública** y las **imágenes** en GridFS (CU [«Registrar atractivo»](../../casos-de-uso/CU-registrar-atractivo.md), [«Actualizar atractivo»](../../casos-de-uso/CU-actualizar-atractivo.md), [«Cambiar estado operativo»](../../casos-de-uso/CU-cambiar-estado-atractivo.md) y [«Consultar detalle de atractivo»](../../casos-de-uso/CU-consultar-detalle-atractivo.md)), de la iteración E, sesión A1 (RF06, RF07, RF24, RF27, RF33, RF58; DEC-206 a DEC-221; [ADR-009](../adr/ADR-009-imagenes-gridfs.md));
 - la **agenda de eventos**: el registro y el panel del Gestor y la agenda pública (CU [«Registrar evento en agenda»](../../casos-de-uso/CU-registrar-evento-agenda.md) y [«Consultar agenda de eventos»](../../casos-de-uso/CU-consultar-agenda-eventos.md)), de la iteración E, sesión A2 (RF25; DEC-215, DEC-235 a DEC-242).
 
-La búsqueda, los filtros, el detalle de un servicio y el endpoint interno de la proyección `cuentas` están descritos en `docs/trazabilidad.md` («Endpoints de ms-catalog») y en [`ms-auth.md`](ms-auth.md) («Endpoint interno de los consumidores»). Las decisiones están en `docs/trazabilidad.md` («Contenido público — decisiones» y «Turista (B1) — decisiones»).
+Desde la revisión del 2026-11-12 también fija la **búsqueda pública**, sus **opciones de filtro** y el **detalle de un servicio** (CU [«Buscar oferta turística»](../../casos-de-uso/CU-buscar-oferta.md) y [«Consultar detalle de oferta»](../../casos-de-uso/CU-consultar-detalle-oferta.md)), que antes solo estaban en `docs/trazabilidad.md` («Endpoints de ms-catalog»). El endpoint interno de la proyección `cuentas` está en [`ms-auth.md`](ms-auth.md) («Endpoint interno de los consumidores»). Las decisiones están en `docs/trazabilidad.md` («Contenido público — decisiones» y «Turista (B1) — decisiones»).
 
 ## Convenciones
 
@@ -32,6 +32,40 @@ La búsqueda, los filtros, el detalle de un servicio y el endpoint interno de la
 - **Fechas:** instantes ISO 8601 en UTC, con milisegundos si los hay (`2026-10-22T15:30:00.123Z`). Excepción: las fechas de día de los eventos (`fechaInicio`, `fechaFin`) van como `yyyy-MM-dd`, en America/Bogota (DEC-215).
 - **Ids:** ObjectId en hexadecimal (24 caracteres en minúscula). Un id que no tiene esa forma responde **404**, igual que uno inexistente.
 - **Página** (el listado de avisos del Administrador, «Mis servicios», la cola de servicios, el panel «Atractivos» del Gestor, su panel de eventos y la agenda pública): de 10, con `pagina` desde 0, como ms-auth (DEC-41): `{elementos, pagina, tamano: 10, totalElementos, totalPaginas}`.
+
+## Búsqueda pública (RF16, RF23, RF27, RF37, RF38, RF50, RF61)
+
+Pública, sin token ([ADR-004](../adr/ADR-004-busqueda-combinada.md)). Decisiones 1 a 6 de «Buscar oferta turística» en `docs/trazabilidad.md`.
+
+`GET /api/v1/catalogo/oferta?texto=&categoria=&precioMax=&lat=&lng=&distanciaKm=&accesibilidad=&orden=&pagina=0&tamano=10`
+
+- **Visibilidad:** servicios con `estadoPublicacion = Publicado` y `prestadorActivo = true` (RF22), y todos los atractivos, también los cerrados o en mantenimiento, con su estado (decisiones 1 y 5).
+- **Parámetros** (todos opcionales):
+  - `texto`: hasta 100 caracteres; coincidencia parcial en el nombre o la descripción, sin distinguir mayúsculas (sí tildes; punto 5 de «Pendientes para el SAD»).
+  - `categoria`: `Alojamiento`, `Gastronomia`, `Tour` o `AlquilerEquipo`; solo aplica a servicios, así que deja fuera los atractivos (decisión 2).
+  - `precioMax`: no negativo; deja fuera los atractivos, que no tienen precio (decisión 3).
+  - `lat` y `lng` juntos (la ubicación del turista, RF38; nunca se guarda) y `distanciaKm` mayor que 0, que exige la ubicación.
+  - `accesibilidad`: una o varias de `MovilidadReducida`, `Visual` y `Auditiva`; el resultado debe declararlas todas (RF50, decisión 6).
+  - `orden`: `Distancia` (exige la ubicación), `PrecioAscendente`, `PrecioDescendente` o `Nombre`. Por defecto, `Distancia` con ubicación y `Nombre` sin ella. Los resultados sin precio van al final al ordenar por precio (decisión 4). El orden por calificación de RF61 no existe (RF17 no está implementado).
+  - `pagina` desde 0 y `tamano` de 1 a 10 (RF16; por defecto 10).
+  - **«Más filtros»**, cada uno con su categoría: `serviciosIncluidos`, `huespedes` y `tipoHabitacion` (Alojamiento; huéspedes, tipo y precio máximo los debe cumplir una misma unidad, D1), `menuVegetariano` y `tipoCocina` (Gastronomía), `nivelDificultad` y `duracionMaxHoras` (Tour), `tipoVehiculoEquipo` (AlquilerEquipo). Los textos de estos filtros se comparan completos, sin distinguir mayúsculas.
+- **200** `{elementos, pagina, tamano, totalElementos, totalPaginas}`. Cada elemento: `tipo` (`Servicio` o `Atractivo`), `id`, `nombre`, `categoria`, `descripcionCorta`, `precio` (el «desde»: con filtros de unidad, el menor `precioNoche` de las unidades que los cumplen; null en un atractivo), `imagen`, `coordenada` `{longitud, latitud}`, `distanciaKm` (dos decimales; null sin ubicación), `accesibilidad` y `estadoOperativo` (solo en atractivos, RF33).
+- **400 `CRITERIOS_INVALIDOS`** con un mensaje: `lat` sin `lng`, coordenadas fuera de rango, distancia u orden por distancia sin ubicación, precio negativo, texto de más de 100, `tamano` fuera de 1 a 10, página negativa, un filtro de «Más filtros» sin su categoría o con otra, un servicio incluido desconocido. Es una excepción explícita a «`DATOS_INVALIDOS` con `campos`».
+
+## Opciones de «Más filtros»
+
+`GET /api/v1/catalogo/filtros?categoria=` · público → **200** con las opciones que existen en los servicios publicados de prestadores activos de esa categoría (cada opción devuelve resultados): `categoria` y, según ella, `serviciosIncluidos`, `tiposHabitacion` y `huespedes` `{minimo, maximo}` (Alojamiento, de todas las unidades); `opcionVegetariana` y `tiposCocina` (Gastronomía); `nivelesDificultad` y `duracionHoras` `{minimo, maximo}` (Tour); `tiposVehiculoEquipo` (AlquilerEquipo). Los campos de otras categorías no se envían. Sin categoría o con una inválida → **400 `CRITERIOS_INVALIDOS`**.
+
+## Detalle público de un servicio (RF09, RF10, RF27, RF37, RF43, RF58)
+
+`GET /api/v1/catalogo/servicios/{id}` · público. Es también el endpoint que consulta ms-booking antes de reservar y para materializar la oferta ([ADR-007](../adr/ADR-007-reservas-y-catalogo.md)).
+
+- **200** `{id, idPrestador, nombreComercial, categoria, descripcion, imagenes, precioBase, moneda: "COP", detalleCategoria, contacto, condicionesAccesibilidad, horarioAtencion, direccion, rnt, oferta}`.
+  - `detalleCategoria` según la categoría: Alojamiento `{serviciosIncluidos, unidades: [{idUnidad, nombre, tipoHabitacion, numHabitaciones, capacidadMaxHuespedes, precioNoche}]}`; Gastronomía `{tipoCocina, aforoMaxTurno, menuVegetariano, rangoPrecioPlato}`; Tour `{puntoEncuentro, duracionHoras, nivelDificultad, aforoMaxGrupo}`; AlquilerEquipo `{tipoVehiculoEquipo, unidadesDisponibles, condicionesAlquiler}`.
+  - `precioBase` es el «desde» (en Alojamiento, el menor `precioNoche`); `imagenes`, la primera es la portada.
+  - `contacto` `{telefono, correo}` (null si no hay); `condicionesAccesibilidad` en el orden de RF27 (vacía si no hay); `horarioAtencion`, `direccion` y `rnt`, null si el servicio no los trae (DEC-150).
+  - `oferta` `{diasOperacion, salidas}` en Tour (`salidas` en `HH:mm`), `{diasOperacion}` en Alojamiento y null en Gastronomía y AlquilerEquipo (DEC-136).
+- **404 `OFERTA_NO_DISPONIBLE`** si no existe, no está Publicado, su prestador no está activo o el id no es un ObjectId (la misma visibilidad de la búsqueda).
 
 ## Preguntas frecuentes (RF26, RF47)
 
@@ -447,12 +481,12 @@ Lo que fija el servidor se ignora si llega: `gestorId` (el `sub`) y `fechaRegist
 | Código | HTTP | Cuándo |
 |---|---|---|
 | `DATOS_INVALIDOS` | 400 | `campos` como se indica arriba. Un cuerpo que no es JSON, sin `campos` |
-| `CRITERIOS_INVALIDOS` | 400 | `POST /historial` con criterios que `GET /oferta` también rechaza (DEC-88) |
+| `CRITERIOS_INVALIDOS` | 400 | `GET /oferta` o `GET /filtros` con criterios inválidos, y `POST /historial` con criterios que `GET /oferta` también rechaza (DEC-88) |
 | `NO_AUTENTICADO` | 401 | Sin token en `/admin/**`, `/favoritos/**`, `/historial`, `/prestador/**` o `/gestor/**`, o con un token vencido, inválido o de servicio (`rol = SERVICIO`) |
 | `SESION_INVALIDADA` | 401 | `ver` menor que la versión de la proyección `cuentas`, o un token de Gestor o Administrador cuya cuenta no tiene fila en ella (DEC-110; L3 cerrado con RF45) |
 | `ACCESO_DENEGADO` | 403 | `/admin/**` con un rol que no es Administrador (Turista, Prestador o Gestor); `/favoritos/**` o `/historial` con un rol que no es Turista; `/prestador/**` con un rol que no es Prestador; `/gestor/**` (atractivos y eventos) con un rol que no es Gestor (Turista, Prestador o Administrador) |
 | `PRESTADOR_NO_HABILITADO` | 403 | `POST /prestador/servicios` de un prestador sin fila en `cuentas`, no `Activo` o sin RNT (DEC-139) |
-| `OFERTA_NO_DISPONIBLE` | 404 | `PUT /favoritos/{tipo}/{id}` con un id inválido, inexistente o no visible |
+| `OFERTA_NO_DISPONIBLE` | 404 | `GET /servicios/{id}` o `PUT /favoritos/{tipo}/{id}` con un id inválido, inexistente o no visible |
 | `FAQ_NO_ENCONTRADA` | 404 | Pregunta inexistente o id que no es un ObjectId |
 | `AVISO_NO_ENCONTRADO` | 404 | Aviso inexistente o id que no es un ObjectId |
 | `SERVICIO_NO_ENCONTRADO` | 404 | Servicio inexistente, id que no es un ObjectId o, en «Mis servicios», de otro prestador |

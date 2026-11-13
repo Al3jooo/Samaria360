@@ -108,7 +108,7 @@ Levanta todo el sistema (PostgreSQL, MongoDB, ms-auth, ms-catalog, ms-booking, a
 - OpenSSL, para generar las llaves del JWT. En Windows viene con Git Bash.
 - Unos **4 GB de memoria** en la máquina virtual de Docker (ver «Memoria», abajo). En Docker Desktop se revisa en
   *Settings → Resources*, o en `.wslconfig` con WSL 2.
-- Puertos libres en el host: **8000** (frontend) y, solo en 127.0.0.1, **8080** (API Gateway), 5432 y 27017 (bases
+- Puertos libres en el host, todos solo en 127.0.0.1: **8000** (frontend), **8080** (API Gateway), 5432 y 27017 (bases
   de datos). Todos se pueden cambiar en `.env`, salvo el 8080.
 
 **Pasos** (desde la raíz del repositorio, en Git Bash o en una terminal de Linux/macOS)
@@ -134,7 +134,7 @@ Para crear cuentas nuevas: **«Registrarse»** en la pantalla de inicio de sesi�
 **Cómo queda desplegado**
 - El navegador habla solo con el **frontend** (nginx). nginx sirve la SPA y pasa `/api/` al **api-gateway**, que es
   el único punto de entrada a los servicios ([ADR-005](docs/sad/adr/ADR-005-api-gateway.md)).
-- En el host se publican el 8000 (frontend) y el 8080 (gateway, solo en `127.0.0.1`). ms-auth (8081), ms-catalog
+- En el host se publican, solo en `127.0.0.1`, el 8000 (frontend) y el 8080 (gateway): el sistema no queda expuesto a la red local, porque corre con el perfil `dev` y los usuarios de prueba (DEC-266). ms-auth (8081), ms-catalog
   (8082) y ms-booking (8083) solo se alcanzan dentro de la red de Docker. PostgreSQL y MongoDB se publican solo en
   `127.0.0.1`, para DBeaver o Compass.
 - Las llaves del JWT se montan como *secrets* de solo lectura en `/run/secrets/` de ms-auth; nunca se copian a una
@@ -186,7 +186,7 @@ docker compose down -v                     # detener todo y BORRAR los volúmene
 
 | Síntoma | Causa | Solución |
 |---|---|---|
-| `Bind for 0.0.0.0:8000 failed: port is already allocated` (o `Bind for 127.0.0.1:8080`, `:5432` o `:27017`) | Otro programa usa el puerto | Cambiar `FRONTEND_PORT`, `POSTGRES_PORT` o `MONGO_PORT` en `.env`, o cerrar el programa. Para encontrarlo: `netstat -ano \| findstr :8000` en Windows o `lsof -i :8000` en Linux/macOS. El 8080 es fijo: hay que liberarlo. |
+| `Bind for 127.0.0.1:8000 failed: port is already allocated` (o `Bind for 127.0.0.1:8080`, `:5432` o `:27017`) | Otro programa usa el puerto | Cambiar `FRONTEND_PORT`, `POSTGRES_PORT` o `MONGO_PORT` en `.env`, o cerrar el programa. Para encontrarlo: `netstat -ano \| findstr :8000` en Windows o `lsof -i :8000` en Linux/macOS. El 8080 es fijo: hay que liberarlo. |
 | PostgreSQL no arranca en 5432, o ms-auth se conecta a otra base | En Windows, el servicio de PostgreSQL instalado localmente (`postgresql-x64-*`) ya ocupa el 5432 | Poner `POSTGRES_PORT=5433` en `.env`, o detener ese servicio en `services.msc`. Dentro de Docker no cambia nada: ms-auth usa `postgres:5432` por la red interna. |
 | `docker compose up` falla con un error que menciona `infra/keys/jwt-privada.pem` (o la pública) | Faltan las llaves del JWT | Generarlas en `infra/keys/` (paso 2) y volver a ejecutar `docker compose up -d`. |
 | `required variable POSTGRES_PASSWORD is missing a value: Falta POSTGRES_PASSWORD en .env` | Falta el `.env` o una variable | `cp .env.example .env` y completar los valores. |

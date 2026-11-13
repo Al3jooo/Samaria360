@@ -1,6 +1,6 @@
 # API de ms-auth
 
-Contrato de ms-auth para el frontend y para las pruebas. Todas las rutas van por el API Gateway (`/api/v1/auth/**`); el servicio escucha en el 8081 solo dentro de la red de Docker. Este documento nace con el CU «Administrar cuentas» (RF28, RF22, RF62; WF-12) y fija los endpoints del **Administrador**, el token y el endpoint interno. Los endpoints de inicio de sesión y registro (RF15, RF01, RF02) están descritos en `docs/trazabilidad.md` («Endpoints de ms-auth»). Decisiones en `docs/trazabilidad.md` («Administrar cuentas — decisiones»), [ADR-008](../adr/ADR-008-sincronizacion-estado-cuentas.md) y el [CU](../../casos-de-uso/CU-administrar-cuentas.md). La iteración B1 agrega el **perfil del turista** (RF53; [CU](../../casos-de-uso/CU-actualizar-perfil.md), «Turista (B1) — decisiones»), y la B2, el **cambio de rol** (RF45; [CU](../../casos-de-uso/CU-cambiar-rol-cuenta.md), «Cambiar rol de cuenta — decisiones»).
+Contrato de ms-auth para el frontend y para las pruebas. Todas las rutas van por el API Gateway (`/api/v1/auth/**`); el servicio escucha en el 8081 solo dentro de la red de Docker. Este documento nace con el CU «Administrar cuentas» (RF28, RF22, RF62; WF-12) y fija los endpoints del **Administrador**, el token y el endpoint interno. Desde la revisión del 2026-11-12 también fija el inicio de sesión, `/me`, el registro, los países y el JWKS (RF15, RF01, RF02), que antes solo estaban en `docs/trazabilidad.md` («Endpoints de ms-auth»). Decisiones en `docs/trazabilidad.md` («Administrar cuentas — decisiones»), [ADR-008](../adr/ADR-008-sincronizacion-estado-cuentas.md) y el [CU](../../casos-de-uso/CU-administrar-cuentas.md). La iteración B1 agrega el **perfil del turista** (RF53; [CU](../../casos-de-uso/CU-actualizar-perfil.md), «Turista (B1) — decisiones»), y la B2, el **cambio de rol** (RF45; [CU](../../casos-de-uso/CU-cambiar-rol-cuenta.md), «Cambiar rol de cuenta — decisiones»).
 
 ## Convenciones
 
@@ -21,7 +21,65 @@ Contrato de ms-auth para el frontend y para las pruebas. Todas las rutas van por
 | `ver` | `usuario.version_cuenta` al iniciar sesión (DEC-29) |
 | `iat`, `exp` | `exp - iat` = **15 minutos** (antes, 60) |
 
-`version_cuenta` sube en 1 con cada cambio de estado o de rol de la cuenta (RF45), y V15 la subió una vez para los Gestores y Administradores existentes (DEC-108). Cada servicio rechaza con **401 `SESION_INVALIDADA`** un token con `ver` menor que la versión conocida; un token sin `ver` cuenta como 0. ms-catalog y ms-booking rechazan también un token de Gestor o Administrador sin fila en su proyección (DEC-110). ms-auth compara contra su propia tabla en **todos** sus endpoints autenticados (`/me`, `/perfil` y `/admin/**`). La respuesta de `/login` no cambia (`expiraEn` es ahora 15 minutos después).
+`version_cuenta` sube en 1 con cada cambio de estado o de rol de la cuenta (RF45), y V15 la subió una vez para los Gestores y Administradores existentes (DEC-108). Cada servicio rechaza con **401 `SESION_INVALIDADA`** un token con `ver` menor que la versión conocida; un token sin `ver` cuenta como 0. ms-catalog y ms-booking rechazan también un token de Gestor o Administrador sin fila en su proyección (DEC-110). ms-auth compara contra su propia tabla en **todos** sus endpoints autenticados (`/me`, `/perfil`, `/prestador/perfil` y `/admin/**`). La respuesta de `/login` no cambia (`expiraEn` es ahora 15 minutos después).
+
+## Inicio de sesión (RF15)
+
+CU [«Iniciar sesión»](../../casos-de-uso/CU-iniciar-sesion.md). Público.
+
+`POST /api/v1/auth/login`
+
+```json
+{ "correo": "turista@samaria360.test", "contrasena": "…" }
+```
+
+- **200** `{token, tipo: "Bearer", expiraEn, idUsuario, rol}`; `expiraEn` es un instante ISO 8601 (15 minutos después de emitirlo, DEC-29).
+- **Orden de las verificaciones** (decisión D3): el correo se compara sin mayúsculas y sin espacios en los extremos.
+  1. Cuenta bloqueada por intentos → **423 `CUENTA_BLOQUEADA`** con `bloqueadoHasta`. Es lo único que se responde antes de verificar la contraseña (riesgo residual aceptado en [ADR-006](../adr/ADR-006-registro-sin-enumeracion.md)).
+  2. Correo inexistente o contraseña incorrecta → **401 `CREDENCIALES_INVALIDAS`**, con el mismo mensaje en los dos casos; con un correo inexistente se compara igual un hash BCrypt ficticio, para que el tiempo no revele la cuenta. Una contraseña incorrecta suma un intento, sea cual sea el estado de la cuenta; el tercer intento consecutivo bloquea la cuenta 15 minutos y responde 423.
+  3. Con la contraseña correcta: **403 `CUENTA_INACTIVA`** si `estado_cuenta` no es Activo (RF22, RF62); **403 `CUENTA_PENDIENTE_VALIDACION`** o **`CUENTA_RECHAZADA`** si es un prestador sin validar (RF02, RF28). No se emite token y el conteo vuelve a 0.
+  4. Token emitido: el conteo vuelve a 0 y se registra el acceso.
+- **400 `DATOS_INVALIDOS`** con `campos` si falta el correo (o no tiene forma de correo) o la contraseña.
+
+## Usuario autenticado
+
+`GET /api/v1/auth/me` · cualquier rol → **200** `{idUsuario, correo, rol, estadoCuenta, nombreVisible}`. `nombreVisible` alimenta el avatar: el primer nombre y el primer apellido si la cuenta tiene fila en `turista` (también un Gestor o un Administrador con rol base Turista, RF45), el representante legal si es un prestador y, si no tiene ninguna de las dos (el personal de la semilla), la parte del correo antes de la `@`.
+- **403 `CUENTA_INACTIVA`** si la cuenta dejó de estar Activa con el token vigente; **401 `SESION_INVALIDADA`** si el token es de antes de un cambio de la cuenta.
+
+## Registro (RF01, RF02)
+
+CU [«Registrarse»](../../casos-de-uso/CU-registrarse.md); [ADR-006](../adr/ADR-006-registro-sin-enumeracion.md). Públicos. **Respuesta uniforme:** **202 `{"estado": "RECIBIDO"}`** exista o no el correo, con BCrypt siempre y sin inicio de sesión automático. Si el correo ya existe no se crea nada y `NotificadorCuentaLogAdapter` deja un log con el id (el aviso por correo llega con RF34).
+
+`POST /api/v1/auth/registro/turista`
+
+```json
+{
+  "primerNombre": "Ana", "segundoNombre": null, "primerApellido": "Pérez", "segundoApellido": null,
+  "correo": "ana@correo.com", "contrasena": "…", "paisOrigen": "CO",
+  "categoriasInteres": ["Naturaleza", "Cultura"], "aceptoPoliticas": true
+}
+```
+
+- Nombres y apellidos de 1 a 50 (los segundos, opcionales); correo de hasta 100 con forma de correo; contraseña de 8 caracteres como mínimo y 72 bytes UTF-8 como máximo (límite de BCrypt); `paisOrigen` de `GET /paises`; `categoriasInteres` de 1 a 3, sin repetir, de `Naturaleza`, `Cultura` y `Aventura` (decisión D1). La cuenta queda **Activa**.
+
+`POST /api/v1/auth/registro/prestador`
+
+```json
+{
+  "nombreRepresentanteLegal": "Luis Gómez", "razonSocial": null, "rnt": "12345",
+  "correoCorporativo": "contacto@empresa.com", "telefono": "3001234567", "contrasena": "…", "aceptoPoliticas": true
+}
+```
+
+- Representante de 1 a 150; razón social opcional, hasta 150 (D2); RNT de 1 a 50; teléfono de 1 a 20; el correo corporativo es también la credencial (D2). La cuenta queda **Pendiente de Validación** (RF02) y no puede iniciar sesión hasta que el Administrador la valide (RF28).
+- **409 `RNT_YA_REGISTRADO`** si el RNT ya existe.
+
+**Errores comunes:** **400 `DATOS_INVALIDOS`** con un código por campo (`REQUERIDO`, `FORMATO`, `LONGITUD_MINIMA`, `LONGITUD_MAXIMA`, `NO_PERMITIDO`, `DUPLICADO`), todos a la vez; con los datos válidos y `aceptoPoliticas` distinto de `true`, **400 `POLITICAS_NO_ACEPTADAS`** (D6).
+
+## Países y clave pública
+
+- `GET /api/v1/auth/paises` · público → **200** con la lista de códigos ISO 3166-1 alfa-2 admitidos (`["AR", "BR", "CO", …]`) y `Cache-Control: max-age=86400, public`. El frontend traduce los nombres (D5).
+- `GET /api/v1/auth/.well-known/jwks.json` · público → el JWKS con la clave pública RS256. Lo usan ms-catalog y ms-booking para validar el JWT ([ADR-005](../adr/ADR-005-api-gateway.md)); el gateway no lo valida.
 
 ## Estados de la cuenta
 
@@ -226,7 +284,13 @@ CU [«Actualizar datos comerciales»](../../casos-de-uso/CU-actualizar-datos-com
 | Código | HTTP | Cuándo |
 |---|---|---|
 | `DATOS_INVALIDOS` | 400 | `campos` como se indica arriba. Un cuerpo que no es JSON también, sin `campos` |
+| `POLITICAS_NO_ACEPTADAS` | 400 | Registro con datos válidos sin aceptar las políticas (D6) |
+| `CREDENCIALES_INVALIDAS` | 401 | Login con un correo inexistente o una contraseña incorrecta (el mismo mensaje) |
 | `NO_AUTENTICADO` | 401 | Sin token, vencido, inválido o de servicio (`rol = SERVICIO`) |
+| `CUENTA_INACTIVA` | 403 | Login con la contraseña correcta o `/me`, con la cuenta no Activa (RF22, RF62) |
+| `CUENTA_PENDIENTE_VALIDACION`, `CUENTA_RECHAZADA` | 403 | Login de un prestador sin validar o rechazado, con la contraseña correcta (D3) |
+| `RNT_YA_REGISTRADO` | 409 | Registro de un prestador con un RNT que ya existe |
+| `CUENTA_BLOQUEADA` | 423 | Login de una cuenta bloqueada por intentos; lleva `bloqueadoHasta` (RF15) |
 | `SESION_INVALIDADA` | 401 | `ver` menor que `version_cuenta`: la cuenta cambió después de iniciar sesión |
 | `ACCESO_DENEGADO` | 403 | El rol no es Administrador (`/admin/**`), no es Turista (`/perfil`) o no es Prestador (`/prestador/perfil`) |
 | `CUENTA_NO_ENCONTRADA` | 404 | No existe, o es de otro rol (en el cambio de rol: no existe) |

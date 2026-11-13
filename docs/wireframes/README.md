@@ -2,10 +2,12 @@
 
 **Versión 2 — 12/10/2026.** Reemplaza a la versión del Documento Entregable 2; la versión anterior queda en el historial de Git. Cada imagen tiene aquí su descripción escrita, que es la referencia cuando un detalle de la imagen no se lea bien.
 
+**Imágenes de los wireframes propuestos por arquitectura (13/11/2026, DEC-268).** WF-01 a WF-10 los dibujó el equipo de diseño. Los nuevos (WF-12 `_004` a `_006`, WF-13 a WF-26, WF-06 para atractivos y `WF-05-06-11-cambios-turista`) tienen un `.png` con el mismo nombre que su `.puml`, dibujado por arquitectura en el mismo estilo de boceto (escala de grises, sin identidad visual) a partir del `.puml` y de la pantalla implementada. Un `.png` con varias láminas muestra la pantalla, sus estados y sus diálogos; las notas en recuadro punteado son anotaciones, no elementos de la pantalla. Siguen pendientes de validación del equipo.
+
 **Reglas:**
 - **Trazabilidad:** toda pantalla del prototipo corresponde a un wireframe de esta carpeta. Si un elemento queda fuera del alcance de la iteración, se muestra deshabilitado («Próximamente») y se lista como pendiente en `docs/trazabilidad.md`.
 - **Guía, no plano:** los wireframes fijan la estructura, el contenido y el orden de los elementos. El diseño visual es libre dentro de la identidad «Santa Marta» (`frontend/src/app/estilos.css`).
-- **Fuente de requisitos:** si un wireframe contradice el SRS (`docs/srs/especificacion-de-requisitos.pdf`), manda el SRS y la diferencia se anota en la trazabilidad. Ejemplo: los wireframes dicen «aforo» donde el SRS dice «afluencia» (RF39).
+- **Fuente de requisitos:** si un wireframe contradice el SRS (`docs/srs/especificacion de requisitos.pdf`), manda el SRS y la diferencia se anota en la trazabilidad. Ejemplo: los wireframes dicen «aforo» donde el SRS dice «afluencia» (RF39).
 
 ## Elementos comunes
 
@@ -20,36 +22,36 @@
 
 ## Índice
 
-| Archivo | Pantalla | Caso de uso | Requisitos | Alcance del prototipo (Elaboración) |
+| Archivo | Pantalla | Caso de uso | Requisitos | Alcance del prototipo (Construcción) |
 |---|---|---|---|---|
 | WF-01-inicio-sesion.png | Inicio de sesión | Iniciar sesión | RF15, RF03, RF34, RF46 | **Sí** (sin recuperación de contraseña) |
-| WF-02-registro-turista.png | Registro de turista | Registrarse | RF01 | No |
-| WF-03-registro-prestador.png | Registro de prestador | Registrarse | RF02 | No |
-| WF-04-inicio-busqueda.png | Inicio y búsqueda | Buscar oferta turística | RF16, RF40, RF04 | **Sí** (sin banner de avisos) |
+| WF-02-registro-turista.png | Registro de turista | Registrarse | RF01 | **Sí** (`/registro`) |
+| WF-03-registro-prestador.png | Registro de prestador | Registrarse | RF02 | **Sí** (`/registro`, sin razón social en el formulario) |
+| WF-04-inicio-busqueda.png | Inicio y búsqueda | Buscar oferta turística | RF16, RF40, RF04 | **Sí** (el banner de avisos es un elemento común, WF-14; «Destacados» con criterio provisional) |
 | WF-05-exploracion.png | Exploración: mapa y resultados | Buscar oferta, filtrar, ordenar, navegar el mapa | RF16, RF10, RF23, RF27, RF38, RF39, RF50, RF61 | **Sí** (núcleo del catálogo, incluye «Más filtros») |
 | WF-06-detalle.png | Detalle de lugar o servicio | Consultar detalle de oferta | RF37, RF39, RF51, RF54, RF57, RF58 | Sí (versión mínima: solo servicios y los datos que existen). La ficha de un atractivo tiene su propia variante (`WF-06-detalle-atractivo.puml`, iteración E) |
 | WF-07-asistente-ia.png | Asistente virtual IA | Interactuar con el asistente | RF04, RF35, RF36, RF59 | No |
-| WF-08-registrar-servicio.png (+ `WF-08-registrar-servicio.puml`, ampliación) | Registrar servicio comercial | Registrar servicio comercial | RF09, RF10, RF27, RF37, RF48, RF58 | Backend en la iteración C (sesión A1); **pantalla hecha en B1** (`/prestador/servicios/nuevo`), sin fotos (iteración E), «cobra por» ni impuestos. La ampliación en Salt está **propuesta por arquitectura, pendiente de validación del equipo** |
+| WF-08-registrar-servicio.png (+ `WF-08-registrar-servicio.puml`, ampliación) | Registrar servicio comercial | Registrar servicio comercial | RF09, RF10, RF27, RF37, RF48, RF58 | Backend en la iteración C (sesión A1); **pantalla hecha en B1** (`/prestador/servicios/nuevo`), sin fotos (RF48, descartado en DEC-54), «cobra por» ni impuestos. La ampliación en Salt está **propuesta por arquitectura, pendiente de validación del equipo** |
 | WF-09-registrar-atractivo.png (+ `WF-09-registrar-atractivo.puml`, ampliación) | Registrar atractivo turístico | Registrar atractivo; Actualizar atractivo | RF06, RF07, RF24, RF27, RF33, RF58 | **Sí** (iteración E, sesión B1; `/gestor/atractivos/nuevo` y, en edición, `/gestor/atractivos/:id`), con la casilla de veracidad deshabilitada y sin editar las fotos de un atractivo registrado. La ampliación en Salt está **propuesta por arquitectura, pendiente de validación del equipo** |
 | WF-10-disponibilidad-reserva.png | Disponibilidad y reserva **(nuevo)** | Reservar servicio | RF11, RF20, RF37, RF44 | **Sí** (sin RNT, impuestos, pagos ni «Notificarme si se libera») |
 | — (WF-11, sin imagen) | Mis reservas **(pendiente de diseño)** | Reservar servicio | RF12, RF18, RF44, RF52 | Sí (diseño provisional) |
 | WF-12-administrar-cuentas.puml (+ `.png` y `.svg`) | Administrar cuentas **(nuevo)** | Administrar cuentas; Cambiar rol de cuenta | RF28, RF22, RF62, RF45 | **Sí** (sin la reactivación del prestador; RF45 implementado en B2). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-13-preguntas-frecuentes.puml | Preguntas frecuentes **(nuevo)** | Gestionar FAQs | RF26, RF47 | **Sí** (sesión B). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-14-avisos.puml | Avisos generales: banner y gestión **(nuevo)** | Crear y publicar aviso general | RF40 | **Sí** (sesión B). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-15-terminos.puml | Términos y condiciones **(nuevo)** | Consultar términos y condiciones | RF46 | **Sí** (sesión B). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-16-perfil-turista.puml | Perfil del turista **(nuevo)** | Actualizar datos personales, Actualizar intereses turísticos | RF53 | **Sí** (sesión B de B1). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-17-mis-favoritos.puml | Mis favoritos **(nuevo)** | Guardar favoritos | RF54 | **Sí** (sesión B de B1; el «Ver detalle» de un atractivo, desde la iteración E). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-18-mis-servicios.puml | Mis servicios **(nuevo)** | Registrar servicio comercial (flujo «Consultar mis servicios», DEC-129) | RF09 | Backend en la iteración C (A1); **pantalla hecha en B1** (`/prestador/servicios` y `/prestador/servicios/:id`). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-19-aprobar-servicios.puml | Aprobar servicios **(nuevo)** | Aprobar o rechazar servicio; Consultar listado pendiente; Justificar rechazo de servicio | RF21 | Backend en la iteración C (A1); pantalla hecha en B2 (DEC-174 a DEC-181). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-20-actualizar-precio.puml | Actualizar precio **(nuevo)** | Actualizar tarifas | RF32 | **Sí** (iteración D, sesión B; `/prestador/servicios/:id/precio`). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-21-datos-comerciales-servicio.puml | Editar datos comerciales del servicio **(nuevo)** | Actualizar datos comerciales (flujo B) | RF43 | **Sí** (iteración D, sesión B; `/prestador/servicios/:id/datos-comerciales`). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-22-perfil-comercial.puml | Mi perfil comercial **(nuevo)** | Actualizar datos comerciales (flujo A) | RF43 | **Sí** (iteración D, sesión B; `/prestador/perfil`). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-23-historial-reservas-prestador.puml | Historial de reservas del Prestador **(nuevo)** | Consultar historial | RF12 | **Sí** (iteración D, sesión B; `/prestador/reservas`). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-24-atractivos-gestor.puml | Atractivos, panel del gestor **(nuevo)** | Actualizar atractivo (flujo «Consultar atractivos»); Cambiar estado operativo | RF07, RF33 | **Sí** (iteración E, sesión B1; `/gestor/atractivos`), con los filtros deshabilitados. **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-25-eventos-gestor.puml | Eventos, panel del gestor, y Registrar evento **(nuevo)** | Registrar evento en agenda (con el flujo «Consultar eventos registrados») | RF25 | **Sí** (iteración E, sesión B2; `/gestor/eventos` y `/gestor/eventos/nuevo`). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-26-agenda-eventos.puml | Agenda de eventos **(nuevo)** | Consultar agenda de eventos | RF25 | **Sí** (iteración E, sesión B2; `/agenda`, pública). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-06-detalle-atractivo.puml | Ficha pública de un atractivo **(nuevo)** | Consultar detalle de atractivo | RF06, RF07, RF24, RF27, RF33, RF58 | **Sí** (iteración E, sesión B1; `/atractivos/:id`). **Propuesto por arquitectura, pendiente de validación del equipo** |
-| WF-05-06-11-cambios-turista.puml | Cambios en WF-05, WF-06 y WF-11 **(nuevo)** | Consultar historial de búsquedas, Guardar favoritos, Compartir reserva completada | RF60, RF54, RF49 | **Sí** (sesión B de B1). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-13-preguntas-frecuentes.puml (+ `.png`) | Preguntas frecuentes **(nuevo)** | Gestionar FAQs | RF26, RF47 | **Sí** (sesión B). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-14-avisos.puml (+ `.png`) | Avisos generales: banner y gestión **(nuevo)** | Crear y publicar aviso general | RF40 | **Sí** (sesión B). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-15-terminos.puml (+ `.png`) | Términos y condiciones **(nuevo)** | Consultar términos y condiciones | RF46 | **Sí** (sesión B). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-16-perfil-turista.puml (+ `.png`) | Perfil del turista **(nuevo)** | Actualizar datos personales, Actualizar intereses turísticos | RF53 | **Sí** (sesión B de B1). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-17-mis-favoritos.puml (+ `.png`) | Mis favoritos **(nuevo)** | Guardar favoritos | RF54 | **Sí** (sesión B de B1; el «Ver detalle» de un atractivo, desde la iteración E). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-18-mis-servicios.puml (+ `.png`) | Mis servicios **(nuevo)** | Registrar servicio comercial (flujo «Consultar mis servicios», DEC-129) | RF09 | Backend en la iteración C (A1); **pantalla hecha en B1** (`/prestador/servicios` y `/prestador/servicios/:id`). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-19-aprobar-servicios.puml (+ `.png`) | Aprobar servicios **(nuevo)** | Aprobar o rechazar servicio; Consultar listado pendiente; Justificar rechazo de servicio | RF21 | Backend en la iteración C (A1); pantalla hecha en B2 (DEC-174 a DEC-181). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-20-actualizar-precio.puml (+ `.png`) | Actualizar precio **(nuevo)** | Actualizar tarifas | RF32 | **Sí** (iteración D, sesión B; `/prestador/servicios/:id/precio`). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-21-datos-comerciales-servicio.puml (+ `.png`) | Editar datos comerciales del servicio **(nuevo)** | Actualizar datos comerciales (flujo B) | RF43 | **Sí** (iteración D, sesión B; `/prestador/servicios/:id/datos-comerciales`). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-22-perfil-comercial.puml (+ `.png`) | Mi perfil comercial **(nuevo)** | Actualizar datos comerciales (flujo A) | RF43 | **Sí** (iteración D, sesión B; `/prestador/perfil`). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-23-historial-reservas-prestador.puml (+ `.png`) | Historial de reservas del Prestador **(nuevo)** | Consultar historial | RF12 | **Sí** (iteración D, sesión B; `/prestador/reservas`). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-24-atractivos-gestor.puml (+ `.png`) | Atractivos, panel del gestor **(nuevo)** | Actualizar atractivo (flujo «Consultar atractivos»); Cambiar estado operativo | RF07, RF33 | **Sí** (iteración E, sesión B1; `/gestor/atractivos`), con los filtros deshabilitados. **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-25-eventos-gestor.puml (+ `.png`) | Eventos, panel del gestor, y Registrar evento **(nuevo)** | Registrar evento en agenda (con el flujo «Consultar eventos registrados») | RF25 | **Sí** (iteración E, sesión B2; `/gestor/eventos` y `/gestor/eventos/nuevo`). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-26-agenda-eventos.puml (+ `.png`) | Agenda de eventos **(nuevo)** | Consultar agenda de eventos | RF25 | **Sí** (iteración E, sesión B2; `/agenda`, pública). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-06-detalle-atractivo.puml (+ `.png`) | Ficha pública de un atractivo **(nuevo)** | Consultar detalle de atractivo | RF06, RF07, RF24, RF27, RF33, RF58 | **Sí** (iteración E, sesión B1; `/atractivos/:id`). **Propuesto por arquitectura, pendiente de validación del equipo** |
+| WF-05-06-11-cambios-turista.puml (+ `.png`) | Cambios en WF-05, WF-06 y WF-11 **(nuevo)** | Consultar historial de búsquedas, Guardar favoritos, Compartir reserva completada | RF60, RF54, RF49 | **Sí** (sesión B de B1). **Propuesto por arquitectura, pendiente de validación del equipo** |
 
 ## WF-01 — Inicio de sesión
 
@@ -77,7 +79,7 @@ Pestaña **Registrarse** activa; opción **Prestador de Servicios** seleccionada
 - «Explora por categoría»: **Alojamiento, Gastronomía, Tours, Alquiler de equipos**, con icono.
 - «Destacados esta semana»: 3 tarjetas con imagen, nombre, categoría, calificación, precio «desde», disponibilidad y **Ver detalle**. Cambio respecto a la v1: sin el enlace «Reservar».
 
-**Prototipo:** la búsqueda y las categorías llevan a WF-05 con el filtro aplicado. El banner de avisos es un elemento común de la plataforma (ver «Elementos comunes» y WF-14). Su fuente de datos ya existe: `GET /api/v1/catalogo/avisos`. Lo implementa la sesión B de «Contenido público».
+**Prototipo:** la búsqueda y las categorías llevan a WF-05 con el filtro aplicado. El banner de avisos es un elemento común de la plataforma (ver «Elementos comunes» y WF-14). Su fuente de datos es `GET /api/v1/catalogo/avisos`; lo implementó la sesión B de «Contenido público» (DEC-72).
 
 **Nota:** El botón flotante del asistente se retiró por decisión del equipo; el acceso a RF04 queda en la navegación.
 
@@ -117,7 +119,7 @@ Migas: Panel del Prestador › Mis Servicios › Registrar Nuevo Servicio. Aviso
 - **Dirección** obligatoria y **pin en el mapa** (DEC-132).
 - El **RNT** se muestra en solo lectura: es el de la cuenta del prestador y el servicio guarda una copia (DEC-126; diferencia 5).
 - **Accesibilidad** con las tres condiciones de RF27 (diferencia 3).
-- «Cobra por», «incluye impuestos» y **Fotos**, deshabilitados: los dos primeros no están en el esquema (diferencia 5); las fotos llegan en la iteración E (DEC-55).
+- «Cobra por», «incluye impuestos» y **Fotos**, deshabilitados: los dos primeros no están en el esquema (diferencia 5); las fotos del servicio dependen de RF48, descartado del plan del 60 % (DEC-54): la iteración E llevó las imágenes solo a los atractivos (DEC-55, ADR-009).
 - **«Publicar servicio» pasa a «Enviar a aprobación»**: el servicio queda «Pendiente de aprobación» hasta que lo revise el Administrador (RF09, RF21).
 - La casilla de veracidad se conserva; no tiene requisito en el SRS y no se guarda.
 
@@ -230,7 +232,7 @@ Contenido: **lista de reservas** del turista, con el servicio y la unidad tal co
 
 ## WF-12 — Administrar cuentas (nuevo)
 
-**Estado: propuesto por arquitectura, pendiente de validación del equipo (DEC-36).** No lo dibujó quien hizo los wireframes: es un wireframe en PlantUML Salt (`WF-12-administrar-cuentas.puml`, con su `.png` y su `.svg`). Cuando el equipo lo valide o lo rediseñe, la pantalla se ajusta a ese diseño. Pantalla privada del **Administrador**; se llega desde el menú del avatar. Cada diagrama del `.puml` se exporta a su propio archivo: `WF-12-administrar-cuentas` (la primera pantalla), `_001`, `_002` y `_003`; los de RF45, `_004` a `_006` (los exporta el equipo).
+**Estado: propuesto por arquitectura, pendiente de validación del equipo (DEC-36).** No lo dibujó quien hizo los wireframes: es un wireframe en PlantUML Salt (`WF-12-administrar-cuentas.puml`, con su `.png` y su `.svg`). Cuando el equipo lo valide o lo rediseñe, la pantalla se ajusta a ese diseño. Pantalla privada del **Administrador**; se llega desde el menú del avatar. Cada diagrama del `.puml` se exporta a su propio archivo: `WF-12-administrar-cuentas` (la primera pantalla), `_001`, `_002` y `_003`. Los de RF45, `_004` (pestaña «Personal»), `_005` («Asignar rol» en «Turistas») y `_006` (diálogos de cambio de rol), los dibujó arquitectura con el estilo de los PNG del equipo de diseño y la pantalla implementada (DEC-268).
 
 Contenido (CU «Administrar cuentas», `docs/casos-de-uso/CU-administrar-cuentas.md`):
 - **Pestañas «Prestadores por validar (n)», «Prestadores» y «Turistas».** Cada una con buscador (nombre, correo o RNT en los prestadores; nombre o correo en los turistas), filtro de estado, tabla y paginación de 10 (DEC-41).
@@ -254,7 +256,7 @@ Cambios respecto del contenido propuesto, por lo que el modelo guarda (DEC-45 y 
 
 **Estado: propuestos por arquitectura, pendientes de validación del equipo (DEC-67, como DEC-36).**
 - No los dibujó quien hizo los wireframes. Son wireframes en PlantUML Salt, solo de estructura (regiones, elementos y flujo).
-- Los `.png` y `.svg` los exporta el equipo.
+- Cada `.puml` tiene un `.png` con el mismo nombre, dibujado por arquitectura con el estilo de los PNG del equipo de diseño y la pantalla implementada (DEC-268). El `.puml` sigue siendo la referencia de estructura.
 - Los implementa la sesión B de la iteración «Contenido público».
 - El contenido de las preguntas y los avisos va en el idioma en que lo escribe el Administrador; la interfaz, en ES y EN (DEC-69).
 
@@ -290,7 +292,7 @@ Cambios respecto del contenido propuesto, por lo que el modelo guarda (DEC-45 y 
 
 **Estado: propuestos por arquitectura, pendientes de validación del equipo (DEC-90, como DEC-36 y DEC-67).**
 - No los dibujó quien hizo los wireframes. Son wireframes en PlantUML Salt, solo de estructura (regiones, elementos y flujo).
-- Los `.png` y `.svg` los exporta el equipo.
+- Cada `.puml` tiene un `.png` con el mismo nombre, dibujado por arquitectura con el estilo de los PNG del equipo de diseño y la pantalla implementada (DEC-268). El `.puml` sigue siendo la referencia de estructura.
 - Los implementa la sesión B de la iteración B1 «Turista» (DEC-83). Son solo para el rol Turista.
 
 **WF-16 — Perfil del turista** (CU «Actualizar datos personales» y «Actualizar intereses turísticos», `docs/casos-de-uso/CU-actualizar-perfil.md`; RF53):
@@ -317,11 +319,13 @@ Cambios respecto del contenido propuesto, por lo que el modelo guarda (DEC-45 y 
 - **WF-06 (RF54):** el corazón de la ficha pasa a estar activo. El ícono **Compartir** de la ficha **sigue deshabilitado**: RF49 solo traza el botón de las reservas Completadas de WF-11.
 - **WF-11 (RF49):** botón **Compartir** solo en las reservas Completadas. Comparte el enlace `/servicios/:idServicio` con la hoja de compartir del sistema o, si no existe, lo copia al portapapeles (DEC-81).
 
-## Diferencias detectadas en la v2 (pendientes de resolver antes de implementar esas pantallas)
+## Diferencias detectadas en la v2
 
-1. **WF-10 frente al modelo de datos (crítico):** la pantalla muestra varias unidades por servicio (p. ej. «Cabaña Campestre Familiar», «Cabaña Mirador del Mar»), cada una con su precio, capacidad, servicios y cupos. El modelo tenía un solo `tipoHabitacion` por servicio en `catalog_db` e `Inventario_Cupo` por servicio y fecha en `reservas_db`. **Resuelta a favor del wireframe** (D1 de «Reservar servicio», `docs/trazabilidad.md`): un alojamiento tiene una o más unidades, cada una con tipo, habitaciones, capacidad y precio por noche (`catalog_db`, migración M001); `inventario_cupo` de ms-booking lleva cupos por unidad y noche. Queda abierto: las etiquetas de servicios son del alojamiento, no de cada unidad. **Pendiente en WF-08:** el formulario pide un solo número de habitaciones y una capacidad; debe permitir agregar varias unidades.
-2. **Pagos en WF-10:** «Pago seguro con tarjeta, PSE o Nequi» no tiene requisito en el SRS ni componente en la arquitectura. «Notificarme si se libera» tampoco tiene requisito.
+Se detectaron antes de implementar las pantallas; cada punto dice cómo quedó. El estado detallado está en `docs/trazabilidad.md` («Cambios de los wireframes v2»).
+
+1. **WF-10 frente al modelo de datos (crítico):** la pantalla muestra varias unidades por servicio (p. ej. «Cabaña Campestre Familiar», «Cabaña Mirador del Mar»), cada una con su precio, capacidad, servicios y cupos. El modelo tenía un solo `tipoHabitacion` por servicio en `catalog_db` e `Inventario_Cupo` por servicio y fecha en `reservas_db`. **Resuelta a favor del wireframe** (D1 de «Reservar servicio», `docs/trazabilidad.md`): un alojamiento tiene una o más unidades, cada una con tipo, habitaciones, capacidad y precio por noche (`catalog_db`, migración M001); `inventario_cupo` de ms-booking lleva cupos por unidad y noche. Queda abierto: las etiquetas de servicios son del alojamiento, no de cada unidad. **WF-08 resuelto en la iteración C (B1):** el formulario admite de 1 a 20 unidades (`EditorUnidades`, DEC-133, DEC-164).
+2. **Pagos en WF-10:** «Pago seguro con tarjeta, PSE o Nequi» no tiene requisito en el SRS ni componente en la arquitectura. «Notificarme si se libera» tampoco tiene requisito. **Se omiten** en la pantalla (`docs/trazabilidad.md`, «Pendientes», WF-10).
 3. **Vocabulario de accesibilidad:** RF27 y RF50 definen tres condiciones (movilidad reducida, visual, auditiva). WF-08 usa otras cuatro (rampas, silla de ruedas, braille, baños adaptados) y WF-09 otras dos. Hay que unificarlas en un solo vocabulario. **Resuelta:** WF-08 usa las tres de RF27 (DEC-131) y WF-09 también, con la casilla «Señalización visual/auditiva» dividida en dos (DEC-221, iteración E).
-4. **Vocabulario de servicios incluidos:** WF-08 ofrece WiFi, Desayuno, Piscina y Parqueadero; WF-10 muestra además Aire acondicionado y Baño privado. Debe existir una sola lista cerrada.
-5. **WF-08 frente a RF10 y al esquema `servicios`:** falta el campo obligatorio «tipo de habitación» (con las unidades de la diferencia 1, cada unidad lleva el suyo); «cobra por» e «incluye impuestos» no existen en el esquema; el RNT pertenece al prestador (`auth_db`), no a cada servicio.
+4. **Vocabulario de servicios incluidos:** WF-08 ofrece WiFi, Desayuno, Piscina y Parqueadero; WF-10 muestra además Aire acondicionado y Baño privado. Debe existir una sola lista cerrada. **Abierta:** el prototipo usa la lista de WF-08 como vocabulario cerrado (validador de MongoDB y «Más filtros»); la lista definitiva sigue por decidir.
+5. **WF-08 frente a RF10 y al esquema `servicios`:** falta el campo obligatorio «tipo de habitación» (con las unidades de la diferencia 1, cada unidad lleva el suyo); «cobra por» e «incluye impuestos» no existen en el esquema; el RNT pertenece al prestador (`auth_db`), no a cada servicio. **Resuelta en parte:** el tipo de habitación va en cada unidad (DEC-133) y el servicio guarda una copia del RNT de la cuenta (DEC-126); «cobra por» e «incluye impuestos» siguen deshabilitados (DEC-167).
 6. **«Aforo» frente a «afluencia»:** los wireframes usan «aforo» para el indicador de RF39; el prototipo usa «afluencia», como el SRS.
