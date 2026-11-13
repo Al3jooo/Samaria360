@@ -23,10 +23,11 @@ spring:
       max-request-size: 30MB
   data:
     mongodb:
-      # El usuario raíz de docker-compose se crea en la base admin: authSource=admin.
+      # Usuario propio con readWrite solo en catalog_db (DEC-275), creado en la base admin por mongo-migraciones:
+      # authSource=admin. Sin CATALOG_DB_USER en .env (arranque local antiguo), el usuario raíz.
       # Si la contraseña tiene caracteres especiales (@ : / ? # %), debe ir codificada para URL en .env.
       # MONGO_HOST: localhost con ./mvnw; "mongo" dentro de Docker Compose.
-      uri: mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/catalog_db?authSource=admin
+      uri: mongodb://${CATALOG_DB_USER:${MONGO_USER}}:${CATALOG_DB_PASSWORD:${MONGO_PASSWORD}}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/catalog_db?authSource=admin
       # Explícito: en pruebas, la conexión de Testcontainers apunta a otra base por defecto.
       database: catalog_db
 

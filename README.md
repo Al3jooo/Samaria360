@@ -114,7 +114,7 @@ Levanta todo el sistema (PostgreSQL, MongoDB, ms-auth, ms-catalog, ms-booking, a
 **Pasos** (desde la raíz del repositorio, en Git Bash o en una terminal de Linux/macOS)
 
 ```bash
-cp .env.example .env                       # y cambiar las contraseñas
+cp .env.example .env                       # y cambiar las contraseñas (también AUTH_DB_*, BOOKING_DB_* y CATALOG_DB_*)
 cd infra/keys                              # llaves RS256 del JWT (no se versionan)
 openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out jwt-privada.pem
 openssl rsa -in jwt-privada.pem -pubout -out jwt-publica.pem
@@ -140,8 +140,10 @@ Para crear cuentas nuevas: **«Registrarse»** en la pantalla de inicio de sesi�
 - Las llaves del JWT se montan como *secrets* de solo lectura en `/run/secrets/` de ms-auth; nunca se copian a una
   imagen.
 - **Servicios de un solo uso**, que se ejecutan en cada `docker compose up`, terminan y no dejan nada corriendo:
-  `postgres-bases` crea las bases que falten (`infra/postgres/asegurar-bases.sql`) y `mongo-migraciones` aplica las
-  migraciones de catalog_db que falten (`infra/mongo/migraciones`, registradas en la colección `migraciones`). Así un
+  `postgres-bases` crea las bases que falten y el usuario propio de ms-auth y de ms-booking (`infra/postgres/asegurar-bases.sql`, DEC-275) y `mongo-migraciones` aplica las
+  migraciones de catalog_db que falten (`infra/mongo/migraciones`, registradas en la colección `migraciones`) y el
+  usuario propio de ms-catalog. Cada servicio se conecta con su usuario, con el mínimo privilegio: el administrador de
+  `POSTGRES_USER` y `MONGO_USER` solo lo usan estos dos servicios (DEC-275). Así un
   volumen creado con una versión anterior se pone al día **sin borrar datos**. ms-auth, ms-booking y ms-catalog
   esperan a que terminen bien (`service_completed_successfully`); en `docker compose ps -a` aparecen como `Exited (0)`.
 - **Reservas:** ms-booking materializa los cupos de los próximos 60 días bajo demanda, a partir de la oferta que cada
@@ -190,6 +192,7 @@ docker compose down -v                     # detener todo y BORRAR los volúmene
 | PostgreSQL no arranca en 5432, o ms-auth se conecta a otra base | En Windows, el servicio de PostgreSQL instalado localmente (`postgresql-x64-*`) ya ocupa el 5432 | Poner `POSTGRES_PORT=5433` en `.env`, o detener ese servicio en `services.msc`. Dentro de Docker no cambia nada: ms-auth usa `postgres:5432` por la red interna. |
 | `docker compose up` falla con un error que menciona `infra/keys/jwt-privada.pem` (o la pública) | Faltan las llaves del JWT | Generarlas en `infra/keys/` (paso 2) y volver a ejecutar `docker compose up -d`. |
 | `required variable POSTGRES_PASSWORD is missing a value: Falta POSTGRES_PASSWORD en .env` | Falta el `.env` o una variable | `cp .env.example .env` y completar los valores. |
+| `required variable AUTH_DB_PASSWORD is missing a value` (o `BOOKING_DB_PASSWORD`, `CATALOG_DB_PASSWORD`) | El `.env` es anterior a los usuarios propios de cada servicio (DEC-275) | Copiar de `.env.example` el bloque `AUTH_DB_*`, `BOOKING_DB_*` y `CATALOG_DB_*` y poner contraseñas propias. `docker compose up -d` crea los usuarios y les pasa las bases sin borrar datos. |
 | En Linux, ms-auth no puede leer la llave privada | Los *secrets* de Compose son archivos montados con los permisos del host | Dar permiso de lectura al usuario del contenedor: `chmod 644 infra/keys/jwt-*.pem`. |
 | Faltan datos de prueba, o no aparecen cambios de los scripts de `infra/*/init/` | Los scripts de inicialización solo corren con el volumen vacío, y son la línea base: no cambian | Los cambios de esquema y de datos llegan como migraciones (Flyway en ms-auth; `infra/mongo/migraciones` en catalog_db), que se aplican solas con `docker compose up -d` sin borrar nada. Solo como último recurso, y sabiendo que **borra** los datos: `docker compose down -v`. |
 | ms-catalog no arranca y `mongo-migraciones` aparece como `Exited (1)` (o ms-auth y ms-booking, y `postgres-bases`) | Una migración falló; por ejemplo, M001 se detiene si un alojamiento no tiene `precioBase` | `docker compose logs mongo-migraciones` (o `postgres-bases`) muestra el motivo. Corregir el dato y volver a ejecutar `docker compose up -d`: las migraciones ya aplicadas no se repiten. |

@@ -502,7 +502,6 @@ Bajo `/api/v1/reservas`. Contrato completo en [`sad/api/ms-booking.md`](sad/api/
 | **Nota de RF19.** Cuando el prestador pueda modificar sus cupos (RF19), hay que definir antes: qué pasa si baja los cupos por debajo de lo ya reservado (hoy el CHECK lo impide) y qué pasa con las reservas futuras de una unidad que elimina del catálogo (hoy sus filas quedan huérfanas y no se pueden reservar) | WF-08 | RF19 | Con RF19 |
 | RF13, RF30 y RF63 los resuelve ms-notificaciones; ms-booking no publica eventos en esta iteración | — | RF13, RF30, RF63 | Con ms-notificaciones |
 | El esquema `servicios` no define la unidad del precio («cobra por», diferencia 5 de la v2): el prototipo cobra el alojamiento por noche y habitación, y el tour por persona, como dicen las tarjetas de WF-05 | WF-08 | RF37 | Construcción |
-| ms-booking se conecta a `reservas_db` con el superusuario de PostgreSQL, como ms-auth (pendiente conocido); rol propio previsto: `booking_app`, con privilegios solo sobre `reservas_db` | — | RNF06 | Por definir |
 | **WF-12, «Reactivar» un prestador inactivo, deshabilitado (DEC-37):** RF22 no define la reactivación; hay que preguntar al SRS o al equipo antes de implementarla | WF-12 | RF22 | Mejora pendiente (no la exige el SRS) |
 | **Token de refresco.** Con el TTL de 15 minutos (DEC-29) el usuario vuelve a iniciar sesión cada 15 minutos. El frontend ya atiende el vencimiento sin romper las vistas públicas (DEC-47 a DEC-50; A7 resuelto), pero la sesión sigue durando 15 minutos | Común | RF15, RF55 | Por definir |
 | RF55 (cerrar sesión) no revoca el token del dispositivo: solo se descarta en el cliente; el token vale hasta su `exp` o hasta el próximo cambio de la cuenta | Común | RF55 | Por definir |
@@ -539,6 +538,7 @@ Bajo `/api/v1/reservas`. Contrato completo en [`sad/api/ms-booking.md`](sad/api/
 - **Retención del outbox (resuelto el 2026-11-13, DEC-272).** `PurgaOutboxProgramador` (ms-auth) borra cada hora los eventos entregados a todos sus destinos hace más de 30 días; los pendientes no se tocan.
 - **Motivo del rechazo al prestador (resuelto el 2026-11-13, DEC-273).** El 403 `CUENTA_RECHAZADA` del login lleva `motivo` (solo con la contraseña correcta) y WF-01 lo muestra.
 - **Búsqueda sin tildes (resuelto el 2026-11-13, DEC-274).** «cafe» encuentra «Café» en `/oferta`, sin cambiar el esquema de `catalog_db`.
+- **Credenciales de administrador en los servicios (resuelto el 2026-11-13, DEC-275).** Cada servicio usa su propio usuario de base de datos con el mínimo privilegio (`auth_app`, `booking_app`, `catalog_app`).
 - **Validación de los wireframes propuestos por arquitectura (resuelto el 2026-11-13, DEC-269).** WF-12 a WF-26, WF-06 para atractivos y los cambios en WF-05, WF-06 y WF-11, con sus PNG (DEC-268).
 - **Pantallas de la iteración D (resuelto en la sesión B).** WF-20 a WF-23, propuestos por arquitectura e implementados; validados por el equipo (DEC-269).
 
@@ -628,7 +628,7 @@ Las decisiones (DEC), hallazgos y verificaciones de cada sesión están en `docs
 | Atractivos y agenda, frontend — decisiones (iteración E, sesión B2; RF25) | [`trazabilidad/decisiones-iteracion-e-atractivos-agenda.md`](trazabilidad/decisiones-iteracion-e-atractivos-agenda.md) |
 | Profesionalización del repositorio — decisiones (DEC-252 a DEC-259 y DEC-261) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | API Gateway: caché DNS — decisión (DEC-260) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
-| Revisión de documentación y código — decisiones (DEC-262 a DEC-274) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
+| Revisión de documentación y código — decisiones (DEC-262 a DEC-275) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Buscar oferta turística — decisiones de búsqueda (RF16, RF23, RF33, RF38, RF50, RF61) | [`trazabilidad/decisiones-busqueda-y-detalle.md`](trazabilidad/decisiones-busqueda-y-detalle.md) |
 | Consultar detalle de oferta — decisiones y hallazgos (WF-06) | [`trazabilidad/decisiones-busqueda-y-detalle.md`](trazabilidad/decisiones-busqueda-y-detalle.md) |
 

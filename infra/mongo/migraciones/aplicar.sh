@@ -16,4 +16,6 @@ until mongosh "$conexion" -u "$MONGO_USER" -p "$MONGO_PASSWORD" --quiet --eval '
   sleep 2
 done
 
-exec mongosh "$conexion" -u "$MONGO_USER" -p "$MONGO_PASSWORD" --quiet /migraciones/aplicar.js
+mongosh "$conexion" -u "$MONGO_USER" -p "$MONGO_PASSWORD" --quiet /migraciones/aplicar.js
+# Usuario propio de ms-catalog (DEC-275), después de las migraciones.
+exec mongosh "$conexion" -u "$MONGO_USER" -p "$MONGO_PASSWORD" --quiet /migraciones/usuario-servicio.js

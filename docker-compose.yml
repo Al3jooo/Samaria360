@@ -57,9 +57,23 @@ services:
       PGDATABASE: postgres
       PGUSER: ${POSTGRES_USER:?Falta POSTGRES_USER en .env}
       PGPASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+      # Usuarios propios de ms-auth y ms-booking (DEC-275): este servicio los crea o actualiza en cada arranque.
+      AUTH_DB_USER: ${AUTH_DB_USER:-auth_app}
+      AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD:?Falta AUTH_DB_PASSWORD en .env}
+      BOOKING_DB_USER: ${BOOKING_DB_USER:-booking_app}
+      BOOKING_DB_PASSWORD: ${BOOKING_DB_PASSWORD:?Falta BOOKING_DB_PASSWORD en .env}
     volumes:
-      - ./infra/postgres/asegurar-bases.sql:/asegurar-bases.sql:ro
-    command: ["psql", "-v", "ON_ERROR_STOP=1", "-f", "/asegurar-bases.sql"]
+      - ./infra/postgres/asegurar-bases.sql:/sql/asegurar-bases.sql:ro
+      - ./infra/postgres/reasignar-objetos.sql:/sql/reasignar-objetos.sql:ro
+    # Las contraseñas llegan como variables de psql (-v), nunca en el texto del script.
+    command:
+      - sh
+      - -c
+      - >-
+        psql -v ON_ERROR_STOP=1
+        -v auth_usuario="$$AUTH_DB_USER" -v auth_clave="$$AUTH_DB_PASSWORD"
+        -v booking_usuario="$$BOOKING_DB_USER" -v booking_clave="$$BOOKING_DB_PASSWORD"
+        -f /sql/asegurar-bases.sql
     depends_on:
       postgres:
         condition: service_healthy
@@ -99,6 +113,9 @@ services:
       MONGO_PASSWORD: ${MONGO_PASSWORD:?Falta MONGO_PASSWORD en .env}
       # Configuración de DEMOSTRACIÓN: aplica también infra/mongo/migraciones/semilla. Para un despliegue real, false.
       MONGO_SEMILLA: "true"
+      # Usuario propio de ms-catalog (DEC-275): readWrite solo en catalog_db; lo crea o actualiza este servicio.
+      CATALOG_DB_USER: ${CATALOG_DB_USER:-catalog_app}
+      CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD:?Falta CATALOG_DB_PASSWORD en .env}
     volumes:
       - ./infra/mongo/migraciones:/migraciones:ro
     entrypoint: ["sh", "/migraciones/aplicar.sh"]
@@ -117,8 +134,9 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
-      POSTGRES_USER: ${POSTGRES_USER:?Falta POSTGRES_USER en .env}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+      # Usuario propio, dueño solo de auth_db (DEC-275); el superusuario no llega a este contenedor.
+      AUTH_DB_USER: ${AUTH_DB_USER:-auth_app}
+      AUTH_DB_PASSWORD: ${AUTH_DB_PASSWORD:?Falta AUTH_DB_PASSWORD en .env}
       # Relevo de cuentas hacia los endpoints internos de ms-catalog y ms-booking (ADR-008): URI, no secretos.
       CATALOG_INTERNO_URI: http://ms-catalog:8082
       BOOKING_INTERNO_URI: http://ms-booking:8083
@@ -147,8 +165,9 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       MONGO_HOST: mongo
       MONGO_PORT: "27017"
-      MONGO_USER: ${MONGO_USER:?Falta MONGO_USER en .env}
-      MONGO_PASSWORD: ${MONGO_PASSWORD:?Falta MONGO_PASSWORD en .env}
+      # Usuario propio con readWrite solo en catalog_db (DEC-275); root no llega a este contenedor.
+      CATALOG_DB_USER: ${CATALOG_DB_USER:-catalog_app}
+      CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD:?Falta CATALOG_DB_PASSWORD en .env}
       AUTH_JWKS_URI: http://ms-auth:8081/api/v1/auth/.well-known/jwks.json
     expose:
       - "8082"
@@ -171,8 +190,9 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
-      POSTGRES_USER: ${POSTGRES_USER:?Falta POSTGRES_USER en .env}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+      # Usuario propio, dueño solo de reservas_db (DEC-275); el superusuario no llega a este contenedor.
+      BOOKING_DB_USER: ${BOOKING_DB_USER:-booking_app}
+      BOOKING_DB_PASSWORD: ${BOOKING_DB_PASSWORD:?Falta BOOKING_DB_PASSWORD en .env}
       AUTH_JWKS_URI: http://ms-auth:8081/api/v1/auth/.well-known/jwks.json
       # Llamada directa al endpoint público de detalle antes de reservar y para materializar la oferta del catálogo
       # en el inventario bajo demanda (ADR-007 y su enmienda A2; DEC-135)
