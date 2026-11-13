@@ -1,7 +1,7 @@
 # Subsistema «Gestionar cuenta»: «Actualizar datos comerciales»
 
 Fase de Construcción (RUP). Caso de uso de la iteración D «Oferta del prestador» (DEC-54): RF43. Cierra HC1 para RF43 y O16.
-- **Pantallas:** WF-22 «Mi perfil comercial» (`/prestador/perfil`, flujo A; desde el menú del avatar) y WF-21 «Editar datos comerciales» del servicio (`/prestador/servicios/:id/datos-comerciales`, flujo B; desde el detalle propio de WF-18 en `Pendiente` o `Publicado`). Propuestas por arquitectura, pendientes de validación; implementadas en la iteración D, sesión B (DEC-196, DEC-199, DEC-202). WF-08 muestra el RNT del perfil (O16, DEC-203).
+- **Pantallas:** WF-22 «Mi perfil comercial» (`/prestador/perfil`, flujo A; desde el menú del avatar) y WF-21 «Editar datos comerciales» del servicio (`/prestador/servicios/:id/datos-comerciales`, flujo B; desde el detalle propio de WF-18 en `Pendiente` o `Publicado`). Propuestas por arquitectura y validadas por el equipo; implementadas en la iteración D, sesión B (DEC-196, DEC-199, DEC-202). WF-08 muestra el RNT del perfil (O16, DEC-203).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Oferta del prestador — decisiones», DEC-183 a DEC-195).
 - **Contrato HTTP:** [`sad/api/ms-auth.md`](../sad/api/ms-auth.md) («Perfil comercial del Prestador») y [`sad/api/ms-catalog.md`](../sad/api/ms-catalog.md) («Editar un servicio (RF32, RF43)»).

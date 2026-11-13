@@ -1,5 +1,5 @@
 ' WF-22 — Mi perfil comercial (CU «Actualizar datos comerciales», flujo A, RF43; DEC-188, DEC-196, DEC-202; cierra
-' O16). Propuesto por arquitectura, pendiente de validación del equipo. Solo estructura. Solo para el Prestador; se
+' O16). Propuesto por arquitectura y validado por el equipo. Solo estructura. Solo para el Prestador; se
 ' llega desde el menú del avatar («Mi perfil comercial»). Ruta: /prestador/perfil.
 
 @startsalt

@@ -1,5 +1,5 @@
 ' WF-23 — Historial de reservas del Prestador (CU «Consultar historial», RF12 del lado del Prestador; DEC-191, DEC-192,
-' DEC-196, DEC-204). Propuesto por arquitectura, pendiente de validación del equipo. Solo estructura. Solo para el
+' DEC-196, DEC-204). Propuesto por arquitectura y validado por el equipo. Solo estructura. Solo para el
 ' Prestador; se llega desde el menú del avatar («Historial de reservas»). Ruta:
 ' /prestador/reservas?desde=&hasta=&estado=&servicio=&pagina= (filtros y página en la URL, DEC-169).
 ' Sin ningún dato del Turista (Ley 1581) y sin acciones: el Prestador no cancela.

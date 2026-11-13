@@ -1,4 +1,4 @@
-' WF-13 — Preguntas frecuentes (RF26, RF47). Propuesto por arquitectura, pendiente de validación del equipo (DEC-67).
+' WF-13 — Preguntas frecuentes (RF26, RF47). Propuesto por arquitectura y validado por el equipo (DEC-67).
 ' Solo estructura: regiones, elementos y flujo. Diagramas: (1) sección pública con el buscador; (2) gestión del
 ' Administrador; (3) formulario de crear o editar; (4) confirmación de eliminar.
 

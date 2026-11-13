@@ -1,6 +1,6 @@
 # CU «Administrar cuentas»
 
-Fase de Construcción (RUP). Caso de uso de la iteración «Administrar cuentas»: RF28, RF62 y RF22, con la pantalla WF-12 ([wireframe](../wireframes/WF-12-administrar-cuentas.puml), propuesto por arquitectura y pendiente de validación del equipo). Requisitos citados de `docs/srs/especificacion de requisitos.pdf`. Decisiones en `docs/trazabilidad.md` («Administrar cuentas — decisiones») y [ADR-008](../sad/adr/ADR-008-sincronizacion-estado-cuentas.md). Contrato HTTP en [`sad/api/ms-auth.md`](../sad/api/ms-auth.md).
+Fase de Construcción (RUP). Caso de uso de la iteración «Administrar cuentas»: RF28, RF62 y RF22, con la pantalla WF-12 ([wireframe](../wireframes/WF-12-administrar-cuentas.puml), propuesto por arquitectura y validado por el equipo). Requisitos citados de `docs/srs/especificacion de requisitos.pdf`. Decisiones en `docs/trazabilidad.md` («Administrar cuentas — decisiones») y [ADR-008](../sad/adr/ADR-008-sincronizacion-estado-cuentas.md). Contrato HTTP en [`sad/api/ms-auth.md`](../sad/api/ms-auth.md).
 
 | Campo | Valor |
 |---|---|

@@ -1,7 +1,7 @@
 # Subsistema «Gestionar reservas»: «Compartir reserva completada»
 
 Fase de Construcción (RUP). Caso de uso nuevo de la iteración B1 «Turista» (DEC-83): RF49. Cierra el Hallazgo Crítico **HC-B1** (RF49 no tenía un caso de uso).
-- **Pantalla:** WF-11 «Mis reservas», con el botón «Compartir» en las reservas Completadas ([cambios](../wireframes/WF-05-06-11-cambios-turista.puml), propuestos por arquitectura y pendientes de validación del equipo).
+- **Pantalla:** WF-11 «Mis reservas», con el botón «Compartir» en las reservas Completadas ([cambios](../wireframes/WF-05-06-11-cambios-turista.puml), propuestos por arquitectura y validados por el equipo).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Turista (B1) — decisiones»).
 - **Contrato HTTP:** ninguno nuevo. Usa `GET /api/v1/reservas/mias` ([`sad/api/ms-booking.md`](../sad/api/ms-booking.md)).

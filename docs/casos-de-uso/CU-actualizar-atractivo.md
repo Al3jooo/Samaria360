@@ -1,7 +1,7 @@
 # Subsistema «Gestionar atractivos»: «Actualizar atractivo»
 
 Fase de Construcción (RUP). Caso de uso de la iteración E «Atractivos y agenda», sesión A1 (DEC-54, DEC-213): RF07, RF24, RF27 y RF58 (parte del Gestor), con el flujo «Consultar atractivos» (el panel del Gestor). Cierra HC-E1 para la edición y N4 para el Gestor en el backend.
-- **Pantallas:** WF-24 «Atractivos» (Panel del gestor; propuesto por arquitectura, pendiente de validación) y el formulario de WF-09 en modo edición. Las pantallas son de la sesión B1.
+- **Pantallas:** WF-24 «Atractivos» (Panel del gestor; propuesto por arquitectura y validado por el equipo) y el formulario de WF-09 en modo edición. Las pantallas son de la sesión B1.
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Atractivos y agenda — decisiones», DEC-206 a DEC-221).
 - **Contrato HTTP:** en [`sad/api/ms-catalog.md`](../sad/api/ms-catalog.md), sección «Atractivos (Gestor)».

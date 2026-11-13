@@ -1,4 +1,4 @@
-' WF-14 — Avisos generales (RF40). Propuesto por arquitectura, pendiente de validación del equipo (DEC-67).
+' WF-14 — Avisos generales (RF40). Propuesto por arquitectura y validado por el equipo (DEC-67).
 ' Solo estructura: regiones, elementos y flujo. Diagramas: (1) banner, elemento común de las pantallas con el
 ' encabezado de la plataforma; (2) gestión del Administrador; (3) confirmación de despublicar.
 

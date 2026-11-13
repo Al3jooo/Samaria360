@@ -1,7 +1,7 @@
 # CU «Crear y publicar aviso general»
 
 Fase de Construcción (RUP). Caso de uso de la iteración «Contenido público»: RF40.
-- **Pantalla:** WF-14 ([wireframe](../wireframes/WF-14-avisos.puml), propuesto por arquitectura y pendiente de validación del equipo).
+- **Pantalla:** WF-14 ([wireframe](../wireframes/WF-14-avisos.puml), propuesto por arquitectura y validado por el equipo).
 - **CU secundario:** «Consultar avisos generales», el banner.
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Contenido público — decisiones»).

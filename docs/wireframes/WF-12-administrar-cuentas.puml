@@ -74,8 +74,8 @@ de estado; se recargó la lista» (DEC-39) | lista vacía
 
 @startsalt
 {+
-' RF45 (B2, DEC-114): pestaña «Personal» para modificar o revocar el rol. Propuesto por arquitectura, pendiente de
-' validación del equipo. La implementa la sesión B.
+' RF45 (B2, DEC-114): pestaña «Personal» para modificar o revocar el rol. Propuesto por arquitectura y validado
+' por el equipo (DEC-269). La implementa la sesión B.
 {/ Prestadores por validar | Prestadores | Turistas | <b>Personal }
 { Buscar | "nombre o correo  " | Rol | ^Todos^ | [Buscar] }
 {#

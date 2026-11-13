@@ -1,7 +1,7 @@
 # Subsistema «Explorar oferta turística»: «Consultar historial de búsquedas»
 
 Fase de Construcción (RUP). Caso de uso de la iteración B1 «Turista» (DEC-83): RF60.
-- **Pantalla:** «Últimas búsquedas» en WF-05 ([cambios](../wireframes/WF-05-06-11-cambios-turista.puml), propuestos por arquitectura y pendientes de validación del equipo).
+- **Pantalla:** «Últimas búsquedas» en WF-05 ([cambios](../wireframes/WF-05-06-11-cambios-turista.puml), propuestos por arquitectura y validados por el equipo).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Turista (B1) — decisiones»).
 - **Contrato HTTP:** en [`sad/api/ms-catalog.md`](../sad/api/ms-catalog.md), sección «Historial de búsquedas».

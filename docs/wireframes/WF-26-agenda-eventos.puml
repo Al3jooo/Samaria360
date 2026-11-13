@@ -1,5 +1,5 @@
 ' WF-26 — Agenda de eventos (CU «Consultar agenda de eventos»; RF25; DEC-215, DEC-239, DEC-246, DEC-247, DEC-249).
-' Propuesto por arquitectura, pendiente de validación del equipo. Solo estructura: regiones, elementos y flujo.
+' Propuesto por arquitectura y validado por el equipo. Solo estructura: regiones, elementos y flujo.
 ' Diagramas: (1) agenda con eventos; (2) agenda vacía. Pública, sin token; se llega desde «Agenda de eventos» de la
 ' columna «Municipio» del pie. Lo implementa la iteración E, sesión B2.
 

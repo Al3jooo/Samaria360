@@ -1,4 +1,4 @@
-' WF-16 — Perfil del turista (RF53). Propuesto por arquitectura, pendiente de validación del equipo (DEC-90).
+' WF-16 — Perfil del turista (RF53). Propuesto por arquitectura y validado por el equipo (DEC-90).
 ' Solo estructura: regiones, elementos y flujo. Diagramas: (1) datos personales; (2) intereses turísticos.
 ' Se llega desde el menú del avatar («Mi perfil», solo para turistas). Desde aquí se abre «Mis favoritos» (WF-17).
 

@@ -1,7 +1,7 @@
 # Subsistema «Agenda de eventos»: «Consultar agenda de eventos»
 
 Fase de Construcción (RUP). Caso de uso de la iteración E «Atractivos y agenda», sesión A2 (DEC-54, DEC-213): RF25 (parte del Turista). Cierra HC-E1 para RF25.
-- **Pantallas:** WF-26 (`docs/wireframes/WF-26-agenda-eventos.puml`: `/agenda`, pública, desde «Agenda de eventos» del pie), propuesto por arquitectura y pendiente de validación; implementado en la sesión B2 (DEC-246, DEC-247, DEC-249).
+- **Pantallas:** WF-26 (`docs/wireframes/WF-26-agenda-eventos.puml`: `/agenda`, pública, desde «Agenda de eventos» del pie), propuesto por arquitectura y validado por el equipo; implementado en la sesión B2 (DEC-246, DEC-247, DEC-249).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Fuente del modelo:** DocumentoEntregable2.md (documento del Proyecto, fuera del repositorio): §2.1 (el Turista «visualiza» `EventoTuristico`) y §2.4 (colección `eventos`).
 - **Decisiones:** DEC-215 y DEC-239 en `docs/trazabilidad.md`.

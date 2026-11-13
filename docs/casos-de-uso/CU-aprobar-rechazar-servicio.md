@@ -1,7 +1,7 @@
 # Subsistema «Gestionar servicios»: «Aprobar o rechazar servicio»
 
 Fase de Construcción (RUP). Caso de uso de la iteración C «Registrar y aprobar servicio» (DEC-54, DEC-134): RF21. Incluye «Consultar listado pendiente» y lo extiende «Justificar rechazo de servicio».
-- **Pantalla:** WF-19 «Aprobar servicios» ([wireframe](../wireframes/WF-19-aprobar-servicios.puml), propuesto por arquitectura y pendiente de validación del equipo). Implementada en la sesión B2: `/admin/servicios` (cola) y `/admin/servicios/:id` (revisión), solo para el Administrador (DEC-174 a DEC-182; ver «Pantalla» abajo).
+- **Pantalla:** WF-19 «Aprobar servicios» ([wireframe](../wireframes/WF-19-aprobar-servicios.puml), propuesto por arquitectura y validado por el equipo). Implementada en la sesión B2: `/admin/servicios` (cola) y `/admin/servicios/:id` (revisión), solo para el Administrador (DEC-174 a DEC-182; ver «Pantalla» abajo).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Registrar y aprobar servicio — decisiones», DEC-124 a DEC-151).
 - **Contrato HTTP:** en [`sad/api/ms-catalog.md`](../sad/api/ms-catalog.md), sección «Aprobar o rechazar servicio».

@@ -74,8 +74,9 @@ GitHub Actions corre las mismas pruebas en el PR; no se integra con el CI en roj
 
 ## Documentación
 
-- Cada CU nuevo agrega su especificación en `docs/casos-de-uso/` y sus filas en
-  [`docs/trazabilidad.md`](docs/trazabilidad.md).
+- Cada CU nuevo agrega su especificación en `docs/casos-de-uso/`, sus filas en
+  [`docs/trazabilidad.md`](docs/trazabilidad.md) y sus decisiones (DEC) en el archivo de su iteración en
+  [`docs/trazabilidad/`](docs/trazabilidad/).
 - Las decisiones de arquitectura van como ADR en `docs/sad/adr/` y los contratos de la API en `docs/sad/api/`.
 - Un elemento de pantalla que no está en el wireframe y tiene función se registra como «Mejora de diseño» en la
   trazabilidad.

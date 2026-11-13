@@ -1,5 +1,5 @@
 ' WF-18 — Mis servicios (flujo «Consultar mis servicios» del CU «Registrar servicio comercial»; RF09, DEC-129, DEC-143).
-' Propuesto por arquitectura, pendiente de validación del equipo. Solo estructura: regiones, elementos y flujo.
+' Propuesto por arquitectura y validado por el equipo. Solo estructura: regiones, elementos y flujo.
 ' Diagramas: (1) lista con filtro; (2) detalle de un servicio rechazado; (3) estado vacío.
 ' Solo para el Prestador; se llega desde el menú del avatar. Lo implementa la sesión B1.
 

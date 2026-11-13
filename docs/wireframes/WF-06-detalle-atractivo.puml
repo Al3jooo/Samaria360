@@ -1,6 +1,6 @@
 ' WF-06 para atractivos — Ficha pública de un atractivo (CU «Consultar detalle de atractivo»; RF06, RF07, RF24, RF27,
 ' RF33, RF58; DEC-87, DEC-217, DEC-224).
-' Propuesto por arquitectura, pendiente de validación del equipo. Solo estructura: regiones, elementos y flujo. Parte de
+' Propuesto por arquitectura y validado por el equipo. Solo estructura: regiones, elementos y flujo. Parte de
 ' la imagen WF-06-detalle.png y deja fuera lo que un atractivo no tiene (precio, contacto, RNT y reserva).
 ' Pública, sin token; se llega con «Ver detalle» de la tarjeta (WF-05), del mapa y de «Mis favoritos» (WF-17).
 ' Lo implementa la iteración E, sesión B1, en /atractivos/:id.

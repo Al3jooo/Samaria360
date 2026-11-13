@@ -1,7 +1,7 @@
 # Subsistema «Gestionar cuenta»: «Actualizar datos personales» y «Actualizar intereses turísticos»
 
 Fase de Construcción (RUP). Casos de uso de la iteración B1 «Turista» (DEC-83): RF53.
-- **Pantalla:** WF-16 ([wireframe](../wireframes/WF-16-perfil-turista.puml), propuesto por arquitectura y pendiente de validación del equipo).
+- **Pantalla:** WF-16 ([wireframe](../wireframes/WF-16-perfil-turista.puml), propuesto por arquitectura y validado por el equipo).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Turista (B1) — decisiones»).
 - **Contrato HTTP:** en [`sad/api/ms-auth.md`](../sad/api/ms-auth.md), sección «Perfil del turista».

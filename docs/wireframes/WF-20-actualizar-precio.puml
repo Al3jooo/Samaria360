@@ -1,5 +1,5 @@
 ' WF-20 — Actualizar precio (CU «Actualizar tarifas», RF32; DEC-183 a DEC-187, DEC-196, DEC-198, DEC-200, DEC-201).
-' Propuesto por arquitectura, pendiente de validación del equipo. Solo estructura: regiones, elementos y flujo.
+' Propuesto por arquitectura y validado por el equipo. Solo estructura: regiones, elementos y flujo.
 ' Diagramas: (1) Tour, Gastronomía o Alquiler de equipos; (2) Alojamiento, con el precio de cada unidad; (3) 409
 ' SERVICIO_MODIFICADO. Solo para el Prestador; se llega con «Actualizar precio» desde el detalle propio de WF-18, en
 ' Pendiente o Publicado (en Rechazado no aparece). Ruta: /prestador/servicios/:id/precio.

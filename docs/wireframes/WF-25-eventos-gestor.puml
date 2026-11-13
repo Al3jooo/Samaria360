@@ -1,6 +1,6 @@
 ' WF-25 — Eventos, panel del gestor, y Registrar evento (CU «Registrar evento en agenda», con el flujo «Consultar
 ' eventos registrados»; RF25; DEC-215, DEC-238, DEC-245, DEC-247 a DEC-249, DEC-251).
-' Propuesto por arquitectura, pendiente de validación del equipo. Solo estructura: regiones, elementos y flujo.
+' Propuesto por arquitectura y validado por el equipo. Solo estructura: regiones, elementos y flujo.
 ' Diagramas: (1) panel; (2) registro, con los errores por campo. Solo para el Gestor; se llega desde el menú del avatar
 ' («Eventos», «Registrar evento»). Lo implementa la iteración E, sesión B2.
 

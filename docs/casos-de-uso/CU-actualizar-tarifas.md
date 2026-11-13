@@ -1,7 +1,7 @@
 # Subsistema «Gestionar servicios»: «Actualizar tarifas»
 
 Fase de Construcción (RUP). Caso de uso de la iteración D «Oferta del prestador» (DEC-54): RF32. Cierra HC1 para RF32.
-- **Pantallas:** WF-20 «Actualizar precio» (`/prestador/servicios/:id/precio`; propuesto por arquitectura, pendiente de validación), a la que se llega con «Actualizar precio» desde el detalle propio de WF-18 en `Pendiente` o `Publicado`. Implementada en la iteración D, sesión B (DEC-196, DEC-198, DEC-200, DEC-201).
+- **Pantallas:** WF-20 «Actualizar precio» (`/prestador/servicios/:id/precio`; propuesto por arquitectura y validado por el equipo), a la que se llega con «Actualizar precio» desde el detalle propio de WF-18 en `Pendiente` o `Publicado`. Implementada en la iteración D, sesión B (DEC-196, DEC-198, DEC-200, DEC-201).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Oferta del prestador — decisiones», DEC-183 a DEC-195).
 - **Contrato HTTP:** en [`sad/api/ms-catalog.md`](../sad/api/ms-catalog.md), sección «Editar un servicio (RF32, RF43)».

@@ -1,6 +1,6 @@
 ' WF-24 — Atractivos, panel del gestor (flujo «Consultar atractivos» del CU «Actualizar atractivo» y CU «Cambiar estado
 ' operativo»; RF07, RF33; DEC-206, DEC-222, DEC-225, DEC-233).
-' Propuesto por arquitectura, pendiente de validación del equipo. Solo estructura: regiones, elementos y flujo.
+' Propuesto por arquitectura y validado por el equipo. Solo estructura: regiones, elementos y flujo.
 ' Diagramas: (1) lista; (2) diálogo «Cambiar estado» con el aviso del 409. Solo para el Gestor; se llega desde el menú
 ' del avatar («Atractivos») o desde «Panel del gestor» del pie. Lo implementa la iteración E, sesión B1.
 

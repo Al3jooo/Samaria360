@@ -1,7 +1,7 @@
 # Subsistema «Gestionar FAQs»
 
 Fase de Construcción (RUP). Casos de uso de la iteración «Contenido público»: RF26 y RF47.
-- **Pantalla:** WF-13 ([wireframe](../wireframes/WF-13-preguntas-frecuentes.puml), propuesto por arquitectura y pendiente de validación del equipo).
+- **Pantalla:** WF-13 ([wireframe](../wireframes/WF-13-preguntas-frecuentes.puml), propuesto por arquitectura y validado por el equipo).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Contenido público — decisiones»).
 - **Contrato HTTP:** en [`sad/api/ms-catalog.md`](../sad/api/ms-catalog.md).
