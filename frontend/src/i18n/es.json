@@ -158,6 +158,7 @@
     "CUENTA_INACTIVA": "Tu cuenta no está activa. Comunícate con el administrador de la plataforma.",
     "CUENTA_PENDIENTE_VALIDACION": "Tu cuenta está en revisión por el administrador. Podrás iniciar sesión cuando sea validada.",
     "CUENTA_RECHAZADA": "El administrador rechazó la solicitud de tu cuenta. Comunícate con la plataforma para más información.",
+    "CUENTA_RECHAZADA_MOTIVO": "El administrador rechazó la solicitud de tu cuenta. Motivo: «{{motivo}}». Comunícate con la plataforma para más información.",
     "DATOS_INVALIDOS": "Revisa los datos: escribe un correo electrónico válido y tu contraseña.",
     "ERROR_RED": "No fue posible conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.",
     "SERVICIO_NO_DISPONIBLE": "El servicio no está disponible por el momento. Inténtalo de nuevo en unos minutos.",

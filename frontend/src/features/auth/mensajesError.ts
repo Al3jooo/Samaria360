@@ -5,6 +5,8 @@ import { ApiError, ERROR_RED, servicioNoDisponible } from '../../shared/api/http
 export interface ErrorInicioSesion {
   codigo: string
   bloqueadoHasta?: string
+  /** Justificación del rechazo del prestador (CUENTA_RECHAZADA, DEC-273). */
+  motivo?: string
 }
 
 const CODIGOS_CON_MENSAJE = new Set([
@@ -29,9 +31,11 @@ export function aErrorInicioSesion(error: unknown): ErrorInicioSesion {
     return { codigo: 'SERVICIO_NO_DISPONIBLE' }
   }
   const bloqueadoHasta = error.problema?.bloqueadoHasta
+  const motivo = error.problema?.motivo
   return {
     codigo: CODIGOS_CON_MENSAJE.has(error.codigo) ? error.codigo : 'GENERICO',
     bloqueadoHasta: typeof bloqueadoHasta === 'string' ? bloqueadoHasta : undefined,
+    motivo: typeof motivo === 'string' && motivo.trim() !== '' ? motivo : undefined,
   }
 }
 
@@ -48,6 +52,9 @@ export function textoError(error: ErrorInicioSesion, t: TFunction, idioma: strin
   if (error.codigo === 'CUENTA_BLOQUEADA') {
     const hora = error.bloqueadoHasta ? formatearHora(error.bloqueadoHasta, idioma) : null
     return hora ? t('errores.CUENTA_BLOQUEADA', { hora }) : t('errores.CUENTA_BLOQUEADA_SIN_HORA')
+  }
+  if (error.codigo === 'CUENTA_RECHAZADA' && error.motivo) {
+    return t('errores.CUENTA_RECHAZADA_MOTIVO', { motivo: error.motivo })
   }
   return t(`errores.${error.codigo}`)
 }

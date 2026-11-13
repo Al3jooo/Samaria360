@@ -77,7 +77,7 @@ BL ..> IS : <<extend>>\n[3 intentos fallidos]
 - **FA1. Correo inexistente o contraseña incorrecta.** 401 `CREDENCIALES_INVALIDAS` con el mismo mensaje en los dos casos (ADR-006). La pantalla muestra «Correo o contraseña incorrectos» sin decir cuál.
 - **FA2. Cuenta bloqueada.** En el paso 5, antes de verificar la contraseña: 423 `CUENTA_BLOQUEADA` con la hora de desbloqueo. La pantalla la muestra en la hora local del navegador.
 - **FA3. Cuenta no activa.** Con la contraseña correcta y `estado_cuenta` distinto de Activo (prestador Inactivo, RF22; turista Desactivado, RF62): 403 `CUENTA_INACTIVA`, sin token y con el conteo en 0.
-- **FA4. Prestador sin validar o rechazado.** Con la contraseña correcta: 403 `CUENTA_PENDIENTE_VALIDACION` («Tu cuenta está en revisión por el administrador») o `CUENTA_RECHAZADA` (mensaje genérico; el motivo no se muestra, ver «Pendientes»), sin token y con el conteo en 0.
+- **FA4. Prestador sin validar o rechazado.** Con la contraseña correcta: 403 `CUENTA_PENDIENTE_VALIDACION` («Tu cuenta está en revisión por el administrador») o `CUENTA_RECHAZADA` con `motivo`, la justificación del Administrador (RF28, DEC-273), que la pantalla muestra; sin token y con el conteo en 0.
 - **FA5. Datos incompletos.** El cliente marca el campo vacío sin enviar; si llega al servidor, 400 `DATOS_INVALIDOS` con `campos`.
 - **FA6. Servicio no disponible.** 502, 503 o 504 (o `SERVICIO_NO_DISPONIBLE` del gateway): «El servicio no está disponible por el momento». Un 500 muestra el mensaje genérico.
 
