@@ -162,6 +162,10 @@ Esta enmienda no crea un ADR nuevo: el RNT y la cuenta del prestador viajan por 
    - el registro relee la proyección después de insertar el servicio y, si ya no está Activa, oculta ese servicio.
    Con los dos, ningún entrelazado deja visible el servicio nuevo de un prestador inactivo.
 
+## Retención del outbox (DEC-272, 2026-11-13)
+
+`PurgaOutboxProgramador` borra cada hora, en una transacción, los eventos entregados a todos sus destinos hace más de 30 días, con sus entregas (`samaria360.outbox.purga.*`). Un evento con algún destino pendiente no se toca, así que la purga nunca pierde un cambio sin entregar: el supuesto de orden del relevo (solo la última versión de cada usuario) no cambia.
+
 ## Cuándo revisarla
 
 - Cuando exista el *refresh token*, el TTL podrá bajar más y esta ventana se reduce.

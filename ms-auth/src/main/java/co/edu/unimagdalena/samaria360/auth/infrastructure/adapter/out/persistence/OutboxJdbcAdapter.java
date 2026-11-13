@@ -129,6 +129,27 @@ public class OutboxJdbcAdapter implements OutboxPort {
         }
     }
 
+    /**
+     * Borra, en una transacción, las entregas y los eventos que ya llegaron a todos sus destinos antes de {@code limite}
+     * (DEC-272). La condición sobre {@code outbox_entrega} completa evita borrar un evento con algún destino pendiente.
+     */
+    @Override
+    @Transactional
+    public int purgarEntregados(Instant limite) {
+        List<Long> eventos = jdbc.queryForList("""
+                SELECT en.id_evento
+                FROM outbox_entrega en
+                GROUP BY en.id_evento
+                HAVING bool_and(en.entregado_en IS NOT NULL) AND max(en.entregado_en) < ?
+                """, Long.class, Timestamp.from(limite));
+        if (eventos.isEmpty()) {
+            return 0;
+        }
+        Long[] ids = eventos.toArray(Long[]::new);
+        jdbc.update("DELETE FROM outbox_entrega WHERE id_evento = ANY (?)", (Object) ids);
+        return jdbc.update("DELETE FROM outbox_evento WHERE id_evento = ANY (?)", (Object) ids);
+    }
+
     private String escribir(Map<String, Object> carga) {
         try {
             return json.writeValueAsString(carga);
