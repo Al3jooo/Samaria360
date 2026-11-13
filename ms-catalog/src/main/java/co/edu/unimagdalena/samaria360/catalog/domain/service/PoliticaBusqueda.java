@@ -9,6 +9,7 @@ import co.edu.unimagdalena.samaria360.catalog.domain.model.OrdenBusqueda;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.PaginaResultados;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.ResultadoOferta;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.ServicioComercial;
+import co.edu.unimagdalena.samaria360.catalog.domain.model.TextoBusqueda;
 
 import java.math.BigDecimal;
 import java.text.Collator;
@@ -120,14 +121,12 @@ public final class PoliticaBusqueda {
                 resultados.size());
     }
 
-    /** Texto sobre nombre y descripción, sin distinguir mayúsculas (sí distingue tildes; pendiente para el SAD). */
+    /** Texto sobre nombre y descripción, sin distinguir mayúsculas ni tildes (DEC-274, {@link TextoBusqueda}). */
     private static boolean coincideTexto(String nombre, String descripcion, CriteriosBusqueda criterios) {
         if (criterios.texto() == null) {
             return true;
         }
-        String buscado = criterios.texto().toLowerCase(Locale.ROOT);
-        return nombre.toLowerCase(Locale.ROOT).contains(buscado)
-                || (descripcion != null && descripcion.toLowerCase(Locale.ROOT).contains(buscado));
+        return TextoBusqueda.contiene(nombre, criterios.texto()) || TextoBusqueda.contiene(descripcion, criterios.texto());
     }
 
     /** Distancia al turista (null sin ubicación) y si queda dentro de la distancia máxima (RF38). */

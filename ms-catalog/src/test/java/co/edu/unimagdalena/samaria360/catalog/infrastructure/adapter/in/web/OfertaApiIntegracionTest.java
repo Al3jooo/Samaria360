@@ -188,16 +188,19 @@ class OfertaApiIntegracionTest {
 
     @Test
     void elTextoBuscaEnNombreYDescripcionSinDistinguirMayusculas() throws Exception {
+        // «Cabañas El Roble» dice «cafetales» en su descripción: desde DEC-274, «CAFÉ» también coincide sin la tilde.
         assertThat(nombres(todos("texto=CAFÉ")))
-                .containsExactlyInAnyOrder("Tour de Café en Minca", "Tour de café Samaria Alta");
+                .containsExactlyInAnyOrder("Cabañas El Roble", "Tour de Café en Minca", "Tour de café Samaria Alta");
         assertThat(nombres(todos("texto=piscinas"))).containsExactly("Cascada Quebrada Valencia");
     }
 
     @Test
-    void comportamientoActual_elTextoDistingueTildes() throws Exception {
-        // Pendiente para el SAD (docs/trazabilidad.md): campos normalizados sin tildes.
+    void elTextoNoDistingueTildesEnNingunSentido() throws Exception {
+        // DEC-274: «basilica» encuentra «Basílica» y «CAFE» encuentra «Café» (antes no).
         assertThat(nombres(todos("texto=BASÍLICA"))).containsExactly("Catedral Basílica de Santa Marta");
-        assertThat(todos("texto=basilica")).isEmpty();
+        assertThat(nombres(todos("texto=basilica"))).containsExactly("Catedral Basílica de Santa Marta");
+        assertThat(nombres(todos("texto=CAFE")))
+                .containsExactlyInAnyOrder("Cabañas El Roble", "Tour de Café en Minca", "Tour de café Samaria Alta");
     }
 
     // ------------------------------------------------------------------ errores

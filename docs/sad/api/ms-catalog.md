@@ -41,7 +41,7 @@ Pública, sin token ([ADR-004](../adr/ADR-004-busqueda-combinada.md)). Decisione
 
 - **Visibilidad:** servicios con `estadoPublicacion = Publicado` y `prestadorActivo = true` (RF22), y todos los atractivos, también los cerrados o en mantenimiento, con su estado (decisiones 1 y 5).
 - **Parámetros** (todos opcionales):
-  - `texto`: hasta 100 caracteres; coincidencia parcial en el nombre o la descripción, sin distinguir mayúsculas (sí tildes; punto 5 de «Pendientes para el SAD»).
+  - `texto`: hasta 100 caracteres; coincidencia parcial en el nombre o la descripción, sin distinguir mayúsculas ni tildes (DEC-274): «cafe» encuentra «Café».
   - `categoria`: `Alojamiento`, `Gastronomia`, `Tour` o `AlquilerEquipo`; solo aplica a servicios, así que deja fuera los atractivos (decisión 2).
   - `precioMax`: no negativo; deja fuera los atractivos, que no tienen precio (decisión 3).
   - `lat` y `lng` juntos (la ubicación del turista, RF38; nunca se guarda) y `distanciaKm` mayor que 0, que exige la ubicación.
