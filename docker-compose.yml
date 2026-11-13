@@ -231,7 +231,9 @@ services:
     container_name: samaria360-frontend
     <<: *reinicio
     ports:
-      - "${FRONTEND_PORT:-8000}:8080" # nginx sin root escucha en 8080 dentro del contenedor (frontend/Dockerfile)
+      # Solo en 127.0.0.1, como el gateway y las bases (DEC-266): el perfil dev y los usuarios de prueba no quedan
+      # expuestos a la red local. nginx sin root escucha en 8080 dentro del contenedor (frontend/Dockerfile).
+      - "127.0.0.1:${FRONTEND_PORT:-8000}:8080"
     # Espera al gateway sano: así el primer /api/ no encuentra el puerto cerrado. Si aun así nginx no logra hablar
     # con él (p. ej. tras reiniciar Docker, donde restart no respeta depends_on), responde un 503 con el ProblemDetail
     # SERVICIO_NO_DISPONIBLE (frontend/nginx/default.conf).

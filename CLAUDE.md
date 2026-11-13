@@ -187,7 +187,7 @@ Plataforma de turismo de Santa Marta. Proyecto Capstone Design (Arquitectura de 
 - `infrastructure`: Testcontainers contra PostgreSQL/MongoDB reales.
 - `architecture`: reglas ArchUnit de capas.
 - Antes de dar algo por terminado: `./mvnw test` debe pasar.
-- CI en GitHub Actions (`.github/workflows/`): un workflow por servicio, filtrado por `paths`, que llama a `_java.yml` (`./mvnw verify`, con la cobertura de JaCoCo), y `frontend.yml` (`npm run lint`, `npm run build` y `npm test`; ESLint sin errores, los avisos no bloquean). Un servicio nuevo agrega su workflow.
+- CI en GitHub Actions (`.github/workflows/`): un workflow por servicio, filtrado por `paths`, que llama a `_java.yml` (`./mvnw verify`, con la cobertura de JaCoCo), y `frontend.yml` (`npm run lint`, `npm run build` y `npm test`; ESLint sin errores, los avisos no bloquean). `compose-humo.yml` levanta `docker-compose.yml` y corre `infra/humo/humo.sh` (prueba de humo con endpoints públicos, sin iniciar sesión) cuando cambian Compose, `infra/`, un `Dockerfile` o `frontend/nginx/` (H17). Un servicio nuevo agrega su workflow.
 - Spring Boot se mantiene en la línea 3.5 durante la Construcción ([ADR-010](docs/sad/adr/ADR-010-linea-spring-boot-3-5.md)); no cambiar de línea dentro de una iteración.
 
 ## Comandos
