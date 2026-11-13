@@ -1,0 +1,67 @@
+# Prueba de humo del sistema completo (H17 de la revisión del 2026-11-12): levanta docker-compose.yml como en la
+# demostración y corre infra/humo/humo.sh. Los workflows de cada servicio prueban el código; este prueba el despliegue:
+# Compose, Dockerfiles, nginx (CSP, Permissions-Policy, proxy /api/), migraciones y el gateway.
+name: compose-humo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docker-compose.yml"
+      - "infra/**"
+      - "**/Dockerfile"
+      - "frontend/nginx/**"
+      - ".github/workflows/compose-humo.yml"
+  pull_request:
+    paths:
+      - "docker-compose.yml"
+      - "infra/**"
+      - "**/Dockerfile"
+      - "frontend/nginx/**"
+      - ".github/workflows/compose-humo.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  humo:
+    name: docker compose up y prueba de humo
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Crear .env con contraseñas aleatorias (solo para este runner)
+        run: |
+          cp .env.example .env
+          sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" .env
+          sed -i "s/^MONGO_PASSWORD=.*/MONGO_PASSWORD=$(openssl rand -hex 16)/" .env
+
+      - name: Generar las llaves RS256 del JWT (no se versionan)
+        working-directory: infra/keys
+        run: |
+          openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out jwt-privada.pem
+          openssl rsa -in jwt-privada.pem -pubout -out jwt-publica.pem
+          chmod 644 jwt-*.pem
+
+      - name: Levantar el sistema
+        run: docker compose up -d --build
+
+      - name: Prueba de humo
+        run: bash infra/humo/humo.sh
+
+      - name: Estado y logs si algo falló
+        if: failure()
+        run: |
+          docker compose ps -a
+          docker compose logs --no-color --tail=200
+
+      - name: Detener y borrar el entorno del runner
+        if: always()
+        # Solo en el runner efímero de CI: en una máquina del equipo nunca se usa -v sin permiso (CLAUDE.md).
+        run: docker compose down -v

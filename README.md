@@ -229,6 +229,9 @@ cd frontend && npm test        # y npm run build (tipos) y npm run lint (ESLint)
 
 En GitHub Actions (`.github/workflows/`) corren las mismas pruebas en cada *push* a `main` y en cada PR, solo para los
 servicios cuyas carpetas cambiaron. El informe de cobertura de cada servicio Java queda como artefacto del workflow.
+`compose-humo.yml` levanta el sistema completo y corre la prueba de humo `infra/humo/humo.sh` cuando cambian
+`docker-compose.yml`, `infra/`, un `Dockerfile` o `frontend/nginx/`. La misma prueba sirve en local, con el sistema
+arriba: `bash infra/humo/humo.sh`.
 
 ## Equipo
 
