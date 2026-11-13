@@ -12,6 +12,7 @@ import co.edu.unimagdalena.samaria360.catalog.domain.model.FiltrosTour;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.OrdenBusqueda;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.PaginaResultados;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.ResultadoOferta;
+import co.edu.unimagdalena.samaria360.catalog.domain.model.TextoBusqueda;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.TipoOferta;
 import co.edu.unimagdalena.samaria360.catalog.domain.service.PoliticaBusqueda;
 import org.bson.Document;
@@ -175,14 +176,15 @@ public class OfertaMongoAdapter implements OfertaRepositoryPort {
         return filtrosComunes(new Document(), criterios, "nombre");
     }
 
-    /** Decisión 6 (accesibilidad en ambos) y texto sobre nombre y descripción, sin distinguir mayúsculas. */
+    /** Decisión 6 (accesibilidad en ambos) y texto sobre nombre y descripción, sin mayúsculas ni tildes (DEC-274). */
     private static Document filtrosComunes(Document filtro, CriteriosBusqueda criterios, String campoNombre) {
         if (!criterios.accesibilidad().isEmpty()) {
             filtro.append("condicionesAccesibilidad", new Document("$all",
                     criterios.accesibilidad().stream().map(Enum::name).sorted().toList()));
         }
         if (criterios.texto() != null) {
-            Document regex = new Document("$regex", escaparRegex(criterios.texto())).append("$options", "i");
+            Document regex = new Document("$regex", TextoBusqueda.patronSinTildes(criterios.texto()))
+                    .append("$options", "i");
             filtro.append("$or", List.of(new Document(campoNombre, regex), new Document("descripcion", regex)));
         }
         return filtro;

@@ -144,5 +144,4 @@ end
 ## Fuera de alcance
 
 - Orden por calificación (RF17) y por afluencia, y el indicador de afluencia (RF39).
-- Búsqueda sin distinguir tildes en el catálogo (punto 5 de «Pendientes para el SAD»).
 - Criterio definitivo de «Destacados esta semana» (provisional; «Pendientes»).
