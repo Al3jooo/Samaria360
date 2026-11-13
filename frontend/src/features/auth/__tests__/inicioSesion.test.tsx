@@ -82,6 +82,29 @@ describe('Inicio de sesión (RF15)', () => {
     expect(await screen.findByText(/Tu cuenta no está activa/)).toBeInTheDocument()
   }, 15_000)
 
+  // DEC-273: con la contraseña correcta, el prestador rechazado ve la justificación del Administrador, como texto.
+  it('un 403 CUENTA_RECHAZADA con motivo lo muestra como texto', async () => {
+    simularFetch({
+      [LOGIN]: () => respuestaProblema(403, 'CUENTA_RECHAZADA', { motivo: 'El RNT <b>no</b> está vigente' }),
+    })
+    const { usuario } = renderApp('/login')
+
+    await llenarYEnviar(usuario, 'prestador@samaria360.test', 'Samaria360*')
+
+    const alerta = await screen.findByRole('alert')
+    await screen.findByText(/Motivo: «El RNT <b>no<\/b> está vigente»/)
+    expect(alerta.querySelector('b')).toBeNull()
+  }, 15_000)
+
+  it('un 403 CUENTA_RECHAZADA sin motivo conserva el mensaje genérico', async () => {
+    simularFetch({ [LOGIN]: () => respuestaProblema(403, 'CUENTA_RECHAZADA') })
+    const { usuario } = renderApp('/login')
+
+    await llenarYEnviar(usuario, 'prestador@samaria360.test', 'Samaria360*')
+
+    expect(await screen.findByText(/^El administrador rechazó la solicitud de tu cuenta\. Comunícate/)).toBeInTheDocument()
+  }, 15_000)
+
   // Límite de 15 s: medida en más de 2 s (23 pulsaciones de usuario.type).
   it('un 400 muestra el mensaje de datos inválidos', async () => {
     simularFetch({ [LOGIN]: () => respuestaProblema(400, 'DATOS_INVALIDOS') })
@@ -106,6 +129,18 @@ describe('Inicio de sesión (RF15)', () => {
       await screen.findByText('El servicio no está disponible por el momento. Inténtalo de nuevo en unos minutos.'),
     ).toBeInTheDocument()
   })
+
+  // DEC-271: el gateway responde 429 DEMASIADAS_SOLICITUDES al pasar el límite de tasa por conexión.
+  it('un 429 del gateway muestra el aviso de demasiados intentos', async () => {
+    simularFetch({ [LOGIN]: () => respuestaProblema(429, 'DEMASIADAS_SOLICITUDES') })
+    const { usuario } = renderApp('/login')
+
+    await llenarYEnviar(usuario, 'a@b.co', 'x')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Hubo demasiados intentos desde esta conexión. Espera unos minutos e inténtalo de nuevo.',
+    )
+  }, 15_000)
 
   it('un 500 muestra el mensaje genérico (defecto del servidor, no una caída)', async () => {
     simularFetch({ [LOGIN]: () => respuestaProblema(500, 'ERROR_INTERNO') })

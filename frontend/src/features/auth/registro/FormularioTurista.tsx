@@ -122,7 +122,7 @@ export function FormularioTurista({ onRegistrado }: { onRegistrado: (correo: str
  * «Acepto la Política de Privacidad y el tratamiento de mis datos» (RF01; para el prestador, WF-03 y E1 §3.2.7.4).
  * «Política de Privacidad» va al mismo destino que el pie de página (RUTA_POLITICA_PRIVACIDAD, la sección 4 de WF-15).
  * Se abre en una pestaña nueva para no perder lo escrito en el formulario (DEC-76), y lo anuncia a los lectores de
- * pantalla. Sin ruta (`rutaPolitica = null`) se muestra como «Próximamente», igual que en el pie.
+ * pantalla. Sin ruta (`rutaPolitica = null`) se muestra deshabilitada («No disponible»), igual que en el pie (DEC-270).
  */
 export function CasillaPoliticas({
   id,
@@ -141,7 +141,7 @@ export function CasillaPoliticas({
   const politica = rutaPolitica ? (
     <Link to={rutaPolitica} target="_blank" rel="noopener noreferrer" aria-describedby={`${id}-pestana`} />
   ) : (
-    <span className="enlace-deshabilitado" title={t('comun.proximamente')} />
+    <span className="enlace-deshabilitado" />
   )
   return (
     <div className="registro__politicas">
@@ -159,7 +159,7 @@ export function CasillaPoliticas({
           {!rutaPolitica && (
             <>
               {' '}
-              <span className="solo-lector">({t('comun.proximamente')})</span>
+              <span className="solo-lector">({t('comun.noDisponible')})</span>
             </>
           )}
         </span>

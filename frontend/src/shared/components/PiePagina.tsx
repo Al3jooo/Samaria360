@@ -8,6 +8,8 @@ import { LogoSamaria } from './LogoSamaria'
 interface EnlacePie {
   texto: string
   destino?: string
+  /** Solo con la sesión de un Gestor (DEC-270). */
+  soloGestor?: boolean
 }
 
 /** Las categorías van a la exploración (WF-05) con el filtro aplicado; los nombres son los de la API. */
@@ -28,8 +30,12 @@ const COLUMNAS: { titulo: string; enlaces: EnlacePie[] }[] = [
   },
   {
     titulo: 'pie.prestadores',
-    // «Panel del gestor» lleva al panel «Atractivos» (WF-24, DEC-233); un rol que no es Gestor ve «Sin permiso».
-    enlaces: [{ texto: 'pie.registrarServicio' }, { texto: 'pie.panelGestor', destino: '/gestor/atractivos' }],
+    // «Registrar servicio» lleva al registro del Prestador (WF-08): sin sesión, al login y de vuelta; con otro rol,
+    // «Sin permiso». «Panel del gestor» (WF-24, DEC-233) solo se muestra con la sesión de un Gestor (DEC-270).
+    enlaces: [
+      { texto: 'pie.registrarServicio', destino: '/prestador/servicios/nuevo' },
+      { texto: 'pie.panelGestor', destino: '/gestor/atractivos', soloGestor: true },
+    ],
   },
   {
     titulo: 'pie.legal',
@@ -49,13 +55,13 @@ const ENLACES_ACCESO: EnlacePie[] = [
   { texto: 'pie.ayuda' },
 ]
 
-/** Enlace sin destino en esta iteración: texto deshabilitado, con «Próximamente» para lectores de pantalla. */
+/** Enlace sin destino: el estado único de DEC-22 (DEC-270), con «No disponible» solo para lectores de pantalla. */
 function Pendiente({ texto }: { texto: string }) {
   const { t } = useTranslation()
   return (
-    <span className="enlace-deshabilitado" title={t('comun.proximamente')}>
+    <span className="enlace-deshabilitado">
       {t(texto)}
-      <span className="solo-lector"> ({t('comun.proximamente')})</span>
+      <span className="solo-lector"> ({t('comun.noDisponible')})</span>
     </span>
   )
 }
@@ -67,7 +73,7 @@ function AvisoAcademico() {
 }
 
 /** Pie de las pantallas de la plataforma (docs/wireframes/README.md, v2): logo y cuatro columnas. */
-export function PiePagina() {
+export function PiePagina({ esGestor = false }: { esGestor?: boolean }) {
   const { t } = useTranslation()
   return (
     <footer className="pie">
@@ -84,11 +90,13 @@ export function PiePagina() {
           <section key={columna.titulo} className="pie__columna" aria-labelledby={`pie-${columna.titulo}`}>
             <h2 id={`pie-${columna.titulo}`}>{t(columna.titulo)}</h2>
             <ul>
-              {columna.enlaces.map((enlace) => (
-                <li key={enlace.texto}>
-                  {enlace.destino ? <Link to={enlace.destino}>{t(enlace.texto)}</Link> : <Pendiente texto={enlace.texto} />}
-                </li>
-              ))}
+              {columna.enlaces
+                .filter((enlace) => !enlace.soloGestor || esGestor)
+                .map((enlace) => (
+                  <li key={enlace.texto}>
+                    {enlace.destino ? <Link to={enlace.destino}>{t(enlace.texto)}</Link> : <Pendiente texto={enlace.texto} />}
+                  </li>
+                ))}
             </ul>
           </section>
         ))}

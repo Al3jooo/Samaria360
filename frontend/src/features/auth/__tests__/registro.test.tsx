@@ -271,6 +271,19 @@ describe('CU Registrarse (RF01, RF02; WF-02, WF-03)', () => {
     expect(screen.getByLabelText('Primer nombre')).not.toHaveAttribute('aria-invalid')
   }, 15_000)
 
+  // DEC-271: el gateway limita los registros por conexión y responde 429 DEMASIADAS_SOLICITUDES.
+  it('un 429 del gateway avisa de los demasiados intentos sin marcar campos', async () => {
+    simular({ [REGISTRO_TURISTA]: () => respuestaProblema(429, 'DEMASIADAS_SOLICITUDES') })
+    const { usuario } = renderApp('/registro')
+    await screen.findByRole('option', { name: 'Colombia' })
+
+    await llenarTurista(usuario)
+    await usuario.click(screen.getByRole('button', { name: 'Crear cuenta de turista' }))
+
+    expect(await screen.findByText(/Hubo demasiados intentos desde esta conexión/)).toBeInTheDocument()
+    expect(screen.getByLabelText('Primer nombre')).not.toHaveAttribute('aria-invalid')
+  }, 15_000)
+
   it('los países salen del backend, ordenados por el nombre en el idioma activo', async () => {
     simular()
     const { usuario } = renderApp('/registro')

@@ -1,6 +1,5 @@
 {
   "comun": {
-    "proximamente": "Coming soon",
     "cargando": "Loading…",
     "saltarAlContenido": "Skip to content",
     "cerrarAviso": "Dismiss notice",
@@ -152,12 +151,14 @@
     "ayudaCategorias": "Choose at least one."
   },
   "errores": {
+    "DEMASIADAS_SOLICITUDES": "Too many attempts from this connection. Wait a few minutes and try again.",
     "CREDENCIALES_INVALIDAS": "Incorrect email or password.",
     "CUENTA_BLOQUEADA": "Your account is locked after 3 failed attempts. You can try again at {{hora}}.",
     "CUENTA_BLOQUEADA_SIN_HORA": "Your account is temporarily locked after failed attempts. Try again in a few minutes.",
     "CUENTA_INACTIVA": "Your account is not active. Please contact the platform administrator.",
     "CUENTA_PENDIENTE_VALIDACION": "Your account is being reviewed by the administrator. You can sign in once it is validated.",
     "CUENTA_RECHAZADA": "The administrator rejected your account request. Contact the platform for more information.",
+    "CUENTA_RECHAZADA_MOTIVO": "The administrator rejected your account request. Reason: “{{motivo}}”. Contact the platform for more information.",
     "DATOS_INVALIDOS": "Check your details: enter a valid email address and your password.",
     "ERROR_RED": "Could not reach the server. Check your connection and try again.",
     "SERVICIO_NO_DISPONIBLE": "The service is temporarily unavailable. Please try again in a few minutes.",
