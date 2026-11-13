@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, NavLink } from 'react-router-dom'
 import { LogoSamaria } from './LogoSamaria'
 import { MenuUsuario, type UsuarioEncabezado } from './MenuUsuario'
-import { BotonProximamente } from './Proximamente'
+import { AccionNoDisponible } from './BotonNoDisponible'
 import { SelectorIdioma } from './SelectorIdioma'
 
 function LogoInicio() {
@@ -50,10 +50,10 @@ export function Encabezado({
               <NavLink to="/explorar">{t('encabezado.busqueda')}</NavLink>
             </li>
             <li>
-              <BotonProximamente etiquetaVisible={false}>{t('encabezado.servicios')}</BotonProximamente>
+              <AccionNoDisponible>{t('encabezado.servicios')}</AccionNoDisponible>
             </li>
             <li>
-              <BotonProximamente etiquetaVisible={false}>{t('encabezado.asistente')}</BotonProximamente>
+              <AccionNoDisponible>{t('encabezado.asistente')}</AccionNoDisponible>
             </li>
           </ul>
         </nav>

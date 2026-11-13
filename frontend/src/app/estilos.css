@@ -13,7 +13,7 @@
   --color-superficie: #ffffff; /* tarjetas, menú, campos */
   --color-borde: #e2d9ca; /* separadores (decorativo) */
   --color-borde-campo: #7c8d91; /* borde de campos: contraste no textual ≥ 3:1 */
-  --color-deshabilitado: #5c6d71; /* elementos «Próximamente» */
+  --color-deshabilitado: #5c6d71; /* elementos deshabilitados («No disponible», DEC-22) */
 
   /* --- Color: mar Caribe --- */
   --color-mar-900: #073b44;
@@ -193,32 +193,21 @@ svg {
   animation: girar 800ms linear infinite;
 }
 
-/* ===== Elementos fuera de alcance: visibles, enfocables, «Próximamente» ===== */
+/* ===== Elementos fuera de alcance: visibles, enfocables, «No disponible» (DEC-22, DEC-270) ===== */
 
 .deshabilitado {
   color: var(--color-deshabilitado);
   cursor: not-allowed;
-}
-
-.insignia-proximamente {
-  display: inline-block;
-  margin-left: var(--espacio-2);
-  padding: 0.1rem var(--espacio-2);
-  border-radius: var(--radio-pill);
-  background: var(--color-sol-100);
-  color: var(--color-cafe-700);
-  font-size: var(--texto-xs);
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  line-height: 1.5;
-  text-decoration: none;
-  vertical-align: middle;
-  white-space: nowrap;
+  /* Estado único de DEC-22 (DEC-270): la señal no depende solo del color (WCAG 1.4.1). */
+  text-decoration: underline dashed;
+  text-underline-offset: 0.25em;
 }
 
 .enlace-deshabilitado {
   color: var(--color-deshabilitado);
   cursor: default;
+  text-decoration: underline dashed;
+  text-underline-offset: 0.25em;
 }
 
 /* =========================== Logo =========================== */
