@@ -53,10 +53,18 @@ El correo viaja por el **estado del router**, no por la URL, para que no quede e
 
 ## Consecuencias y riesgo residual
 
-- **423 del login:** el bloqueo de RF15 (423 `CUENTA_BLOQUEADA`, evaluado antes de la contraseña) todavía revela que una cuenta existe, porque solo se bloquean cuentas reales. Es el único riesgo residual del login: las cuentas inactivas, pendientes o rechazadas solo se informan con la contraseña correcta. Se acepta como riesgo conocido y se mitiga en Construcción con un **límite de tasa en el API Gateway**.
+- **423 del login:** el bloqueo de RF15 (423 `CUENTA_BLOQUEADA`, evaluado antes de la contraseña) todavía revela que una cuenta existe, porque solo se bloquean cuentas reales. Es el único riesgo residual del login: las cuentas inactivas, pendientes o rechazadas solo se informan con la contraseña correcta. Se acepta como riesgo conocido y se mitiga en Construcción con un **límite de tasa en el API Gateway**: implementado el 2026-11-13 (DEC-271; ver «Mitigación implementada»).
 - **Caso límite aceptado:** dos registros de prestador simultáneos con el mismo correo **y** el mismo RNT. El segundo choca con la restricción del correo y se reintenta; el reintento ya ve el RNT y responde 409. Según cuál restricción falle primero, podría responder 202 en vez de 409. Se acepta: no revela datos de terceros.
 - **RF34**, cuando se construya, deberá responder de forma uniforme («si el correo existe, te enviamos un enlace»).
 - **Pendiente:** el envío real del aviso por correo electrónico (SMTP) llega con RF34; el puerto ya existe.
+
+## Mitigación implementada (DEC-271, 2026-11-13)
+
+`LimiteTasaWebFilter` (api-gateway) cuenta, por dirección del cliente y en una ventana fija, los `POST /api/v1/auth/login` (10 por minuto) y los `POST /api/v1/auth/registro/**` (5 cada 10 minutos, turista y prestador juntos). Al pasar el máximo responde **429 `DEMASIADAS_SOLICITUDES`** con `Retry-After`, sin llegar a ms-auth. Los valores están en `application.yml` (`samaria360.limite-tasa.*`).
+- **Dirección del cliente:** el último valor de `X-Forwarded-For`, el que agrega nginx; los anteriores los puede inventar el cliente. El gateway solo se publica en 127.0.0.1 (DEC-257), así que el navegador siempre llega por nginx.
+- **Alcance:** frena el recorrido de muchas cuentas o la creación masiva desde una misma conexión. No reemplaza el bloqueo por cuenta de RF15, que sigue en ms-auth.
+- **Límite conocido:** el contador está en la memoria de una instancia del gateway; con varias réplicas, cada una cuenta por su cuenta. Un despliegue real necesita un contador compartido (por ejemplo, Redis con `RequestRateLimiter`).
+- **Pruebas:** `LimiteTasaTest` y `ContadorVentanaFijaTest` (api-gateway); el mensaje del frontend, en `inicioSesion.test.tsx` y `registro.test.tsx`.
 
 ## Verificación
 

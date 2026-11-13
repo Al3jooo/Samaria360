@@ -151,6 +151,7 @@
     "ayudaCategorias": "Elige al menos una."
   },
   "errores": {
+    "DEMASIADAS_SOLICITUDES": "Hubo demasiados intentos desde esta conexión. Espera unos minutos e inténtalo de nuevo.",
     "CREDENCIALES_INVALIDAS": "Correo o contraseña incorrectos.",
     "CUENTA_BLOQUEADA": "Tu cuenta está bloqueada por 3 intentos fallidos. Podrás intentarlo de nuevo a las {{hora}}.",
     "CUENTA_BLOQUEADA_SIN_HORA": "Tu cuenta está bloqueada temporalmente por intentos fallidos. Inténtalo de nuevo en unos minutos.",
