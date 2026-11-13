@@ -41,6 +41,9 @@ jobs:
           cp .env.example .env
           sed -i "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 16)/" .env
           sed -i "s/^MONGO_PASSWORD=.*/MONGO_PASSWORD=$(openssl rand -hex 16)/" .env
+          for variable in AUTH_DB_PASSWORD BOOKING_DB_PASSWORD CATALOG_DB_PASSWORD; do
+            sed -i "s/^$variable=.*/$variable=$(openssl rand -hex 16)/" .env
+          done
 
       - name: Generar las llaves RS256 del JWT (no se versionan)
         working-directory: infra/keys

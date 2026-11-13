@@ -13,8 +13,9 @@ spring:
   datasource:
     # POSTGRES_HOST: localhost con ./mvnw; "postgres" dentro de Docker Compose.
     url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/reservas_db
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    # Usuario propio del servicio (DEC-275); sin BOOKING_DB_USER en .env (arranque local antiguo), el superusuario.
+    username: ${BOOKING_DB_USER:${POSTGRES_USER}}
+    password: ${BOOKING_DB_PASSWORD:${POSTGRES_PASSWORD}}
   jpa:
     open-in-view: false
     hibernate:

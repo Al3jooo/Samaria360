@@ -39,7 +39,7 @@ Mantener Spring Boot 3.5.16 en los cuatro servicios hasta el final de la fase de
 - **Positivas:** la línea base de la arquitectura no cambia; las decisiones y pruebas de las iteraciones A a E siguen
   siendo válidas.
 - **Negativas:** el prototipo no recibe correcciones de seguridad de Spring. No debe desplegarse con tráfico real sin
-  migrar antes (se suma al pendiente conocido de las credenciales de superusuario de las bases).
+  migrar antes.
 
 ## Cuándo revisar esta decisión
 
