@@ -1,7 +1,7 @@
 # Subsistema «Gestionar reservas»: «Consultar historial»
 
 Fase de Construcción (RUP). Caso de uso de la iteración D «Oferta del prestador» (DEC-54): RF12, del lado del Turista (ya implementado, PR #13) y del lado del Prestador (DEC-34). Cierra HC1 y O1 para RF12.
-- **Pantallas:** WF-11 «Mis reservas» (`/mis-reservas`, Turista; pendiente de diseño; ya filtra por estado y por rango de fechas) y WF-23 «Historial de reservas» del Prestador (`/prestador/reservas?desde=&hasta=&estado=&servicio=&pagina=`, desde el menú del avatar; propuesto por arquitectura, pendiente de validación; implementado en la iteración D, sesión B, DEC-196 y DEC-204).
+- **Pantallas:** WF-11 «Mis reservas» (`/mis-reservas`, Turista; pendiente de diseño; ya filtra por estado y por rango de fechas) y WF-23 «Historial de reservas» del Prestador (`/prestador/reservas?desde=&hasta=&estado=&servicio=&pagina=`, desde el menú del avatar; propuesto por arquitectura y validado por el equipo; implementado en la iteración D, sesión B, DEC-196 y DEC-204).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Oferta del prestador — decisiones», DEC-183 a DEC-195).
 - **Contrato HTTP:** en [`sad/api/ms-booking.md`](../sad/api/ms-booking.md) (`GET /reservas/mias` y `GET /reservas/prestador`).

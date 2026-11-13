@@ -37,7 +37,7 @@ Spring Boot 3.5 se mantiene durante la Construcción ([ADR-010](docs/sad/adr/ADR
 | Documento | Contenido |
 |---|---|
 | [`docs/srs/`](docs/srs/) | Especificación de requisitos (fuente única de los RF y RNF) |
-| [`docs/sad/adr/`](docs/sad/adr/) | Decisiones de arquitectura (ADR-004 a ADR-010) |
+| [`docs/sad/adr/`](docs/sad/adr/) | Decisiones de arquitectura (ADR-001 a ADR-010) |
 | [`docs/sad/api/`](docs/sad/api/) | Contratos de la API de ms-auth, ms-catalog y ms-booking |
 | [`docs/sad/diagramas/`](docs/sad/diagramas/) y [`docs/sad/modelo-nosql/`](docs/sad/modelo-nosql/) | Modelo lógico (DBML) y esquemas JSON de `catalog_db` |
 | [`docs/casos-de-uso/`](docs/casos-de-uso/) | Especificaciones textuales de los casos de uso |

@@ -1,7 +1,7 @@
 # Subsistema «Gestionar servicios»: «Registrar servicio comercial»
 
 Fase de Construcción (RUP). Caso de uso de la iteración C «Registrar y aprobar servicio» (DEC-54, DEC-134): RF09, RF10 y RF37, con parte de RF27 y RF58. Incluye el flujo «Consultar mis servicios» (DEC-129).
-- **Pantallas:** WF-08 «Registrar servicio comercial» ([ampliación en Salt](../wireframes/WF-08-registrar-servicio.puml) del PNG) y WF-18 «Mis servicios» ([wireframe](../wireframes/WF-18-mis-servicios.puml)), propuestos por arquitectura y pendientes de validación del equipo. Implementadas en la sesión B1 (DEC-161 a DEC-171): `/prestador/servicios/nuevo`, `/prestador/servicios` y `/prestador/servicios/:id`, solo para el Prestador.
+- **Pantallas:** WF-08 «Registrar servicio comercial» ([ampliación en Salt](../wireframes/WF-08-registrar-servicio.puml) del PNG) y WF-18 «Mis servicios» ([wireframe](../wireframes/WF-18-mis-servicios.puml)), propuestos por arquitectura y validados por el equipo. Implementadas en la sesión B1 (DEC-161 a DEC-171): `/prestador/servicios/nuevo`, `/prestador/servicios` y `/prestador/servicios/:id`, solo para el Prestador.
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Registrar y aprobar servicio — decisiones», DEC-124 a DEC-151).
 - **Contrato HTTP:** en [`sad/api/ms-catalog.md`](../sad/api/ms-catalog.md), sección «Registrar servicio comercial y Mis servicios».

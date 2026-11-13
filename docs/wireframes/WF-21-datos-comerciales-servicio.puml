@@ -1,5 +1,5 @@
 ' WF-21 — Editar datos comerciales del servicio (CU «Actualizar datos comerciales», flujo B, RF43; DEC-188, DEC-189,
-' DEC-196, DEC-199 a DEC-201). Propuesto por arquitectura, pendiente de validación del equipo. Solo estructura.
+' DEC-196, DEC-199 a DEC-201). Propuesto por arquitectura y validado por el equipo. Solo estructura.
 ' Solo para el Prestador; se llega con «Editar datos comerciales» desde el detalle propio de WF-18, en Pendiente o
 ' Publicado. Ruta: /prestador/servicios/:id/datos-comerciales. Los 409 se atienden como en WF-20.
 

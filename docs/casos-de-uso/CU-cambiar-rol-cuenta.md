@@ -1,7 +1,7 @@
 # Subsistema «Gestionar usuarios»: «Cambiar rol de cuenta»
 
 Fase de Construcción (RUP). Caso de uso de la iteración B2 «Cambiar rol de cuenta» (DEC-82, DEC-83): RF45.
-- **Pantalla:** WF-12 «Administrar cuentas», con la pestaña «Personal» y la acción «Asignar rol» en la pestaña «Turistas» ([wireframe](../wireframes/WF-12-administrar-cuentas.puml), propuesto por arquitectura y pendiente de validación del equipo). La implementa la sesión B.
+- **Pantalla:** WF-12 «Administrar cuentas», con la pestaña «Personal» y la acción «Asignar rol» en la pestaña «Turistas» ([wireframe](../wireframes/WF-12-administrar-cuentas.puml), propuesto por arquitectura y validado por el equipo). La implementa la sesión B.
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Cambiar rol de cuenta — decisiones», DEC-103 a DEC-114).
 - **Mecanismo:** [ADR-008](../sad/adr/ADR-008-sincronizacion-estado-cuentas.md), sección «Enmienda RF45 (B2)».

@@ -1,7 +1,7 @@
 # Subsistema «Gestionar atractivos»: «Registrar evento en agenda»
 
 Fase de Construcción (RUP). Caso de uso de la iteración E «Atractivos y agenda», sesión A2 (DEC-54, DEC-213): RF25 (parte del Gestor). Cierra HC-E1 para RF25.
-- **Pantallas:** WF-25 (`docs/wireframes/WF-25-eventos-gestor.puml`: panel `/gestor/eventos` y registro `/gestor/eventos/nuevo`), propuesto por arquitectura y pendiente de validación; implementado en la sesión B2 (DEC-245 a DEC-251).
+- **Pantallas:** WF-25 (`docs/wireframes/WF-25-eventos-gestor.puml`: panel `/gestor/eventos` y registro `/gestor/eventos/nuevo`), propuesto por arquitectura y validado por el equipo; implementado en la sesión B2 (DEC-245 a DEC-251).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Fuente del modelo:** DocumentoEntregable2.md (documento del Proyecto, fuera del repositorio): §1.2, figura 5 (CU «Registrar evento en agenda»), §2.1 (clase `EventoTuristico`) y §2.4 (colección `eventos`).
 - **Decisiones:** en `docs/trazabilidad.md` («Atractivos y agenda — decisiones (iteración E, sesión A2)», DEC-235 a DEC-242), más DEC-215.

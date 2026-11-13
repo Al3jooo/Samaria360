@@ -1,7 +1,7 @@
 # Subsistema «Explorar oferta turística»: «Guardar favoritos»
 
 Fase de Construcción (RUP). Caso de uso de la iteración B1 «Turista» (DEC-83): RF54.
-- **Pantallas:** el corazón de las tarjetas de WF-05 y de la ficha WF-06 ([cambios](../wireframes/WF-05-06-11-cambios-turista.puml)) y «Mis favoritos», WF-17 ([wireframe](../wireframes/WF-17-mis-favoritos.puml)). Propuestos por arquitectura y pendientes de validación del equipo.
+- **Pantallas:** el corazón de las tarjetas de WF-05 y de la ficha WF-06 ([cambios](../wireframes/WF-05-06-11-cambios-turista.puml)) y «Mis favoritos», WF-17 ([wireframe](../wireframes/WF-17-mis-favoritos.puml)). Propuestos por arquitectura y validados por el equipo.
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Turista (B1) — decisiones»).
 - **Contrato HTTP:** en [`sad/api/ms-catalog.md`](../sad/api/ms-catalog.md), sección «Favoritos».

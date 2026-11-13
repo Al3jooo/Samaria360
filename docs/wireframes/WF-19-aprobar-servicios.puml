@@ -1,5 +1,5 @@
 ' WF-19 — Aprobar servicios (CU «Aprobar o rechazar servicio», RF21; «Consultar listado pendiente» y «Justificar
-' rechazo de servicio»; DEC-128, DEC-144, DEC-145). Propuesto por arquitectura, pendiente de validación del equipo.
+' rechazo de servicio»; DEC-128, DEC-144, DEC-145). Propuesto por arquitectura y validado por el equipo.
 ' Solo estructura: regiones, elementos y flujo. Diagramas: (1) cola de pendientes; (2) revisión; (3) diálogo de rechazo.
 ' Solo para el Administrador; se llega desde el menú del avatar. Lo implementa la sesión B2.
 

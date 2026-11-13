@@ -1,5 +1,5 @@
-' Cambios de la iteración B1 «Turista» en WF-05, WF-06 y WF-11 (RF60, RF54, RF49). Propuestos por arquitectura,
-' pendientes de validación del equipo (DEC-90). Solo estructura: muestran únicamente las regiones que cambian; el
+' Cambios de la iteración B1 «Turista» en WF-05, WF-06 y WF-11 (RF60, RF54, RF49). Propuestos por arquitectura y
+' validados por el equipo (DEC-90). Solo estructura: muestran únicamente las regiones que cambian; el
 ' resto de cada pantalla es el de su wireframe. Diagramas: (1) WF-05; (2) WF-06; (3) WF-11.
 
 @startsalt

@@ -1,5 +1,5 @@
 ' WF-08 — Registrar servicio comercial (RF09, RF10, RF27, RF37, RF58). Ampliación en Salt del PNG
-' (WF-08-registrar-servicio.png), propuesta por arquitectura y pendiente de validación del equipo (iteración C, DEC-130
+' (WF-08-registrar-servicio.png), propuesta por arquitectura y validada por el equipo (iteración C, DEC-130
 ' a DEC-136). Solo estructura: regiones, elementos y flujo. Conserva todos los elementos del PNG y agrega las unidades
 ' del alojamiento (DEC-133), la oferta inicial (DEC-136), la dirección y el pin del mapa (DEC-132).
 ' Diagramas: (1) datos generales y Alojamiento; (2) Tour con su oferta; (3) Gastronomía, Alquiler y errores.

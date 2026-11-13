@@ -1,6 +1,6 @@
 ' WF-09 — Registrar atractivo turístico, ampliación (CU «Registrar atractivo» y «Actualizar atractivo»; RF06, RF07,
 ' RF24, RF27, RF33, RF58; DEC-219, DEC-221, DEC-223, DEC-226 a DEC-228, DEC-234).
-' Propuesto por arquitectura, pendiente de validación del equipo. Solo estructura: regiones, elementos y flujo. Parte de
+' Propuesto por arquitectura y validado por el equipo. Solo estructura: regiones, elementos y flujo. Parte de
 ' la imagen WF-09-registrar-atractivo.png y agrega la descripción (RF06), el horario (RF58), el campo de la capacidad de
 ' carga (la imagen solo dibuja su etiqueta), las tres condiciones de RF27 y el pin del mapa.
 ' Diagramas: (1) alta con fotos; (2) edición. Solo para el Gestor; se llega desde el panel «Atractivos» (WF-24) o el

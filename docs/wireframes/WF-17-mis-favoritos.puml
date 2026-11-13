@@ -1,4 +1,4 @@
-' WF-17 — Mis favoritos (RF54). Propuesto por arquitectura, pendiente de validación del equipo (DEC-90).
+' WF-17 — Mis favoritos (RF54). Propuesto por arquitectura y validado por el equipo (DEC-90).
 ' Solo estructura: regiones, elementos y flujo. Diagramas: (1) lista; (2) estado vacío.
 ' Se llega desde WF-16 («Mis favoritos») y desde el menú del avatar. Solo para turistas.
 

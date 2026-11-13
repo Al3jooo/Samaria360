@@ -1,7 +1,7 @@
 # CU «Consultar términos y condiciones»
 
 Fase de Construcción (RUP). Caso de uso de la iteración «Contenido público»: RF46.
-- **Pantalla:** WF-15 ([wireframe](../wireframes/WF-15-terminos.puml), propuesto por arquitectura y pendiente de validación del equipo).
+- **Pantalla:** WF-15 ([wireframe](../wireframes/WF-15-terminos.puml), propuesto por arquitectura y validado por el equipo).
 - **Requisitos:** citados de `docs/srs/especificacion de requisitos.pdf`.
 - **Decisiones:** en `docs/trazabilidad.md` («Contenido público — decisiones»).
 - **Por qué es nuevo:** RF46 no tenía caso de uso en el modelo de los entregables (hallazgo HC-A). Este CU lo agrega con un nombre nuevo; los nombres originales de los demás CU se conservan (DEC-59).

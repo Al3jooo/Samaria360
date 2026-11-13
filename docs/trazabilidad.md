@@ -271,7 +271,7 @@ CU **Registrarse** ↔ **RF01** (turista, WF-02) y **RF02** (prestador, WF-03). 
 | WF-11 | Con otro rol, el aviso «“Mis reservas” es solo para cuentas de turista» | Reservar servicio | RNF06 | — | `MisReservasPage.tsx` | Implementado |
 | WF-11 | «Compartir» solo en las reservas Completadas: enlace absoluto `/servicios/:idServicio` (de `GET /mias`) con la Web Share API; si no existe o falla, copia al portapapeles con «Enlace copiado» en `aria-live`; si tampoco se puede, el enlace en un campo de solo lectura, seleccionado. Cerrar la hoja de compartir no es un error (DEC-81, DEC-100). Sin endpoint nuevo ni cambios en ms-booking | Compartir reserva completada («extend» de Consultar historial) | RF49 | `GET /api/v1/reservas/mias` (`idServicio`, `estado`) | `reservas/compartirReserva.ts`, `componentes/TarjetaReserva.tsx`, `MisReservasPage.tsx` (`compartirReserva.test.tsx`) | Implementado |
 
-### WF-12 — Administrar cuentas (nuevo; propuesto por arquitectura, pendiente de validación del equipo)
+### WF-12 — Administrar cuentas (nuevo; propuesto por arquitectura y validado por el equipo)
 
 Pantalla privada del Administrador (DEC-36; [`WF-12-administrar-cuentas.puml`](wireframes/WF-12-administrar-cuentas.puml)), en `/admin/cuentas`, con carga diferida y solo para el rol Administrador (DEC-51). Caso de uso: [«Administrar cuentas»](casos-de-uso/CU-administrar-cuentas.md). Componentes en `features/admin/`; pruebas en `features/admin/__tests__/administrarCuentas.test.tsx` (salvo que se indique otra). Decisiones de la pantalla: DEC-47 a DEC-53 («Administrar cuentas, frontend — decisiones»).
 
@@ -298,7 +298,7 @@ Pantalla privada del Administrador (DEC-36; [`WF-12-administrar-cuentas.puml`](w
 | WF-12 | «Asignar rol» en la pestaña «Turistas», solo para un turista Activo (deshabilitado con su motivo si está Desactivado) | Cambiar rol de cuenta | RF45 | `POST /admin/cuentas/{id}/cambio-rol` | `AdministrarCuentasPage.tsx` | Implementado (`cambiarRol.test.tsx`, DEC-117) |
 | WF-12 | Diálogo de confirmación del cambio de rol (rol actual y nuevo; la advertencia de DEC-112 al asignar) y región `aria-live` con los 409 `ROL_CAMBIADO`, `CUENTA_NO_ELEGIBLE`, `CAMBIO_ROL_PROPIO` y `ULTIMO_ADMINISTRADOR` (avisa y recarga, DEC-52) | Cambiar rol de cuenta | RF45 | 409 de `POST /admin/cuentas/{id}/cambio-rol` | `componentes/DialogoCambioRol.tsx`, `AdministrarCuentasPage.tsx` | Implementado (`cambiarRol.test.tsx`; radios en lugar del `<select>`, DEC-118 y DEC-119) |
 
-### WF-13, WF-14 y WF-15 — Contenido público (nuevos; propuestos por arquitectura, pendientes de validación del equipo)
+### WF-13, WF-14 y WF-15 — Contenido público (nuevos; propuestos por arquitectura y validados por el equipo)
 
 Wireframes en PlantUML Salt (DEC-67, como DEC-36): [`WF-13-preguntas-frecuentes.puml`](wireframes/WF-13-preguntas-frecuentes.puml), [`WF-14-avisos.puml`](wireframes/WF-14-avisos.puml) y [`WF-15-terminos.puml`](wireframes/WF-15-terminos.puml).
 
@@ -322,7 +322,7 @@ Rutas: `/preguntas-frecuentes` y `/terminos` (públicas); `/admin/preguntas-frec
 | WF-15 | Términos y condiciones: página estática, en ES y EN, con la nota de prototipo académico, el índice de DEC-68 con anclas y las 9 secciones (DEC-75) | Consultar términos y condiciones | RF46, RNF08 | — | `features/contenido/terminos/TerminosPage.tsx`, `terminos/textoTerminos.ts` (`terminos.test.tsx`, `paridad.test.ts`) | Implementado |
 | WF-15 | Sección 4 «Datos personales (Ley 1581 de 2012)», destino de «Políticas de privacidad» (pie, pie reducido, login y casilla del registro): `RUTA_POLITICA_PRIVACIDAD = /terminos#privacidad` (DEC-68, DEC-76) | Consultar términos y condiciones | RF46, D6 | — | `shared/rutasLegales.ts`, `features/contenido/terminos/TerminosPage.tsx` (`terminos.test.tsx`, `registro.test.tsx`) | Implementado |
 
-### WF-16 y WF-17 — Turista (nuevos; propuestos por arquitectura, pendientes de validación del equipo)
+### WF-16 y WF-17 — Turista (nuevos; propuestos por arquitectura y validados por el equipo)
 
 Pantallas privadas del rol Turista (DEC-90; [`WF-16-perfil-turista.puml`](wireframes/WF-16-perfil-turista.puml), [`WF-17-mis-favoritos.puml`](wireframes/WF-17-mis-favoritos.puml) y [`WF-05-06-11-cambios-turista.puml`](wireframes/WF-05-06-11-cambios-turista.puml)). El backend es de la sesión A y las pantallas, de la sesión B de B1 (DEC-83): `/perfil?seccion=` (WF-16) y `/perfil/favoritos` (WF-17), diferidas y dentro de `RutaProtegida rol="Turista"` (DEC-92). Decisiones en «Turista (B1), frontend — decisiones (sesión B)».
 
@@ -334,7 +334,7 @@ Pantallas privadas del rol Turista (DEC-90; [`WF-16-perfil-turista.puml`](wirefr
 | WF-17 | «Mis favoritos»: hasta 100, del más reciente al más antiguo, con «n de 100», imagen, nombre, categoría, insignia «Disponible» o «No disponible», «Ver detalle» (solo servicios disponibles) y «Quitar» sin confirmación; estado vacío, error con «Reintentar» (DEC-86, DEC-99) | Guardar favoritos | RF54 | `GET` y `DELETE /api/v1/catalogo/favoritos` | `features/perfil/MisFavoritosPage.tsx` (`misFavoritos.test.tsx`) | Implementado |
 | WF-17 | «Ver detalle» de un atractivo favorito: enlace a su ficha (iteración E, B1; DEC-87, DEC-224) | Guardar favoritos | RF54 | `GET /api/v1/catalogo/atractivos/{id}` | `MisFavoritosPage.tsx` | Implementado |
 
-### WF-20 a WF-23 — Oferta del prestador (nuevos; propuestos por arquitectura, pendientes de validación del equipo)
+### WF-20 a WF-23 — Oferta del prestador (nuevos; propuestos por arquitectura y validados por el equipo)
 
 Pantallas privadas del rol Prestador (DEC-196; [`WF-20-actualizar-precio.puml`](wireframes/WF-20-actualizar-precio.puml), [`WF-21-datos-comerciales-servicio.puml`](wireframes/WF-21-datos-comerciales-servicio.puml), [`WF-22-perfil-comercial.puml`](wireframes/WF-22-perfil-comercial.puml) y [`WF-23-historial-reservas-prestador.puml`](wireframes/WF-23-historial-reservas-prestador.puml)). El backend es de la iteración D, sesión A, y las pantallas, de la sesión B: diferidas y dentro de `RutaProtegida rol="Prestador"` (DEC-161). Componentes: [`sad/diagramas/componentes-frontend-prestador.puml`](sad/diagramas/componentes-frontend-prestador.puml). Decisiones en «Oferta del prestador, frontend — decisiones».
 
@@ -348,7 +348,7 @@ Pantallas privadas del rol Prestador (DEC-196; [`WF-20-actualizar-precio.puml`](
 | WF-23 | Historial: filtros en la URL (desde, hasta, estado múltiple, servicio), 366 días como mucho, 20 por página, tarjetas sin datos del Turista, vacío, error con «Reintentar»; el selector lista hasta los 200 servicios registrados más recientes y, si falla, se deshabilita sin bloquear el historial (DEC-204) | Consultar historial | RF12 | `GET /api/v1/reservas/prestador`, `GET /api/v1/catalogo/prestador/servicios` | `HistorialReservasPage.tsx`, `componentes/TarjetaReservaPrestador.tsx`, `criteriosHistorialPrestador.ts`, `reservasPrestadorApi.ts` (`historialPrestador.test.tsx`) | Implementado |
 | — | Menú del avatar del Prestador: «Historial de reservas» y «Mi perfil comercial» (DEC-197); las rutas nuevas, cerradas a los otros roles y al visitante | Consultar historial; Actualizar datos comerciales | RF12, RF43, RNF06 | — | `shared/components/MenuUsuario.tsx`, `app/App.tsx` (`rutasPrestador.test.tsx`, `sesion.test.tsx`) | Implementado |
 
-### WF-09, WF-24 y WF-06 para atractivos — Atractivos (iteración E, sesión B1; propuestos por arquitectura, pendientes de validación del equipo)
+### WF-09, WF-24 y WF-06 para atractivos — Atractivos (iteración E, sesión B1; propuestos por arquitectura y validados por el equipo)
 
 | Wireframe | Elemento | Caso de uso | RF/RNF | Endpoint | Componente frontend | Estado |
 |---|---|---|---|---|---|---|
@@ -365,7 +365,7 @@ Pantallas privadas del rol Prestador (DEC-196; [`WF-20-actualizar-precio.puml`](
 | Común | Insignia del estado operativo, una sola para la tarjeta, la ficha y el panel (DEC-232) | Buscar oferta; Consultar detalle de atractivo | RF33 | — | `catalogo/componentes/InsigniaEstadoOperativo.tsx` | Implementado |
 | Común | Menú del Gestor: «Atractivos» y «Registrar atractivo»; las rutas `/gestor/**`, cerradas a los otros roles y al visitante (DEC-233; cierra N4 para el Gestor) | Actualizar atractivo; Registrar atractivo | RNF06 | — | `shared/components/MenuUsuario.tsx`, `app/App.tsx` | Implementado |
 
-### WF-25 y WF-26 — Agenda de eventos (iteración E, sesión B2; propuestos por arquitectura, pendientes de validación del equipo)
+### WF-25 y WF-26 — Agenda de eventos (iteración E, sesión B2; propuestos por arquitectura y validados por el equipo)
 
 CU [Registrar evento en agenda](casos-de-uso/CU-registrar-evento-agenda.md) (con el flujo «Consultar eventos registrados») y [Consultar agenda de eventos](casos-de-uso/CU-consultar-agenda-eventos.md). Decisiones DEC-245 a DEC-251 («Atractivos y agenda, frontend — decisiones (iteración E, sesión B2)»).
 
@@ -520,7 +520,6 @@ Bajo `/api/v1/reservas`. Contrato completo en [`sad/api/ms-booking.md`](sad/api/
 | WF-08, elementos deshabilitados (DEC-22, DEC-167): «Cobra por» y «El precio incluye impuestos» (sin campo en el esquema), «Fotos del servicio» (RF48) y la casilla de veracidad (la «visita de verificación del municipio» no está en el SRS). La iteración E llevó las imágenes solo a los atractivos (GridFS, ADR-009); RF48 está descartado del plan del 60 % (DEC-54) | WF-08 | RF37, RF48 | Por definir (equipo); fotos con RF48 |
 | WF-18, «Editar y reenviar» un servicio rechazado, deshabilitado: `Rechazado` es final. **Fuera de la iteración D** (DEC-193): ningún RF de D lo traza. Queda deshabilitado | WF-18 | RF09 | Por definir (equipo) |
 | N22, comentarios Java: los comentarios del backend que citan `CU-registrar-servicio.md` con el nombre antiguo (el archivo conserva su nombre, DEC-173). Los documentos del SAD ya se corrigieron en B2 (DEC-182). **Iteración D, sesión A:** corregidos en los archivos que tocó (`RegistroServicio`, `ServicioPrestadorController`); quedan los demás | — (código) | RF09 | Con la próxima modificación de cada archivo |
-| **Validación de los wireframes propuestos por arquitectura:** WF-12 a WF-26, WF-06 para atractivos y `WF-05-06-11-cambios-turista.puml` están implementados, pero los propuso arquitectura y falta que el equipo (quien hizo los wireframes) los valide o los rediseñe. Sus `.png` los dibujó arquitectura (DEC-268) | WF-12 a WF-26 | RF12, RF21, RF25, RF26, RF32, RF33, RF40, RF43, RF45, RF46, RF53, RF54 | Validación del equipo |
 | **Límite del selector «Servicio» del historial (DEC-204, C6):** lista los 200 servicios registrados más recientes (20 páginas de 10 de `GET /prestador/servicios`); un Prestador con más servicios filtra los anteriores solo por la URL. Quitar el límite exige un listado sin paginar o una búsqueda en el contrato de ms-catalog | WF-23 | RF12 | Por definir (equipo) |
 | **Servicio de prueba de B2 (O21):** crear como máximo un servicio «Recorrido visual B2 …» de un Prestador de la semilla y aprobarlo (queda Publicado, sin vuelta atrás en C), con la sesión del Prestador abierta **en el navegador** (O18); informar su id, su estado final y si ms-booking materializó su oferta. Opcional (decisión de la asesoría). El recorrido de WF-19 ya se hizo (O21) | WF-19 | RF21 | Construcción (antes de la demostración; opcional) |
 
@@ -537,7 +536,8 @@ Bajo `/api/v1/reservas`. Contrato completo en [`sad/api/ms-booking.md`](sad/api/
 - **Editor de unidades del alojamiento (resuelto en B1).** Antes: «WF-08 pide un solo número de habitaciones y una capacidad». Ahora `EditorUnidades` admite de 1 a 20 unidades (DEC-133, DEC-164) y las tarjetas muestran el precio con «Desde» (`catalogo.tarjeta.desde`).
 - **RNT en el formulario de WF-08 (resuelto en la iteración D).** `GET /api/v1/auth/prestador/perfil` trae el RNT (DEC-188, O16) y WF-08 lo muestra (DEC-203).
 - **Historial de reservas del Prestador (resuelto en la iteración D).** Backend en la sesión A (`GET /api/v1/reservas/prestador`, DEC-191, DEC-192) y pantalla WF-23 en la sesión B (DEC-204).
-- **Pantallas de la iteración D (resuelto en la sesión B).** WF-20 a WF-23, propuestos por arquitectura e implementados; su validación sigue en «Pendientes».
+- **Validación de los wireframes propuestos por arquitectura (resuelto el 2026-11-13, DEC-269).** WF-12 a WF-26, WF-06 para atractivos y los cambios en WF-05, WF-06 y WF-11, con sus PNG (DEC-268).
+- **Pantallas de la iteración D (resuelto en la sesión B).** WF-20 a WF-23, propuestos por arquitectura e implementados; validados por el equipo (DEC-269).
 
 **Terminología: «afluencia», no «aforo».** Los wireframes dicen «aforo»: «Aforo Bajo / Medio / Alto» en la leyenda de WF-05, «aforo en tiempo real» (WF-04) y «Aforo en vivo» (WF-06, WF-07); el pie de la v1 decía «Aforos en vivo». La fuente es el SRS, que usa «afluencia» (RF39: «indicador visual del nivel de afluencia actual (Bajo, Medio, Alto) de cada atractivo»). Por eso todos los textos visibles dicen «afluencia» (ES) / «crowd level» (EN). En las tarjetas, la etiqueta depende del tipo de oferta: «Afluencia» en los atractivos (RF39) y «Disponibilidad» en los servicios (RF11, «disponibilidad de cupos y horarios»), tanto en el inicio como en /explorar.
 
@@ -670,7 +670,7 @@ Decisiones del equipo y de arquitectura para el CU «Administrar cuentas» (ms-a
 | DEC-33 | Entrega | Dos PR, una sesión por rama: A es backend y documentos; B es el frontend, desde `main` tras el merge de A | — |
 | DEC-34 | Alcance de reservas | RF19 (modificar fechas, horarios y cupos) fuera de alcance; RF12 del lado del Prestador en la iteración D. **Registrada en la iteración D:** era una decisión de la asesoría que se citaba sin estar copiada aquí | — |
 | DEC-35 | RF39 | RF39 no aplica. **Registrada en la iteración D**, como DEC-34 | — |
-| DEC-36 | WF-12 | Se registra como wireframe nuevo en `docs/wireframes/` (propuesto por arquitectura, pendiente de validación del equipo) | `WF-12-administrar-cuentas.puml` |
+| DEC-36 | WF-12 | Se registra como wireframe nuevo en `docs/wireframes/` (propuesto por arquitectura y validado por el equipo) | `WF-12-administrar-cuentas.puml` |
 | DEC-37 | Reactivar prestador | El prestador inactivo no se reactiva: RF22 no lo define. En WF-12 la acción aparece deshabilitada y se lista como pendiente | — |
 | DEC-38 | Motivo | Inactivar y desactivar no llevan motivo; solo el rechazo (RF28) exige justificación | — |
 | DEC-39 | Concurrencia | Entre administradores, UPDATE condicional sobre el estado esperado; si ya cambió, 409 `ESTADO_CAMBIADO` (con `estadoActual`) | — |
@@ -830,7 +830,7 @@ Quién las tomó:
 | DEC-87 | RF54 para atractivos | Los atractivos aparecen en las tarjetas y el mapa de WF-05, así que se pueden marcar: el backend acepta `Atractivo` y RF54 queda Implementado al cerrar la sesión B. Un atractivo es visible mientras exista (no tiene estado de publicación). El enlace «Ver detalle» de un atractivo espera el **detalle de atractivo de la iteración E** | — |
 | DEC-88 | Detalles del historial | Documento del Entregable 2 (`turistaId`, `criteriosBusqueda` como JSON canónico y `fecha`) más `clave`. Se guardan los criterios de `/oferta` normalizados, **sin página ni coordenadas**: por RF38 la ubicación es un dato personal y cambia, así que solo se guarda `usarUbicacion` y, al repetir, se vuelve a pedir. La misma combinación (texto sin mayúsculas y con los espacios colapsados) actualiza la fecha (*upsert* por el índice único; si choca, se reintenta una vez como update y, si tampoco cambia nada, igual 204). Se conservan las 10 más recientes (poda al escribir). `POST` → 204; sin criterios (solo el orden) → 204 sin guardar. Un criterio inválido es **400 `CRITERIOS_INVALIDOS`**, el mismo contrato de `/oferta` (se validan con `CriteriosBusqueda`): **excepción explícita** a la regla «`DATOS_INVALIDOS` con `campos`». Un cuerpo mal formado o un enum desconocido → 400 `DATOS_INVALIDOS` | `CriteriosGuardados`, `HistorialBusquedasService`, `HistorialBusquedaMongoAdapter` |
 | DEC-89 | Migraciones | MongoDB **M007** (esquema; validadores e índices de `favoritos` e `historial_busqueda`, con sus copias). **Sin M008:** el turista de la demostración crea sus datos al usar la aplicación, y una semilla dependería de los `_id` de la línea base. **Sin V15 en ms-auth:** el esquema ya soporta RF53; V15 queda para B2 | `infra/mongo/migraciones/esquema/M007__*` |
-| DEC-90 | Wireframes | WF-16 (perfil), WF-17 («Mis favoritos») y `WF-05-06-11-cambios-turista.puml`, en PlantUML Salt y solo de estructura, propuestos por arquitectura y pendientes de validación (como DEC-36 y DEC-67). En WF-06, el ícono «Compartir» sigue deshabilitado | `docs/wireframes/` |
+| DEC-90 | Wireframes | WF-16 (perfil), WF-17 («Mis favoritos») y `WF-05-06-11-cambios-turista.puml`, en PlantUML Salt y solo de estructura, propuestos por arquitectura y validados por el equipo (como DEC-36 y DEC-67). En WF-06, el ícono «Compartir» sigue deshabilitado | `docs/wireframes/` |
 | DEC-91 | RF49 en la sesión A | Sin código: solo el CU nuevo y la trazabilidad. RF49 queda Pendiente (solo frontend) | `CU-compartir-reserva-completada.md` |
 
 **Estado de los RF de la iteración al cerrar la sesión A (sigue en 21 de 64; suma 4 al cerrar la sesión B: 21 → 25; meta: 39, DEC-54). El estado actual está en «Turista (B1), frontend — decisiones (sesión B)»:**
@@ -1263,7 +1263,7 @@ Avance: sigue en **30 de 64** (meta 39, DEC-54). Suma 3 al cerrar la sesión B: 
 
 ## Oferta del prestador, frontend — decisiones (iteración D, sesión B; RF32, RF43, RF12)
 
-Pantallas y documentos de la iteración D. **No toca el backend.** Wireframes nuevos WF-20 a WF-23 (propuestos por arquitectura, pendientes de validación del equipo) y diagrama de componentes [`sad/diagramas/componentes-frontend-prestador.puml`](sad/diagramas/componentes-frontend-prestador.puml). Las secuencias desde la pantalla están en los tres CU.
+Pantallas y documentos de la iteración D. **No toca el backend.** Wireframes nuevos WF-20 a WF-23 (propuestos por arquitectura y validados por el equipo) y diagrama de componentes [`sad/diagramas/componentes-frontend-prestador.puml`](sad/diagramas/componentes-frontend-prestador.puml). Las secuencias desde la pantalla están en los tres CU.
 
 **Decisiones de la sesión B (DEC-196 a DEC-205; propuestas por arquitectura y aprobadas con el plan y las condiciones C1 a C9 del usuario):**
 
@@ -1526,7 +1526,7 @@ Sesión del 2026-11-05 sobre `main` en `7595bdc` (merge del PR #32): `docker com
 
 ## Atractivos y agenda, frontend — decisiones (iteración E, sesión B2; RF25)
 
-Pantallas de la agenda de eventos sobre el backend de A2 (PR #32). Un solo PR desde `feature/eventos-agenda-frontend`. CU de referencia: [Registrar evento en agenda](casos-de-uso/CU-registrar-evento-agenda.md) y [Consultar agenda de eventos](casos-de-uso/CU-consultar-agenda-eventos.md); solo cambia su línea «Pantallas». Wireframes nuevos, propuestos por arquitectura y pendientes de validación: [WF-25](wireframes/WF-25-eventos-gestor.puml) (panel y registro del Gestor) y [WF-26](wireframes/WF-26-agenda-eventos.puml) (agenda pública). Sin cambios en el backend.
+Pantallas de la agenda de eventos sobre el backend de A2 (PR #32). Un solo PR desde `feature/eventos-agenda-frontend`. CU de referencia: [Registrar evento en agenda](casos-de-uso/CU-registrar-evento-agenda.md) y [Consultar agenda de eventos](casos-de-uso/CU-consultar-agenda-eventos.md); solo cambia su línea «Pantallas». Wireframes nuevos, propuestos por arquitectura y validados por el equipo: [WF-25](wireframes/WF-25-eventos-gestor.puml) (panel y registro del Gestor) y [WF-26](wireframes/WF-26-agenda-eventos.puml) (agenda pública). Sin cambios en el backend.
 
 **Decisiones que no se reabren:** DEC-215, DEC-235 a DEC-242, DEC-47 (públicos sin `Authorization`), DEC-176 (capas), DEC-233 (menú y pie del Gestor) y DEC-243 (CSP). Riesgo de A2: el frontend **no recalcula «hoy»**.
 
@@ -1635,7 +1635,7 @@ Defecto encontrado durante la revisión del repositorio (2026-11-05), en un PR p
 |---|---|---|---|
 | DEC-260 | Caché DNS de las rutas | El cliente HTTP de las rutas (Reactor Netty) guarda cada resolución **10 s como máximo**. **Causa:** el DNS interno de Docker responde con TTL de 600 s y Reactor Netty lo respeta; al recrear un servicio (`docker compose up -d --build --no-deps ms-catalog`) con otra IP, el gateway seguía enviando a la vieja (503 `SERVICIO_NO_DISPONIBLE` con el servicio sano) hasta 10 minutos y solo se arreglaba reiniciando el gateway. **Verificación:** con la IP vieja ocupada por otro contenedor, antes seguía en 503 después de más de 4 minutos; con el cambio se recupera en 8 s. Es el mismo `valid=10s` del resolvedor de nginx (`frontend/nginx/default.conf`); resolver cada 10 s en la red de Docker no tiene costo apreciable | `api-gateway/…/config/ResolucionNombresConfig.java`, `ResolucionNombresTest`, ADR-005 (nota de despliegue) |
 
-## Revisión de documentación y código — decisiones (DEC-262 a DEC-268)
+## Revisión de documentación y código — decisiones (DEC-262 a DEC-269)
 
 Revisión exhaustiva de solo lectura (2026-11-12) y corrección de la documentación. Las decisiones las tomó el equipo el 2026-11-13, al responder los hallazgos de la revisión. No cambian casos de uso implementados.
 
@@ -1647,7 +1647,8 @@ Revisión exhaustiva de solo lectura (2026-11-12) y corrección de la documentac
 | DEC-265 | Cuentas elegibles de RF45 | El equipo confirma que el Prestador queda fuera del cambio de rol (DEC-82, DEC-113) | «Diferencias con el SRS» |
 | DEC-266 | Exposición del despliegue de demostración | El frontend se publica solo en `127.0.0.1:${FRONTEND_PORT}`, como el gateway y las bases: con el perfil `dev` y los usuarios de prueba no debe quedar en la red local. nginx agrega `Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=()` (WF-05 usa la geolocalización, RF38) | `docker-compose.yml`, `frontend/nginx/seguridad.conf` (`seguridadNginx.test.ts`), README, CLAUDE.md |
 | DEC-267 | Huecos en la numeración de las decisiones | DEC-27, DEC-28, DEC-30 y DEC-32 no tienen texto ni se citan en ningún documento del repositorio: son números sin uso y **no se reasignan**. DEC-31 se cita en el pedido de la iteración E, pero tampoco tiene texto (DEC-218, «pendiente de texto») | Esta matriz |
-| DEC-268 | Imágenes de los wireframes propuestos por arquitectura | Arquitectura dibujó las imágenes que faltaban (WF-12 `_004` a `_006`, WF-13 a WF-26, WF-06 para atractivos y los cambios en WF-05, WF-06 y WF-11) con el estilo de los PNG del equipo de diseño (escala de grises, sin identidad visual) y la estructura del `.puml` y de la pantalla implementada. Cada `.puml` sigue siendo la referencia de estructura; la imagen lo ilustra. **Siguen pendientes de validación del equipo** (DEC-36, DEC-67, DEC-90) | `docs/wireframes/*.png`, README de wireframes |
+| DEC-268 | Imágenes de los wireframes propuestos por arquitectura | Arquitectura dibujó las imágenes que faltaban (WF-12 `_004` a `_006`, WF-13 a WF-26, WF-06 para atractivos y los cambios en WF-05, WF-06 y WF-11) con el estilo de los PNG del equipo de diseño (escala de grises, sin identidad visual) y la estructura del `.puml` y de la pantalla implementada. Cada `.puml` sigue siendo la referencia de estructura; la imagen lo ilustra. El equipo los validó el 2026-11-13 (DEC-269) | `docs/wireframes/*.png`, README de wireframes |
+| DEC-269 | Validación de los wireframes propuestos por arquitectura | El equipo validó el 2026-11-13 los wireframes propuestos por arquitectura: WF-08 y WF-09 ampliados, WF-12 a WF-26, WF-06 para atractivos y los cambios en WF-05, WF-06 y WF-11 (DEC-36, DEC-67, DEC-90). Dejan de estar «pendientes de validación». WF-11 «Mis reservas» sigue **pendiente de diseño** | `docs/wireframes/`, esta matriz |
 
 ## Pendientes para el SAD (modelo NoSQL)
 
