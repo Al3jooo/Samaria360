@@ -8,6 +8,14 @@ spring:
     # .env de la raíz del monorepo (el gateway se ejecuta desde su propia carpeta)
     import: optional:file:../.env[.properties]
   cloud:
+    # Sin el bulkhead por defecto de Spring Cloud CircuitBreaker (semáforo de 25 llamadas simultáneas por ruta, sin
+    # espera): en la prueba de carga de RNF03 un tropiezo de ~1 s lo llenaba, sus rechazos abrían el circuito y la ruta
+    # respondía 503 durante 10 s (DEC-277). El gateway es reactivo (no hay hilos que aislar); a cada ruta la acotan el
+    # timeout de respuesta y su circuit breaker. Lo prueba ConcurrenciaRutasTest.
+    circuitbreaker:
+      bulkhead:
+        resilience4j:
+          enabled: false
     gateway:
       server:
         webflux:
