@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://samaria360.local/sad/api/eventos.schema.json",
+  "title": "Eventos de Samaria360 (RabbitMQ, exchange samaria360.eventos.v1)",
+  "description": "Sobre común y datos de cada evento. Contrato en docs/sad/api/eventos.md; mecanismo en ADR-011. Sin datos personales (ADR-011, punto 7).",
+  "type": "object",
+  "required": ["idEvento", "tipo", "version", "origen", "ocurridoEn", "clave", "datos"],
+  "additionalProperties": false,
+  "properties": {
+    "idEvento": { "$ref": "#/$defs/uuid" },
+    "tipo": {
+      "enum": [
+        "CuentaActualizada", "PrestadorValidado", "RolCambiado",
+        "ReservaConfirmada", "ReservaCancelada", "ReservaCompletada",
+        "ServicioDecidido", "ConsultasAgregadas", "PromedioActualizado", "OcupacionRegistrada", "OfertaModificada"
+      ]
+    },
+    "version": { "type": "integer", "minimum": 1 },
+    "origen": { "enum": ["ms-auth", "ms-booking", "ms-catalog", "ms-analytics"] },
+    "ocurridoEn": { "$ref": "#/$defs/instante" },
+    "clave": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "datos": { "type": "object" }
+  },
+  "allOf": [
+    { "if": { "properties": { "tipo": { "const": "CuentaActualizada" } } },
+      "then": { "properties": { "origen": { "const": "ms-auth" }, "datos": { "$ref": "#/$defs/CuentaActualizada" } } } },
+    { "if": { "properties": { "tipo": { "const": "PrestadorValidado" } } },
+      "then": { "properties": { "origen": { "const": "ms-auth" }, "datos": { "$ref": "#/$defs/PrestadorValidado" } } } },
+    { "if": { "properties": { "tipo": { "const": "RolCambiado" } } },
+      "then": { "properties": { "origen": { "const": "ms-auth" }, "datos": { "$ref": "#/$defs/RolCambiado" } } } },
+    { "if": { "properties": { "tipo": { "const": "ReservaConfirmada" } } },
+      "then": { "properties": { "origen": { "const": "ms-booking" }, "datos": { "$ref": "#/$defs/ReservaConfirmada" } } } },
+    { "if": { "properties": { "tipo": { "const": "ReservaCancelada" } } },
+      "then": { "properties": { "origen": { "const": "ms-booking" }, "datos": { "$ref": "#/$defs/ReservaCancelada" } } } },
+    { "if": { "properties": { "tipo": { "const": "ReservaCompletada" } } },
+      "then": { "properties": { "origen": { "const": "ms-booking" }, "datos": { "$ref": "#/$defs/ReservaCompletada" } } } },
+    { "if": { "properties": { "tipo": { "const": "ServicioDecidido" } } },
+      "then": { "properties": { "origen": { "const": "ms-catalog" }, "datos": { "$ref": "#/$defs/ServicioDecidido" } } } },
+    { "if": { "properties": { "tipo": { "const": "ConsultasAgregadas" } } },
+      "then": { "properties": { "origen": { "const": "ms-catalog" }, "datos": { "$ref": "#/$defs/ConsultasAgregadas" } } } },
+    { "if": { "properties": { "tipo": { "const": "PromedioActualizado" } } },
+      "then": { "properties": { "origen": { "const": "ms-analytics" }, "datos": { "$ref": "#/$defs/PromedioActualizado" } } } },
+    { "if": { "properties": { "tipo": { "const": "OcupacionRegistrada" } } },
+      "then": { "properties": { "origen": { "const": "ms-catalog" }, "datos": { "$ref": "#/$defs/OcupacionRegistrada" } } } },
+    { "if": { "properties": { "tipo": { "const": "OfertaModificada" } } },
+      "then": { "properties": { "origen": { "const": "ms-booking" }, "datos": { "$ref": "#/$defs/OfertaModificada" } } } }
+  ],
+  "$defs": {
+    "uuid": { "type": "string", "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$" },
+    "objectId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+    "instante": { "type": "string", "format": "date-time", "pattern": "Z$" },
+    "rol": { "enum": ["Turista", "Prestador", "Gestor", "Administrador"] },
+    "tipoEntidad": { "enum": ["servicio", "atractivo"] },
+    "nombreServicio": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "personas": { "type": "integer", "minimum": 1 },
+
+    "CuentaActualizada": {
+      "type": "object",
+      "required": ["idUsuario", "rol", "estadoCuenta", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "idUsuario": { "$ref": "#/$defs/uuid" },
+        "rol": { "$ref": "#/$defs/rol" },
+        "estadoCuenta": { "enum": ["Pendiente", "Activo", "Rechazado", "Inactivo", "Desactivado"] },
+        "version": { "type": "integer", "minimum": 0, "description": "0 al registrarse; desde 1, cada cambio" },
+        "pais": { "type": "string", "pattern": "^[A-Z]{2}$", "description": "Solo con rol Turista (ISO 3166-1 alfa-2)" }
+      },
+      "if": { "properties": { "rol": { "not": { "const": "Turista" } } } },
+      "then": { "not": { "required": ["pais"] } }
+    },
+    "PrestadorValidado": {
+      "type": "object",
+      "required": ["idPrestador", "decision", "idAdministrador"],
+      "additionalProperties": false,
+      "properties": {
+        "idPrestador": { "$ref": "#/$defs/uuid" },
+        "decision": { "enum": ["Aprobado", "Rechazado"] },
+        "idAdministrador": { "$ref": "#/$defs/uuid" }
+      }
+    },
+    "RolCambiado": {
+      "type": "object",
+      "required": ["idUsuario", "rolAnterior", "rolNuevo", "idAdministrador"],
+      "additionalProperties": false,
+      "properties": {
+        "idUsuario": { "$ref": "#/$defs/uuid" },
+        "rolAnterior": { "$ref": "#/$defs/rol" },
+        "rolNuevo": { "$ref": "#/$defs/rol" },
+        "idAdministrador": { "$ref": "#/$defs/uuid" }
+      }
+    },
+    "ReservaConfirmada": {
+      "type": "object",
+      "required": ["idReserva", "idTurista", "idPrestador", "idServicio", "nombreServicio", "categoria", "idUnidad", "fechaInicio", "fechaFin", "personas", "cantidad"],
+      "additionalProperties": false,
+      "properties": {
+        "idReserva": { "$ref": "#/$defs/uuid" },
+        "idTurista": { "$ref": "#/$defs/uuid" },
+        "idPrestador": { "$ref": "#/$defs/uuid" },
+        "idServicio": { "$ref": "#/$defs/objectId" },
+        "nombreServicio": { "$ref": "#/$defs/nombreServicio" },
+        "categoria": { "enum": ["Tour", "Alojamiento"] },
+        "idUnidad": { "oneOf": [{ "$ref": "#/$defs/objectId" }, { "type": "null" }] },
+        "fechaInicio": { "$ref": "#/$defs/instante" },
+        "fechaFin": { "$ref": "#/$defs/instante" },
+        "personas": { "$ref": "#/$defs/personas" },
+        "cantidad": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "ReservaCancelada": {
+      "type": "object",
+      "required": ["idReserva", "idTurista", "idPrestador", "idServicio", "nombreServicio", "fechaInicio", "personas", "canceladaPor"],
+      "additionalProperties": false,
+      "properties": {
+        "idReserva": { "$ref": "#/$defs/uuid" },
+        "idTurista": { "$ref": "#/$defs/uuid" },
+        "idPrestador": { "$ref": "#/$defs/uuid" },
+        "idServicio": { "$ref": "#/$defs/objectId" },
+        "nombreServicio": { "$ref": "#/$defs/nombreServicio" },
+        "fechaInicio": { "$ref": "#/$defs/instante" },
+        "personas": { "$ref": "#/$defs/personas" },
+        "canceladaPor": { "$ref": "#/$defs/uuid" }
+      }
+    },
+    "ReservaCompletada": {
+      "type": "object",
+      "required": ["idReserva", "idTurista", "idPrestador", "idServicio", "nombreServicio", "fechaFin"],
+      "additionalProperties": false,
+      "properties": {
+        "idReserva": { "$ref": "#/$defs/uuid" },
+        "idTurista": { "$ref": "#/$defs/uuid" },
+        "idPrestador": { "$ref": "#/$defs/uuid" },
+        "idServicio": { "$ref": "#/$defs/objectId" },
+        "nombreServicio": { "$ref": "#/$defs/nombreServicio" },
+        "fechaFin": { "$ref": "#/$defs/instante" }
+      }
+    },
+    "ServicioDecidido": {
+      "type": "object",
+      "required": ["idServicio", "idPrestador", "decision", "idAdministrador"],
+      "additionalProperties": false,
+      "properties": {
+        "idServicio": { "$ref": "#/$defs/objectId" },
+        "idPrestador": { "$ref": "#/$defs/uuid" },
+        "decision": { "enum": ["Publicado", "Rechazado"] },
+        "idAdministrador": { "$ref": "#/$defs/uuid" }
+      }
+    },
+    "ConsultasAgregadas": {
+      "type": "object",
+      "required": ["ventanaInicio", "ventanaFin", "conteos"],
+      "additionalProperties": false,
+      "properties": {
+        "ventanaInicio": { "$ref": "#/$defs/instante" },
+        "ventanaFin": { "$ref": "#/$defs/instante" },
+        "conteos": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1000,
+          "items": {
+            "type": "object",
+            "required": ["tipoEntidad", "idEntidad", "consultas"],
+            "additionalProperties": false,
+            "properties": {
+              "tipoEntidad": { "$ref": "#/$defs/tipoEntidad" },
+              "idEntidad": { "$ref": "#/$defs/objectId" },
+              "nombre": { "type": "string", "minLength": 1, "maxLength": 150 },
+              "idPrestador": { "$ref": "#/$defs/uuid" },
+              "consultas": { "type": "integer", "minimum": 1 }
+            },
+            "if": { "properties": { "tipoEntidad": { "const": "atractivo" } } },
+            "then": { "not": { "required": ["idPrestador"] } },
+            "else": { "required": ["idPrestador"] }
+          }
+        }
+      }
+    },
+    "PromedioActualizado": {
+      "type": "object",
+      "required": ["tipoEntidad", "idEntidad", "promedio", "cantidad", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "tipoEntidad": { "$ref": "#/$defs/tipoEntidad" },
+        "idEntidad": { "$ref": "#/$defs/objectId" },
+        "promedio": { "oneOf": [{ "type": "number", "minimum": 1, "maximum": 5, "multipleOf": 0.01 }, { "type": "null" }] },
+        "cantidad": { "type": "integer", "minimum": 0 },
+        "version": { "type": "integer", "minimum": 1 }
+      },
+      "if": { "properties": { "cantidad": { "const": 0 } } },
+      "then": { "properties": { "promedio": { "type": "null" } } },
+      "else": { "properties": { "promedio": { "type": "number" } } }
+    },
+    "OcupacionRegistrada": {
+      "type": "object",
+      "required": ["idAtractivo", "nombreAtractivo", "categoria", "ocupacion", "limiteCapacidadCarga", "porcentaje", "nivel"],
+      "additionalProperties": false,
+      "properties": {
+        "idAtractivo": { "$ref": "#/$defs/objectId" },
+        "nombreAtractivo": { "type": "string", "minLength": 1, "maxLength": 150 },
+        "categoria": { "oneOf": [{ "type": "string", "minLength": 1, "maxLength": 50 }, { "type": "null" }] },
+        "ocupacion": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "limiteCapacidadCarga": { "type": "integer", "minimum": 1, "maximum": 100000 },
+        "porcentaje": { "type": "integer", "minimum": 0 },
+        "nivel": { "enum": ["Bajo", "Medio", "Alto"] }
+      }
+    },
+    "OfertaModificada": {
+      "type": "object",
+      "required": ["idServicio", "idPrestador", "tipo", "valorNuevo"],
+      "additionalProperties": false,
+      "properties": {
+        "idServicio": { "$ref": "#/$defs/objectId" },
+        "idPrestador": { "$ref": "#/$defs/uuid" },
+        "tipo": { "enum": ["Cupos", "Apertura", "Cierre", "Plantilla"] },
+        "fecha": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "horaInicio": { "type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$" },
+        "idUnidad": { "$ref": "#/$defs/objectId" },
+        "valorAnterior": { "type": "string", "maxLength": 200 },
+        "valorNuevo": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "diasOperacion": {
+          "type": "array", "minItems": 1, "maxItems": 7, "uniqueItems": true,
+          "items": { "enum": ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"] }
+        },
+        "salidas": {
+          "type": "array", "maxItems": 10, "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$" }
+        }
+      },
+      "if": { "properties": { "tipo": { "const": "Plantilla" } } },
+      "then": { "required": ["diasOperacion", "salidas"] },
+      "else": { "required": ["fecha"] }
+    }
+  }
+}
