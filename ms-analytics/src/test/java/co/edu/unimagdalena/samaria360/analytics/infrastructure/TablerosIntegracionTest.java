@@ -33,6 +33,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @PruebaIntegracion
 class TablerosIntegracionTest {
 
+    /** H23 (DEC-323): un nombre comercial de más de 120 caracteres (ms-catalog admite 150) debe llegar a los tableros. */
+    private static final String NOMBRE_LARGO = "Tour del panel " + "x".repeat(125);
+
+
     private static final String EXCHANGE = "samaria360.eventos.v1";
 
     @Autowired
@@ -91,14 +95,14 @@ class TablerosIntegracionTest {
         esperarProcesado(publicar("booking.reserva.confirmada", "ReservaConfirmada", "ms-booking", Map.ofEntries(
                 Map.entry("idReserva", UUID.randomUUID().toString()), Map.entry("idTurista", UUID.randomUUID().toString()),
                 Map.entry("idPrestador", prestador.toString()), Map.entry("idServicio", servicio),
-                Map.entry("nombreServicio", "Tour del panel"), Map.entry("categoria", "Tour"),
+                Map.entry("nombreServicio", NOMBRE_LARGO), Map.entry("categoria", "Tour"),
                 Map.entry("fechaInicio", "2030-03-10T13:00:00Z"), Map.entry("fechaFin", "2030-03-10T18:00:00Z"),
                 Map.entry("personas", 2), Map.entry("cantidad", 2))));
         String ahora = Instant.now().truncatedTo(ChronoUnit.SECONDS).toString();
         esperarProcesado(publicar("catalog.ficha.consultas-agregadas", "ConsultasAgregadas", "ms-catalog", Map.of(
                 "ventanaInicio", ahora, "ventanaFin", ahora,
                 "conteos", List.of(
-                        Map.of("tipoEntidad", "servicio", "idEntidad", servicio, "nombre", "Tour del panel",
+                        Map.of("tipoEntidad", "servicio", "idEntidad", servicio, "nombre", NOMBRE_LARGO,
                                 "idPrestador", prestador.toString(), "consultas", 7),
                         Map.of("tipoEntidad", "atractivo", "idEntidad", atractivo, "nombre", "Atractivo top",
                                 "consultas", 100000)))));
@@ -127,7 +131,7 @@ class TablerosIntegracionTest {
         assertThat(fila).as(panel.toString()).isNotNull();
         assertThat(fila.path("consultas").asLong()).isEqualTo(7);
         assertThat(fila.path("reservas").asLong()).isEqualTo(1);
-        assertThat(fila.path("nombre").asText()).isEqualTo("Tour del panel");
+        assertThat(fila.path("nombre").asText()).isEqualTo(NOMBRE_LARGO);
         pedir("/api/v1/analytics/prestador/panel?dias=15", prestador, "Prestador", 400);
 
         // RF64: el Gestor filtra por atractivo; el Administrador no lo ve.

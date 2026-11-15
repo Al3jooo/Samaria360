@@ -41,6 +41,67 @@
         "bsonType": "string",
         "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
         "description": "Ampliación (DEC-292): el evento o la acción que la originó; único"
+      },
+      "datos": {
+        "bsonType": "object",
+        "description": "Ampliación (DEC-322, A005): los valores del detalle por separado, para que la interfaz arme la frase en el idioma activo (RF03, RNF08). Solo identificadores, el nombre del servicio y el motivo de RF29",
+        "additionalProperties": false,
+        "properties": {
+          "idPrestador": {
+            "bsonType": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "idServicio": {
+            "bsonType": "string",
+            "pattern": "^[0-9a-f]{24}$"
+          },
+          "idUsuario": {
+            "bsonType": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "rolAnterior": {
+            "enum": [
+              "Turista",
+              "Prestador",
+              "Gestor",
+              "Administrador"
+            ]
+          },
+          "rolNuevo": {
+            "enum": [
+              "Turista",
+              "Prestador",
+              "Gestor",
+              "Administrador"
+            ]
+          },
+          "idReserva": {
+            "bsonType": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+          },
+          "nombreServicio": {
+            "bsonType": "string",
+            "maxLength": 200
+          },
+          "idCalificacion": {
+            "bsonType": "string",
+            "pattern": "^[0-9a-f]{24}$"
+          },
+          "tipoEntidad": {
+            "enum": [
+              "servicio",
+              "atractivo"
+            ]
+          },
+          "idEntidad": {
+            "bsonType": "string",
+            "pattern": "^[0-9a-f]{24}$"
+          },
+          "motivo": {
+            "bsonType": "string",
+            "maxLength": 500
+          }
+        }
       }
     }
   }

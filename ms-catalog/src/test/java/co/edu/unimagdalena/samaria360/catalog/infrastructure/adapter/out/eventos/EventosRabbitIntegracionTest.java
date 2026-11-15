@@ -61,7 +61,7 @@ class EventosRabbitIntegracionTest {
         String idServicio = new ObjectId().toHexString();
         // Anterior a la hora fija de las pruebas (RelojFijo): el relevo lo encuentra vencido.
         new TransactionTemplate(transacciones).executeWithoutResult(estado -> outbox.registrar(
-                EventoCatalogo.servicioDecidido(idServicio, UUID.randomUUID(), EstadoPublicacion.Rechazado,
+                EventoCatalogo.servicioDecidido(idServicio, "Tour Tayrona", UUID.randomUUID(), EstadoPublicacion.Rechazado,
                         UUID.randomUUID(), Instant.parse("2026-01-01T15:00:00Z"))));
 
         while (relevo.publicar() > 0) {
@@ -94,7 +94,7 @@ class EventosRabbitIntegracionTest {
         String idServicio = new ObjectId().toHexString();
 
         assertThatThrownBy(() -> new TransactionTemplate(transacciones).executeWithoutResult(estado -> {
-            outbox.registrar(EventoCatalogo.servicioDecidido(idServicio, UUID.randomUUID(),
+            outbox.registrar(EventoCatalogo.servicioDecidido(idServicio, "Tour Tayrona", UUID.randomUUID(),
                     EstadoPublicacion.Publicado, UUID.randomUUID(), Instant.now()));
             throw new IllegalStateException("falla después del evento");
         })).isInstanceOf(IllegalStateException.class);

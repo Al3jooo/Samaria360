@@ -29,7 +29,8 @@
       },
       "nombreServicio": {
         "bsonType": "string",
-        "maxLength": 120
+        "maxLength": 150,
+        "description": "Hasta 150, el largo del nombre comercial (DEC-323, A006)"
       },
       "estado": {
         "enum": [

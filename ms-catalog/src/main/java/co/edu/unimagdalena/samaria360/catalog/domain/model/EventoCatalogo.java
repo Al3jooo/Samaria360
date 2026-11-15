@@ -21,15 +21,19 @@ public record EventoCatalogo(String tipo, String clave, Map<String, Object> dato
 
     /**
      * Aprobación o rechazo de un servicio (RF21), para la auditoría de RF13. La justificación del rechazo no viaja: es
-     * texto libre.
+     * texto libre. {@code nombreServicio} (DEC-323): el nombre comercial, para que la auditoría lo muestre (no es un dato
+     * personal).
      */
-    public static EventoCatalogo servicioDecidido(String idServicio, UUID prestadorId, EstadoPublicacion estadoNuevo,
-                                                  UUID administrador, Instant ahora) {
+    public static EventoCatalogo servicioDecidido(String idServicio, String nombreServicio, UUID prestadorId,
+                                                  EstadoPublicacion estadoNuevo, UUID administrador, Instant ahora) {
         if (estadoNuevo != EstadoPublicacion.Publicado && estadoNuevo != EstadoPublicacion.Rechazado) {
             throw new IllegalArgumentException("Una decisión deja el servicio Publicado o Rechazado");
         }
         Map<String, Object> datos = new LinkedHashMap<>();
         datos.put("idServicio", idServicio);
+        if (nombreServicio != null && !nombreServicio.isBlank()) {
+            datos.put("nombreServicio", nombreServicio);
+        }
         datos.put("idPrestador", prestadorId.toString());
         datos.put("decision", estadoNuevo.name());
         datos.put("idAdministrador", administrador.toString());

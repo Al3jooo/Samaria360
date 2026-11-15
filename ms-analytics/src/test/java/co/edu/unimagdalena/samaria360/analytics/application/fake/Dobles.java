@@ -178,5 +178,13 @@ public final class Dobles {
         public void sumar(co.edu.unimagdalena.samaria360.analytics.domain.model.ConsultasFicha consultas) {
             sumadas.add(consultas);
         }
+
+        @Override
+        public java.util.Optional<String> ultimoNombre(
+                co.edu.unimagdalena.samaria360.analytics.domain.model.TipoEntidad tipo, String idEntidad) {
+            return sumadas.stream().filter(c -> c.tipoEntidad() == tipo && c.idEntidad().equals(idEntidad)
+                    && c.nombre() != null).reduce((a, b) -> b)
+                    .map(co.edu.unimagdalena.samaria360.analytics.domain.model.ConsultasFicha::nombre);
+        }
     }
 }

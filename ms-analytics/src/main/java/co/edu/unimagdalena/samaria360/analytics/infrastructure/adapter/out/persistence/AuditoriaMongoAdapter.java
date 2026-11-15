@@ -14,12 +14,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * Colección {@code logs_auditoria} (Entregable 2, §2.4; RF13): {@code usuarioId}, {@code accion}, {@code detalle} y
- * {@code fecha}, más {@code idEvento} (ampliación, DEC-292: índice único para no duplicar una entrada).
+ * {@code fecha}, más {@code idEvento} (ampliación, DEC-292: índice único para no duplicar una entrada) y {@code datos}
+ * (ampliación, DEC-322, A005: los valores del detalle por separado, para traducirlo en la interfaz).
  */
 @Component
 public class AuditoriaMongoAdapter implements AuditoriaRepositoryPort {
@@ -37,11 +40,15 @@ public class AuditoriaMongoAdapter implements AuditoriaRepositoryPort {
         if (mongo.exists(Query.query(Criteria.where("idEvento").is(registro.idEvento().toString())), COLECCION)) {
             return;
         }
-        mongo.insert(new Document("idEvento", registro.idEvento().toString())
+        Document documento = new Document("idEvento", registro.idEvento().toString())
                 .append("usuarioId", registro.usuarioId().toString())
                 .append("accion", registro.accion().name())
                 .append("detalle", registro.detalle())
-                .append("fecha", Date.from(registro.fecha())), COLECCION);
+                .append("fecha", Date.from(registro.fecha()));
+        if (!registro.datos().isEmpty()) {
+            documento.append("datos", new Document(registro.datos()));
+        }
+        mongo.insert(documento, COLECCION);
     }
 
     @Override
@@ -70,8 +77,17 @@ public class AuditoriaMongoAdapter implements AuditoriaRepositoryPort {
         List<RegistroAuditoria> elementos = mongo.find(consulta, Document.class, COLECCION).stream()
                 .map(d -> new RegistroAuditoria(UUID.fromString(d.getString("idEvento")),
                         UUID.fromString(d.getString("usuarioId")), AccionAuditada.desdeTexto(d.getString("accion")),
-                        d.getString("detalle"), d.getDate("fecha").toInstant()))
+                        d.getString("detalle"), datos(d.get("datos", Document.class)), d.getDate("fecha").toInstant()))
                 .toList();
         return new PaginaAuditoria(elementos, pagina, tamano, total);
+    }
+
+    /** Las entradas anteriores a A005 (DEC-322) no tienen {@code datos}. */
+    private static Map<String, String> datos(Document datos) {
+        Map<String, String> resultado = new LinkedHashMap<>();
+        if (datos != null) {
+            datos.forEach((clave, valor) -> resultado.put(clave, String.valueOf(valor)));
+        }
+        return resultado;
     }
 }

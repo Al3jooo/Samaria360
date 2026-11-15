@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { ApiError, servicioNoDisponible } from '../../shared/api/httpClient'
 import { Paginacion } from '../../shared/components/Paginacion'
 import { ACCIONES_AUDITADAS, listarAuditoria, type PaginaAuditoria } from './auditoriaApi'
+import { detalleTraducido } from './detalleAuditoria'
 import './admin.css'
 
 type Estado =
@@ -27,6 +28,8 @@ function fechaHora(instante: string, idioma: string): string {
  * antigua, 20 por página. Filtros de acción y rango de fechas en la URL (se pueden compartir y sobreviven al cambio de
  * idioma, RNF08). El usuario es el id de la cuenta: el log no guarda nombres (ADR-011, punto 7).
  */
+
+
 export function AuditoriaPage() {
   const { t, i18n } = useTranslation()
   const [parametros, setParametros] = useSearchParams()
@@ -130,7 +133,7 @@ export function AuditoriaPage() {
                   <code title={registro.usuarioId}>…{registro.usuarioId.slice(-12)}</code>
                 </td>
                 <td data-titulo={t('auditoria.accion')}>{t(`auditoria.acciones.${registro.accion}`)}</td>
-                <td data-titulo={t('auditoria.detalle')}>{registro.detalle}</td>
+                <td data-titulo={t('auditoria.detalle')}>{detalleTraducido(registro, t)}</td>
               </tr>
             ))}
           </tbody>

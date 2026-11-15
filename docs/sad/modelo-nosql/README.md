@@ -106,7 +106,7 @@ Con el plan del 100 % (DEC-278) ya están todas las colecciones del Entregable 2
 - **Esquema v4 de `atractivos` y colección `ocupaciones` (M016; iteración J; DEC-304):** `atractivos.ocupacionActual {valor, fecha}` (0 a 1 000 000) es la última lectura del Gestor (RF39) y no sube `version`. Índice `atractivos_categoria` para los alternativos (RF51). `ocupaciones` guarda cada lectura: `atractivoId`, `ocupacion`, `limite` (la capacidad de carga en ese momento), `fecha` y `gestorId`; índice `ocupaciones_atractivo` (`{atractivoId, fecha: -1}`). **Ampliación propia.**
 - **Colección `historial_modificaciones` (M017; iteración I; DEC-311):** RF41, últimos 30 días por prestador. Obligatorios: `servicioId`, `prestadorId`, `tipo`, `valorNuevo` y `fecha`; opcionales: `nombreServicio`, `detalle`, `valorAnterior` e `idEvento` (el del `OfertaModificada` de ms-booking). Índices `historial_prestador` (`{prestadorId, fecha: -1, _id: -1}`) e `historial_id_evento` (único y parcial: deduplica los eventos; los cambios de precio de RF32 no lo llevan). **Ampliación propia.**
 
-### analytics_db (ms-analytics; A001 a A004; DEC-292, DEC-300, DEC-304, DEC-308)
+### analytics_db (ms-analytics; A001 a A006; DEC-292, DEC-300, DEC-304, DEC-308, DEC-322, DEC-323)
 
 Todas con `additionalProperties: false`. ms-analytics no lee bases ajenas: sus proyecciones salen de los eventos de RabbitMQ (decisión 6).
 
@@ -124,6 +124,8 @@ Todas con `additionalProperties: false`. ms-analytics no lee bases ajenas: sus p
   - `outbox_eventos`: `PromedioActualizado`, con la misma forma que la de catalog_db.
 - **A003 (iteración J):** `ocupaciones`, copia de `OcupacionRegistrada` con `porcentaje` y `nivel` calculados al recibirla, para RF64. Índice único por `idEvento`.
 - **A004 (iteración K):** `consultas`, por ficha y día de Bogotá (`tipoEntidad`, `idEntidad`, `dia` y `consultas`, con `nombre` e `idPrestador`), para RF14 y RF31. Índices `consultas_tipo_dia` y `consultas_prestador_dia`.
+- **A005 (revisión previa al redespliegue, DEC-322):** validador v2 de `logs_auditoria` con el campo opcional `datos` (los valores del detalle por separado: identificadores, `nombreServicio`, los roles y el `motivo` de RF29), para traducir el detalle en la interfaz. No modifica los datos: las entradas anteriores conservan solo `detalle`.
+- **A006 (DEC-323):** validador v2 de `reservas`: `nombreServicio` admite hasta 150 caracteres, el largo del nombre comercial en ms-catalog (con 120, la reserva de un servicio con un nombre más largo iba a la `.dlq`). No modifica los datos.
 - **Diferencias con el Entregable 2:** `calificaciones`, `reportes`, `logs_auditoria` y `notificaciones` parten del §2.4, con límites, enums e `idEvento` (idempotencia). Las demás son **ampliaciones propias** que exige la mensajería: proyecciones, outbox, correos pendientes e idempotencia.
 
 ### chatbot_db (ms-chatbot; C001; DEC-297)

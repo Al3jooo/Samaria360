@@ -30,9 +30,10 @@ public class AuditoriaController {
 
     private static final ZoneId ZONA = ZoneId.of("America/Bogota");
 
-    public record RegistroDto(UUID usuarioId, String accion, String detalle, Instant fecha) {
+    /** {@code datos} (DEC-322): vacío en las entradas anteriores a A005, que solo traen {@code detalle}. */
+    public record RegistroDto(UUID usuarioId, String accion, String detalle, Map<String, String> datos, Instant fecha) {
         static RegistroDto de(RegistroAuditoria r) {
-            return new RegistroDto(r.usuarioId(), r.accion().name(), r.detalle(), r.fecha());
+            return new RegistroDto(r.usuarioId(), r.accion().name(), r.detalle(), r.datos(), r.fecha());
         }
     }
 

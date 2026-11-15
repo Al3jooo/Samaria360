@@ -98,7 +98,8 @@ public class AdministrarServiciosService implements AdministrarServiciosUseCase 
         }
         ServicioEnRevision decidido = detalle(id);
         // Auditoría de RF13 en ms-analytics (ADR-011, DEC-293): en la misma transacción de MongoDB que la decisión.
-        outbox.registrar(EventoCatalogo.servicioDecidido(id, decidido.servicio().getPrestadorId(),
+        outbox.registrar(EventoCatalogo.servicioDecidido(id, decidido.servicio().getNombreComercial(),
+                decidido.servicio().getPrestadorId(),
                 valor.estadoDestino(), administrador, revision.fechaRevision()));
         return decidido;
     }
