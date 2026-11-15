@@ -1,0 +1,54 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "idPublico",
+      "tipo",
+      "clave",
+      "datos",
+      "creadoEn",
+      "intentos",
+      "proximoIntento"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "idPublico": {
+        "bsonType": "string",
+        "description": "UUID: el idEvento del sobre (ADR-011)"
+      },
+      "tipo": {
+        "enum": [
+          "PromedioActualizado"
+        ]
+      },
+      "clave": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 64
+      },
+      "datos": {
+        "bsonType": "object"
+      },
+      "creadoEn": {
+        "bsonType": "date"
+      },
+      "publicadoEn": {
+        "bsonType": "date"
+      },
+      "intentos": {
+        "bsonType": "int",
+        "minimum": 0
+      },
+      "proximoIntento": {
+        "bsonType": "date"
+      },
+      "ultimoError": {
+        "bsonType": "string",
+        "maxLength": 500
+      }
+    }
+  }
+}

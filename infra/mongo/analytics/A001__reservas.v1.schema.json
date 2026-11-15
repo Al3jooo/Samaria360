@@ -1,0 +1,59 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "idTurista",
+      "idPrestador",
+      "idServicio",
+      "estado",
+      "actualizadaEn"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "id de la reserva en ms-booking"
+      },
+      "idTurista": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "idPrestador": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "idServicio": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{24}$"
+      },
+      "nombreServicio": {
+        "bsonType": "string",
+        "maxLength": 120
+      },
+      "estado": {
+        "enum": [
+          "Confirmada",
+          "Cancelada",
+          "Completada"
+        ]
+      },
+      "fechaInicio": {
+        "bsonType": "date"
+      },
+      "personas": {
+        "bsonType": [
+          "int",
+          "long"
+        ],
+        "minimum": 1
+      },
+      "confirmadaEn": {
+        "bsonType": "date"
+      },
+      "actualizadaEn": {
+        "bsonType": "date"
+      }
+    }
+  }
+}

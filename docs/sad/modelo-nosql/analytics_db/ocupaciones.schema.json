@@ -1,0 +1,64 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "idEvento",
+      "idAtractivo",
+      "nombreAtractivo",
+      "ocupacion",
+      "limite",
+      "porcentaje",
+      "nivel",
+      "fecha"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "idEvento": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "idEvento de OcupacionRegistrada (deduplicación)"
+      },
+      "idAtractivo": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{24}$"
+      },
+      "nombreAtractivo": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 150
+      },
+      "categoria": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 50
+      },
+      "ocupacion": {
+        "bsonType": "int",
+        "minimum": 0,
+        "maximum": 1000000
+      },
+      "limite": {
+        "bsonType": "int",
+        "minimum": 1,
+        "maximum": 100000
+      },
+      "porcentaje": {
+        "bsonType": "int",
+        "minimum": 0
+      },
+      "nivel": {
+        "enum": [
+          "Bajo",
+          "Medio",
+          "Alto"
+        ]
+      },
+      "fecha": {
+        "bsonType": "date"
+      }
+    }
+  }
+}

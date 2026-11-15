@@ -1,0 +1,64 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "tipoEntidad",
+      "idEntidad",
+      "turistaId",
+      "motivo",
+      "descripcion",
+      "estado",
+      "fecha"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "tipoEntidad": {
+        "enum": [
+          "servicio",
+          "atractivo"
+        ]
+      },
+      "idEntidad": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{24}$"
+      },
+      "turistaId": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "motivo": {
+        "enum": [
+          "INFORMACION_FALSA",
+          "INFORMACION_DESACTUALIZADA",
+          "PRECIO_INCORRECTO",
+          "UBICACION_INCORRECTA",
+          "FOTOS_NO_CORRESPONDEN",
+          "OTRO"
+        ]
+      },
+      "descripcion": {
+        "bsonType": "string",
+        "maxLength": 500
+      },
+      "estado": {
+        "enum": [
+          "Pendiente",
+          "Revisado"
+        ]
+      },
+      "fecha": {
+        "bsonType": "date"
+      },
+      "revisadoPor": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "fechaRevision": {
+        "bsonType": "date"
+      }
+    }
+  }
+}

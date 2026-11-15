@@ -1,0 +1,24 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "tipo",
+      "procesadoEn"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "idEvento del sobre (ADR-011)"
+      },
+      "tipo": {
+        "bsonType": "string",
+        "maxLength": 60
+      },
+      "procesadoEn": {
+        "bsonType": "date"
+      }
+    }
+  }
+}

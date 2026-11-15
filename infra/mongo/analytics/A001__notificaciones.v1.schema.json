@@ -1,0 +1,52 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "usuarioId",
+      "tipo",
+      "mensaje",
+      "leida",
+      "fecha",
+      "idEvento"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "usuarioId": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "UUID — referencia a Auth Service (destinatario)"
+      },
+      "tipo": {
+        "enum": [
+          "RESERVA_CONFIRMADA",
+          "RESERVA_CANCELADA",
+          "RESERVA_COMPLETADA",
+          "NUEVA_RESERVA"
+        ]
+      },
+      "mensaje": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "datos": {
+        "bsonType": "object",
+        "description": "Ampliación (DEC-292): valores para el texto en el idioma activo (RF03)"
+      },
+      "leida": {
+        "bsonType": "bool"
+      },
+      "fecha": {
+        "bsonType": "date"
+      },
+      "idEvento": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "Ampliación (DEC-292)"
+      }
+    }
+  }
+}
