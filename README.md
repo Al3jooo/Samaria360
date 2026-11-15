@@ -106,10 +106,10 @@ Levanta todo el sistema (PostgreSQL, MongoDB, ms-auth, ms-catalog, ms-booking, a
 **Requisitos**
 - Docker Desktop (Windows/macOS) o Docker Engine (Linux), con Compose v2 (`docker compose`).
 - OpenSSL, para generar las llaves del JWT. En Windows viene con Git Bash.
-- Unos **4 GB de memoria** en la máquina virtual de Docker (ver «Memoria», abajo). En Docker Desktop se revisa en
+- Unos **6 GB de memoria** en la máquina virtual de Docker (ver «Memoria», abajo). En Docker Desktop se revisa en
   *Settings → Resources*, o en `.wslconfig` con WSL 2.
 - Puertos libres en el host, todos solo en 127.0.0.1: **8000** (frontend), **8080** (API Gateway), 5432 y 27017 (bases
-  de datos). Todos se pueden cambiar en `.env`, salvo el 8080.
+  de datos), 5672 y 15672 (RabbitMQ) y 8025 (Mailpit, perfil `dev`). Todos se pueden cambiar en `.env`, salvo el 8080.
 
 **Pasos** (desde la raíz del repositorio, en Git Bash o en una terminal de Linux/macOS)
 
@@ -157,21 +157,23 @@ portátil de 8 GB. Por eso cada contenedor tiene un límite (`mem_limit` en `doc
 | Contenedor | Límite | Nota |
 |---|---|---|
 | ms-auth, ms-catalog, api-gateway | 768 MB cada uno | La JVM arranca con `-XX:MaxRAMPercentage=75`: heap de unos 576 MB (ancla `x-memoria-java`) |
-| ms-booking | 512 MB | Servicio pequeño: heap de unos 384 MB |
+| ms-booking, ms-analytics, ms-chatbot | 512 MB cada uno | Servicios pequeños: heap de unos 384 MB |
 | mongo | 512 MB | `--wiredTigerCacheSizeGB 0.25`; sin eso, su caché tomaría la mitad de la máquina virtual |
+| rabbitmq | 384 MB | En reposo usa ~145 MB |
 | postgres | 256 MB | En reposo usa ~60-150 MB |
-| frontend (nginx), servicios de un solo uso | — | ~10 MB; los de un solo uso terminan y liberan la memoria |
+| frontend (nginx), mailpit (perfil `dev`) | 64 MB cada uno | ~10 y ~25 MB en reposo |
+| servicios de un solo uso | — | Terminan y liberan la memoria |
 
-La suma de los límites es de unos 3,6 GB, así que todo cabe, aunque justo. Sin estos límites, cada JVM calcularía su
-memoria sobre **toda** la máquina virtual y MongoDB tomaría su caché de ella, y juntos podrían agotarla. Si Docker
-se queda sin memoria (contenedores reiniciados con código 137), se puede subir la de la máquina virtual con
-`memory=5GB` en `.wslconfig`.
+La suma de los límites es de unos 5 GB; en reposo el sistema usa unos **2,4 GB** (medido con `docker stats` el
+2026-11-15). Sin estos límites, cada JVM calcularía su memoria sobre **toda** la máquina virtual y MongoDB tomaría su
+caché de ella, y juntos podrían agotarla. Con 4 GB el sistema arranca, pero bajo carga puede quedarse sin memoria
+(contenedores reiniciados con código 137): se recomienda `memory=6GB` en `.wslconfig`.
 - En Docker Compose los servicios Java corren con el perfil `dev` (`SPRING_PROFILES_ACTIVE` en
   `docker-compose.yml`): carga los usuarios de prueba y Swagger. Es una configuración de demostración; un despliegue
   real debe quitarlo. Fuera de Compose ningún servicio activa `dev` si no se le pide.
 - Las pruebas no corren dentro de las imágenes (usan Testcontainers). Se ejecutan fuera, con `./mvnw test` en cada
-  servicio y `npm test` en `frontend/`. **Antes de correr las pruebas, detener el sistema** (`docker compose stop`):
-  los contenedores de Testcontainers y el sistema completo juntos no caben en 4 GB.
+  servicio y `npm test` en `frontend/`. Con menos de 8 GB en la máquina virtual de Docker, **detener el sistema antes de
+  correr las pruebas** (`docker compose stop`): los contenedores de Testcontainers y el sistema completo juntos no caben.
 
 **Comandos útiles**
 
@@ -221,8 +223,8 @@ ningún servicio publica Swagger. Docker Compose lo activa con `SPRING_PROFILES_
 ## Pruebas
 
 Cada servicio Java se prueba con su propio wrapper (no hay `pom.xml` raíz), y el frontend con npm. Las pruebas de
-infraestructura usan Testcontainers: necesitan Docker en marcha y, en una máquina de 4 GB, el sistema detenido
-(`docker compose stop`).
+infraestructura usan Testcontainers: necesitan Docker en marcha y, con menos de 8 GB en la máquina virtual de Docker,
+el sistema detenido (`docker compose stop`).
 
 ```bash
 cd ms-auth && ./mvnw test      # igual en ms-catalog, ms-booking y api-gateway
