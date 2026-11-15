@@ -1,0 +1,41 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "atractivoId",
+      "ocupacion",
+      "limite",
+      "fecha",
+      "gestorId"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "atractivoId": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{24}$",
+        "description": "_id del atractivo"
+      },
+      "ocupacion": {
+        "bsonType": "int",
+        "minimum": 0,
+        "maximum": 1000000
+      },
+      "limite": {
+        "bsonType": "int",
+        "minimum": 1,
+        "maximum": 100000,
+        "description": "limiteCapacidadCarga al registrar (RF07)"
+      },
+      "fecha": {
+        "bsonType": "date"
+      },
+      "gestorId": {
+        "bsonType": "string",
+        "description": "UUID del Gestor (usuario.id_usuario de auth_db, sin FK física)"
+      }
+    }
+  }
+}

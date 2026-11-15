@@ -3,6 +3,27 @@
     "bsonType": "object",
     "required": ["gestorId", "nombre", "coordenadas", "limiteCapacidadCarga", "fechaRegistro", "version"],
     "properties": {
+      "ocupacionActual": {
+        "bsonType": "object",
+        "description": "Última ocupación que registró el Gestor (RF39, DEC-304); su historial está en la colección ocupaciones",
+        "required": ["valor", "fecha"],
+        "additionalProperties": false,
+        "properties": {
+          "valor": { "bsonType": "int", "minimum": 0, "maximum": 1000000 },
+          "fecha": { "bsonType": "date" }
+        }
+      },
+      "calificacion": {
+        "bsonType": "object",
+        "description": "Promedio visible de RF17, copiado de PromedioActualizado de ms-analytics (DEC-302); solo avanza con una version mayor",
+        "required": ["cantidad", "version"],
+        "additionalProperties": false,
+        "properties": {
+          "promedio": { "bsonType": ["double", "null"], "minimum": 1, "maximum": 5 },
+          "cantidad": { "bsonType": ["int", "long"], "minimum": 0 },
+          "version": { "bsonType": ["int", "long"], "minimum": 1 }
+        }
+      },
       "_id": { "bsonType": "objectId" },
       "gestorId": {
         "bsonType": "string",

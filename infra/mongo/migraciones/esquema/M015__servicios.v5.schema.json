@@ -1,0 +1,284 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "prestadorId",
+      "nombreComercial",
+      "categoria",
+      "coordenadas",
+      "estadoPublicacion",
+      "prestadorActivo",
+      "precioBase",
+      "fechaRegistro",
+      "version"
+    ],
+    "properties": {
+      "calificacion": {
+        "bsonType": "object",
+        "description": "Promedio visible de RF17, copiado de PromedioActualizado de ms-analytics (DEC-302); solo avanza con una version mayor",
+        "required": ["cantidad", "version"],
+        "additionalProperties": false,
+        "properties": {
+          "promedio": { "bsonType": ["double", "null"], "minimum": 1, "maximum": 5 },
+          "cantidad": { "bsonType": ["int", "long"], "minimum": 0 },
+          "version": { "bsonType": ["int", "long"], "minimum": 1 }
+        }
+      },
+      "_id": { "bsonType": "objectId" },
+      "prestadorId": { "bsonType": "string", "description": "UUID — referencia a Auth Service, sin FK física" },
+      "nombreComercial": { "bsonType": "string", "minLength": 1, "maxLength": 150 },
+      "categoria": { "enum": ["Alojamiento", "Gastronomia", "Tour", "AlquilerEquipo"] },
+      "descripcion": { "bsonType": "string", "minLength": 1, "maxLength": 2000 },
+      "direccion": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 200,
+        "description": "Dirección del servicio (RF09, DEC-126). Obligatoria en los registros nuevos; la semilla la recibe en M009"
+      },
+      "coordenadas": {
+        "bsonType": "object",
+        "required": ["type", "coordinates"],
+        "properties": {
+          "type": { "enum": ["Point"] },
+          "coordinates": {
+            "bsonType": "array",
+            "description": "¡ALERTA GEOJSON! El orden exacto debe ser [longitud, latitud]. Rango válido: longitud (-180 a 180), latitud (-90 a 90).",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": { "bsonType": "double" }
+          }
+        }
+      },
+      "contacto": {
+        "bsonType": "object",
+        "properties": {
+          "telefono": { "bsonType": "string" },
+          "correo": { "bsonType": "string" }
+        }
+      },
+      "estadoPublicacion": { "enum": ["Pendiente", "Publicado", "Rechazado"] },
+      "prestadorActivo": {
+        "bsonType": "bool",
+        "description": "Campo denormalizado desde Auth. Si es false (Inactivo), se filtra de las búsquedas (RF22)."
+      },
+      "rnt": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 50,
+        "description": "Copia del RNT del prestador, tomada de la proyección cuentas al registrar (DEC-126). Obligatorio en los registros nuevos"
+      },
+      "condicionesAccesibilidad": {
+        "bsonType": "array",
+        "uniqueItems": true,
+        "items": { "bsonType": "string", "enum": ["MovilidadReducida", "Visual", "Auditiva"] }
+      },
+      "horarioAtencion": { "bsonType": "string", "description": "Días y horarios de atención como texto (RF58)" },
+      "precioBase": {
+        "bsonType": "decimal",
+        "minimum": 0,
+        "exclusiveMinimum": true,
+        "description": "Precio «desde» en COP (RF37, DEC-127), obligatorio en todas las categorías. En Alojamiento es el menor precioNoche de sus unidades; lo exige $expr."
+      },
+      "version": {
+        "bsonType": "int",
+        "minimum": 0,
+        "description": "Versión del documento para la edición del Prestador (RF32, RF43; DEC-186): la sube cada cambio de precio, de datos comerciales y la decisión del Administrador (RF21). Los servicios anteriores la reciben en 0 (M011)"
+      },
+      "imagenes": {
+        "bsonType": "array",
+        "items": { "bsonType": "string" }
+      },
+      "oferta": {
+        "bsonType": "object",
+        "description": "Oferta inicial (DEC-130, DEC-136): solo Tour y Alojamiento. La capacidad sale de aforoMaxGrupo o de cada unidad; ms-booking la materializa bajo demanda (DEC-135)",
+        "required": ["diasOperacion"],
+        "additionalProperties": false,
+        "properties": {
+          "diasOperacion": {
+            "bsonType": "array",
+            "minItems": 1,
+            "maxItems": 7,
+            "uniqueItems": true,
+            "items": {
+              "bsonType": "string",
+              "enum": ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
+            }
+          },
+          "salidas": {
+            "bsonType": "array",
+            "minItems": 1,
+            "maxItems": 12,
+            "uniqueItems": true,
+            "description": "Horas de salida del tour, HH:mm en hora de Santa Marta",
+            "items": { "bsonType": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$" }
+          }
+        }
+      },
+      "fechaRegistro": {
+        "bsonType": "date",
+        "description": "Instante del registro (RelojPort). Los servicios anteriores a M008 la toman del _id"
+      },
+      "motivoRechazo": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 500,
+        "description": "Justificación del rechazo (RF21, DEC-145). Existe si y solo si estadoPublicacion es Rechazado (lo exige $expr)"
+      },
+      "revisadoPor": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "id_usuario del Administrador que aprobó o rechazó (DEC-145) — referencia lógica, sin FK física"
+      },
+      "fechaRevision": { "bsonType": "date" }
+    },
+    "oneOf": [
+      {
+        "properties": {
+          "categoria": { "enum": ["Alojamiento"] },
+          "detalleCategoria": {
+            "bsonType": "object",
+            "required": ["unidades"],
+            "additionalProperties": false,
+            "properties": {
+              "unidades": {
+                "bsonType": "array",
+                "description": "Unidades reservables (tipos de habitación): al menos una; idUnidad única (lo exige $expr).",
+                "minItems": 1,
+                "items": {
+                  "bsonType": "object",
+                  "required": ["idUnidad", "nombre", "tipoHabitacion", "numHabitaciones", "capacidadMaxHuespedes", "precioNoche"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "idUnidad": { "bsonType": "objectId", "description": "Estable: no cambia si se renombra la unidad" },
+                    "nombre": { "bsonType": "string", "minLength": 1, "maxLength": 100 },
+                    "tipoHabitacion": { "bsonType": "string", "minLength": 1 },
+                    "numHabitaciones": { "bsonType": "int", "minimum": 1 },
+                    "capacidadMaxHuespedes": { "bsonType": "int", "minimum": 1 },
+                    "precioNoche": { "bsonType": "decimal", "minimum": 0, "exclusiveMinimum": true }
+                  }
+                }
+              },
+              "serviciosIncluidos": {
+                "bsonType": "array",
+                "items": { "bsonType": "string", "enum": ["WiFi", "Desayuno", "Piscina", "Parqueadero"] }
+              }
+            }
+          },
+          "oferta": {
+            "bsonType": "object",
+            "not": { "required": ["salidas"] }
+          }
+        },
+        "required": ["detalleCategoria", "precioBase", "oferta"]
+      },
+      {
+        "properties": {
+          "categoria": { "enum": ["Gastronomia"] },
+          "detalleCategoria": {
+            "bsonType": "object",
+            "required": ["tipoCocina", "aforoMaxTurno", "rangoPrecioPlato"],
+            "additionalProperties": false,
+            "properties": {
+              "tipoCocina": { "bsonType": "string" },
+              "aforoMaxTurno": { "bsonType": "int", "minimum": 1 },
+              "menuVegetariano": { "bsonType": "bool" },
+              "rangoPrecioPlato": { "bsonType": "string" }
+            }
+          }
+        },
+        "required": ["detalleCategoria"],
+        "not": { "required": ["oferta"] }
+      },
+      {
+        "properties": {
+          "categoria": { "enum": ["Tour"] },
+          "detalleCategoria": {
+            "bsonType": "object",
+            "required": ["puntoEncuentro", "duracionHoras", "aforoMaxGrupo"],
+            "additionalProperties": false,
+            "properties": {
+              "puntoEncuentro": { "bsonType": "string" },
+              "duracionHoras": { "bsonType": "decimal", "minimum": 0, "exclusiveMinimum": true },
+              "nivelDificultad": { "bsonType": "string" },
+              "aforoMaxGrupo": { "bsonType": "int", "minimum": 1 }
+            }
+          },
+          "oferta": { "bsonType": "object", "required": ["diasOperacion", "salidas"] }
+        },
+        "required": ["detalleCategoria", "oferta"]
+      },
+      {
+        "properties": {
+          "categoria": { "enum": ["AlquilerEquipo"] },
+          "detalleCategoria": {
+            "bsonType": "object",
+            "required": ["tipoVehiculoEquipo", "unidadesDisponibles"],
+            "additionalProperties": false,
+            "properties": {
+              "tipoVehiculoEquipo": { "bsonType": "string" },
+              "unidadesDisponibles": { "bsonType": "int", "minimum": 1 },
+              "condicionesAlquiler": { "bsonType": "string" }
+            }
+          }
+        },
+        "required": ["detalleCategoria"],
+        "not": { "required": ["oferta"] }
+      }
+    ]
+  },
+  "$expr": {
+    "$and": [
+      {
+        "$or": [
+          { "$ne": ["$categoria", "Alojamiento"] },
+          {
+            "$and": [
+              {
+                "$eq": [
+                  "$precioBase",
+                  { "$min": "$detalleCategoria.unidades.precioNoche" }
+                ]
+              },
+              {
+                "$eq": [
+                  {
+                    "$size": {
+                      "$setUnion": [
+                        {
+                          "$ifNull": [
+                            "$detalleCategoria.unidades.idUnidad",
+                            []
+                          ]
+                        },
+                        []
+                      ]
+                    }
+                  },
+                  {
+                    "$size": {
+                      "$ifNull": [
+                        "$detalleCategoria.unidades",
+                        []
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "$eq": [
+          { "$eq": ["$estadoPublicacion", "Rechazado"] },
+          {
+            "$ne": [
+              { "$type": "$motivoRechazo" },
+              "missing"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
