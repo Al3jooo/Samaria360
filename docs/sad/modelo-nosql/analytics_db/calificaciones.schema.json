@@ -1,0 +1,72 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "tipoEntidad",
+      "idEntidad",
+      "turistaId",
+      "estrellas",
+      "comentario",
+      "estado",
+      "fecha"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "tipoEntidad": {
+        "enum": [
+          "servicio",
+          "atractivo"
+        ]
+      },
+      "idEntidad": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{24}$",
+        "description": "_id del servicio o atractivo en catalog_db, sin FK física"
+      },
+      "turistaId": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "usuario.id_usuario de auth_db, sin FK física"
+      },
+      "idPrestador": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "solo en servicios (de la reserva Completada)"
+      },
+      "nombreEntidad": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 150
+      },
+      "estrellas": {
+        "bsonType": "int",
+        "minimum": 1,
+        "maximum": 5
+      },
+      "comentario": {
+        "bsonType": "string",
+        "maxLength": 500
+      },
+      "estado": {
+        "enum": [
+          "Visible",
+          "Oculta"
+        ]
+      },
+      "motivoModeracion": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "fecha": {
+        "bsonType": "date"
+      },
+      "fechaModeracion": {
+        "bsonType": "date"
+      }
+    }
+  }
+}

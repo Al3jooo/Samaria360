@@ -1,0 +1,46 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "rol",
+      "estadoCuenta",
+      "version"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "id de la cuenta en ms-auth"
+      },
+      "rol": {
+        "enum": [
+          "Turista",
+          "Prestador",
+          "Gestor",
+          "Administrador"
+        ]
+      },
+      "estadoCuenta": {
+        "enum": [
+          "Pendiente",
+          "Activo",
+          "Rechazado",
+          "Inactivo",
+          "Desactivado"
+        ]
+      },
+      "version": {
+        "bsonType": [
+          "int",
+          "long"
+        ],
+        "minimum": 0
+      },
+      "pais": {
+        "bsonType": "string",
+        "pattern": "^[A-Z]{2}$"
+      }
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "usuarioId",
+      "accion",
+      "fecha",
+      "idEvento"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "usuarioId": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "UUID — referencia a Auth Service (quien hizo la acción)"
+      },
+      "accion": {
+        "enum": [
+          "PRESTADOR_APROBADO",
+          "PRESTADOR_RECHAZADO",
+          "SERVICIO_APROBADO",
+          "SERVICIO_RECHAZADO",
+          "ROL_CAMBIADO",
+          "RESERVA_CANCELADA",
+          "CALIFICACION_OCULTADA",
+          "CALIFICACION_MOSTRADA",
+          "CALIFICACION_ELIMINADA"
+        ]
+      },
+      "detalle": {
+        "bsonType": "string",
+        "maxLength": 600
+      },
+      "fecha": {
+        "bsonType": "date"
+      },
+      "idEvento": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "Ampliación (DEC-292): el evento o la acción que la originó; único"
+      }
+    }
+  }
+}

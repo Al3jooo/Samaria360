@@ -1,0 +1,50 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "tipoEntidad",
+      "idEntidad",
+      "cantidad",
+      "version"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "string",
+        "pattern": "^(servicio|atractivo):[0-9a-f]{24}$"
+      },
+      "tipoEntidad": {
+        "enum": [
+          "servicio",
+          "atractivo"
+        ]
+      },
+      "idEntidad": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{24}$"
+      },
+      "promedio": {
+        "bsonType": [
+          "double",
+          "null"
+        ],
+        "minimum": 1,
+        "maximum": 5
+      },
+      "cantidad": {
+        "bsonType": [
+          "int",
+          "long"
+        ],
+        "minimum": 0
+      },
+      "version": {
+        "bsonType": [
+          "int",
+          "long"
+        ],
+        "minimum": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "idEvento",
+      "idPrestador",
+      "datos",
+      "intentos",
+      "proximoIntento"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "idEvento": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "idPrestador": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "datos": {
+        "bsonType": "object"
+      },
+      "intentos": {
+        "bsonType": [
+          "int",
+          "long"
+        ],
+        "minimum": 0
+      },
+      "proximoIntento": {
+        "bsonType": "date"
+      },
+      "enviadoEn": {
+        "bsonType": "date"
+      },
+      "ultimoError": {
+        "bsonType": "string",
+        "maxLength": 500
+      }
+    }
+  }
+}

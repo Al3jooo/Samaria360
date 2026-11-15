@@ -1,0 +1,49 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "tipoEntidad",
+      "idEntidad",
+      "dia",
+      "consultas"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "string",
+        "pattern": "^(servicio|atractivo):[0-9a-f]{24}:[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      },
+      "tipoEntidad": {
+        "enum": [
+          "servicio",
+          "atractivo"
+        ]
+      },
+      "idEntidad": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{24}$"
+      },
+      "nombre": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 150
+      },
+      "idPrestador": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "dia": {
+        "bsonType": "string",
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+        "description": "día de Santa Marta (America/Bogota)"
+      },
+      "consultas": {
+        "bsonType": [
+          "int",
+          "long"
+        ],
+        "minimum": 1
+      }
+    }
+  }
+}

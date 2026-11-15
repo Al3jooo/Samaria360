@@ -1,0 +1,100 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: ms-analytics
+  config:
+    # .env de la raíz del monorepo (ms-analytics se ejecuta desde su propia carpeta)
+    import: optional:file:../.env[.properties]
+  data:
+    mongodb:
+      # Usuario propio con readWrite solo en analytics_db (como DEC-275), creado por mongo-migraciones. Réplica rs0
+      # (DEC-281): con ./mvnw desde el host, directConnection=true; en Compose, replicaSet=rs0.
+      uri: mongodb://${ANALYTICS_DB_USER:${MONGO_USER}}:${ANALYTICS_DB_PASSWORD:${MONGO_PASSWORD}}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/analytics_db?authSource=admin${MONGO_OPCIONES:&directConnection=true}
+      database: analytics_db
+  # Consumidor de la cola ms-analytics.eventos.v1 (ADR-011): usuario propio, que solo lee su cola. De a un mensaje
+  # (los adaptadores leen antes de escribir); tres intentos (1 s y 5 s de espera) y después a la .dlq.
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ms-analytics
+    password: ${RABBITMQ_ANALYTICS_PASSWORD:}
+    virtual-host: samaria360
+    # Publica PromedioActualizado (DEC-300) con publisher confirms y mandatory, como ms-catalog (ADR-011).
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    connection-timeout: 2s
+    listener:
+      simple:
+        concurrency: 1
+        max-concurrency: 1
+        prefetch: 10
+        default-requeue-rejected: false
+        missing-queues-fatal: false
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1s
+          multiplier: 5
+  # Correo de RF30 por SMTP directo (DEC-282): Mailpit en desarrollo y CI; Gmail en la demo.
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PUERTO:1025}
+    username: ${SMTP_USUARIO:}
+    password: ${SMTP_CLAVE:}
+    properties:
+      mail.smtp.auth: ${SMTP_TLS:false}
+      mail.smtp.starttls.enable: ${SMTP_TLS:false}
+      mail.smtp.starttls.required: ${SMTP_TLS:false}
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 10000
+      mail.smtp.writetimeout: 10000
+
+samaria360:
+  seguridad:
+    # JWKS de ms-auth para validar los JWT (ADR-005).
+    jwk-set-uri: ${AUTH_JWKS_URI:http://localhost:8081/api/v1/auth/.well-known/jwks.json}
+    emisor: samaria360-auth
+    audiencia: ms-analytics
+  # ms-auth interno (DEC-280): contacto del Prestador para el correo de RF30.
+  auth:
+    url: ${AUTH_INTERNO_URI:http://localhost:8081}
+    secreto: ${SERVICIO_ANALYTICS_SECRETO:}
+  correo:
+    remitente: ${CORREO_REMITENTE:no-responder@samaria360.local}
+  correos:
+    habilitado: true
+    cada: PT5S
+
+# Solo /actuator/health. RabbitMQ y el SMTP no cuentan para la salud: si faltan, los mensajes esperan en su cola y los
+# correos en correos_pendientes (ADR-011, DEC-292).
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    rabbit:
+      enabled: false
+    mail:
+      enabled: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
