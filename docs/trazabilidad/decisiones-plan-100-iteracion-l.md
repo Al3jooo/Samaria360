@@ -17,4 +17,4 @@ Fase de Construcción (RUP). Iteración L del plan del 100 % (DEC-278): el conte
 ## Pendientes
 
 - La demo pública se actualiza después de integrar (decisión 9 del equipo). Para usar Gemini en la demo hay que poner `LLM_PROVEEDOR=gemini` y la llave en el `.env` de la VM.
-- La calificación promedio en la búsqueda pública llega con H (RF61): mientras tanto, el criterio `POPULARIDAD` no se activa.
+- ~~La calificación promedio en la búsqueda pública llega con H (RF61): mientras tanto, el criterio `POPULARIDAD` no se activa.~~ **Resuelto en H** (DEC-302): la búsqueda trae `calificacion` y el criterio `POPULARIDAD` se activa con un promedio de 4 o más.
