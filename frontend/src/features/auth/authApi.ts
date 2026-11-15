@@ -23,6 +23,14 @@ export function iniciarSesion(correo: string, contrasena: string): Promise<Sesio
   return solicitar<SesionIniciada>(`${BASE}/login`, { method: 'POST', cuerpo: { correo, contrasena }, publica: true })
 }
 
+/**
+ * Renueva la sesión con el token vigente (DEC-317): devuelve otro token con la misma forma que el del login. La sesión
+ * no pasa de 8 horas desde el inicio (401 SESION_VENCIDA) y una cuenta inactiva recibe 403.
+ */
+export function renovarSesion(): Promise<SesionIniciada> {
+  return solicitar<SesionIniciada>(`${BASE}/sesion/renovacion`, { method: 'POST' })
+}
+
 export function consultarUsuarioActual(): Promise<UsuarioActual> {
   return solicitar<UsuarioActual>(`${BASE}/me`)
 }
@@ -62,6 +70,23 @@ export async function registrarTurista(datos: DatosRegistroTurista): Promise<voi
 
 export async function registrarPrestador(datos: DatosRegistroPrestador): Promise<void> {
   await solicitar<unknown>(`${BASE}/registro/prestador`, { method: 'POST', cuerpo: datos, publica: true })
+}
+
+/**
+ * RF34, primer paso: responde siempre 202 con el mismo cuerpo, exista o no la cuenta (ADR-006). El idioma de la
+ * interfaz (RF03) elige el del correo.
+ */
+export async function solicitarRecuperacion(correo: string, idioma: string): Promise<void> {
+  await solicitar<unknown>(`${BASE}/recuperacion`, { method: 'POST', cuerpo: { correo, idioma }, publica: true })
+}
+
+/** RF34, segundo paso: 204, o 400 TOKEN_INVALIDO si el enlace no existe, ya se usó o venció (DEC-285). */
+export async function restablecerContrasena(token: string, contrasena: string): Promise<void> {
+  await solicitar<unknown>(`${BASE}/recuperacion/restablecimiento`, {
+    method: 'POST',
+    cuerpo: { token, contrasena },
+    publica: true,
+  })
 }
 
 /** Códigos ISO 3166-1 alfa-2 (decisión D5): la única lista de países; los nombres los pone el navegador. */

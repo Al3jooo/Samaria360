@@ -2,6 +2,8 @@ import { Suspense, lazy, type ReactNode } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { LoginPage } from '../features/auth/LoginPage'
 import { RegistroPage } from '../features/auth/registro/RegistroPage'
+import { RecuperarPage } from '../features/auth/recuperacion/RecuperarPage'
+import { RestablecerPage } from '../features/auth/recuperacion/RestablecerPage'
 import { SesionProvider } from '../features/auth/SesionProvider'
 import { EstadoCatalogo } from '../features/catalogo/componentes/EstadoCatalogo'
 import { FavoritosProvider } from '../features/favoritos/FavoritosProvider'
@@ -45,6 +47,38 @@ const TerminosPage = lazy(() =>
 const AdministrarPreguntasPage = lazy(() =>
   import('../features/admin/AdministrarPreguntasPage').then((m) => ({ default: m.AdministrarPreguntasPage })),
 )
+/**
+ * Asistente virtual (iteración L, DEC-297, DEC-298): WF-07 y «Mis itinerarios» (WF-31), solo para el Turista, y la base
+ * de conocimientos (WF-32), solo para el Administrador; diferidas.
+ */
+const AsistentePage = lazy(() => import('../features/asistente/AsistentePage').then((m) => ({ default: m.AsistentePage })))
+const MisItinerariosPage = lazy(() =>
+  import('../features/asistente/MisItinerariosPage').then((m) => ({ default: m.MisItinerariosPage })),
+)
+const ConocimientoAdminPage = lazy(() =>
+  import('../features/asistente/ConocimientoAdminPage').then((m) => ({ default: m.ConocimientoAdminPage })),
+)
+/** Calificaciones y reportes (iteración H, DEC-303): WF-33 del Prestador (RF56) y WF-34 del Administrador (RF29, RF57). */
+const CalificacionesRecibidasPage = lazy(() =>
+  import('../features/calificaciones/CalificacionesRecibidasPage').then((m) => ({
+    default: m.CalificacionesRecibidasPage,
+  })),
+)
+const ModeracionPage = lazy(() =>
+  import('../features/calificaciones/ModeracionPage').then((m) => ({ default: m.ModeracionPage })),
+)
+/** Tableros (iteración K, DEC-308): WF-35 (RF14), WF-36 (RF31) y WF-37 (RF64). */
+const TableroGeneralPage = lazy(() =>
+  import('../features/tableros/TableroGeneralPage').then((m) => ({ default: m.TableroGeneralPage })),
+)
+const PanelPrestadorPage = lazy(() =>
+  import('../features/tableros/PanelPrestadorPage').then((m) => ({ default: m.PanelPrestadorPage })),
+)
+const ReporteAfluenciaPage = lazy(() =>
+  import('../features/tableros/ReporteAfluenciaPage').then((m) => ({ default: m.ReporteAfluenciaPage })),
+)
+/** WF-30 «Auditoría» (RF13, DEC-294): diferida y solo para el Administrador. */
+const AuditoriaPage = lazy(() => import('../features/admin/AuditoriaPage').then((m) => ({ default: m.AuditoriaPage })))
 const AdministrarAvisosPage = lazy(() =>
   import('../features/admin/AdministrarAvisosPage').then((m) => ({ default: m.AdministrarAvisosPage })),
 )
@@ -90,6 +124,17 @@ const PerfilComercialPage = lazy(() =>
 )
 const HistorialReservasPage = lazy(() =>
   import('../features/prestador/HistorialReservasPage').then((m) => ({ default: m.HistorialReservasPage })),
+)
+/** Iteración I (DEC-310 a DEC-313): oferta y disponibilidad (WF-38, RF19), historial de modificaciones (WF-39, RF41) y
+ * asistentes (WF-40, RF42). La galería (RF48) va dentro de WF-18. */
+const OfertaServicioPage = lazy(() =>
+  import('../features/oferta/OfertaServicioPage').then((m) => ({ default: m.OfertaServicioPage })),
+)
+const HistorialModificacionesPage = lazy(() =>
+  import('../features/oferta/HistorialModificacionesPage').then((m) => ({ default: m.HistorialModificacionesPage })),
+)
+const AsistentesPage = lazy(() =>
+  import('../features/oferta/AsistentesPage').then((m) => ({ default: m.AsistentesPage })),
 )
 /**
  * «Atractivos y agenda» (iteración E, B1; DEC-220, DEC-233): el panel «Atractivos» (WF-24), el registro (WF-09) y la
@@ -228,8 +273,63 @@ export function App() {
                   </Diferida>
                 }
               />
+              {/* WF-07 «Asistente virtual IA» y WF-31 «Mis itinerarios» (RF04, RF35, RF36, RF59; DEC-298). */}
+              <Route
+                path="/asistente"
+                element={
+                  <Diferida>
+                    <AsistentePage />
+                  </Diferida>
+                }
+              />
+              <Route
+                path="/perfil/itinerarios"
+                element={
+                  <Diferida>
+                    <MisItinerariosPage />
+                  </Diferida>
+                }
+              />
+            </Route>
+            {/* WF-35 «Tableros» (RF14): el Administrador y el Gestor (respuesta 4 del equipo, DEC-308). */}
+            <Route element={<RutaProtegida rol={['Administrador', 'Gestor']} />}>
+              <Route
+                path="/tableros"
+                element={
+                  <Diferida>
+                    <TableroGeneralPage />
+                  </Diferida>
+                }
+              />
             </Route>
             <Route element={<RutaProtegida rol="Administrador" />}>
+              {/* WF-34 «Moderación» (RF29, RF57; DEC-303). */}
+              <Route
+                path="/admin/moderacion"
+                element={
+                  <Diferida>
+                    <ModeracionPage />
+                  </Diferida>
+                }
+              />
+              {/* WF-32 «Base de conocimientos» (RF05, DEC-297). */}
+              <Route
+                path="/admin/conocimiento"
+                element={
+                  <Diferida>
+                    <ConocimientoAdminPage />
+                  </Diferida>
+                }
+              />
+              {/* WF-30 «Auditoría» (RF13, DEC-294). */}
+              <Route
+                path="/admin/auditoria"
+                element={
+                  <Diferida>
+                    <AuditoriaPage />
+                  </Diferida>
+                }
+              />
               <Route
                 path="/admin/cuentas"
                 element={
@@ -328,6 +428,49 @@ export function App() {
                   </Diferida>
                 }
               />
+              {/* WF-36 «Mi panel» (RF31, DEC-308). */}
+              <Route
+                path="/prestador/panel"
+                element={
+                  <Diferida>
+                    <PanelPrestadorPage />
+                  </Diferida>
+                }
+              />
+              {/* WF-38, WF-39 y WF-40 (RF19, RF41, RF42; DEC-310 a DEC-312). */}
+              <Route
+                path="/prestador/servicios/:id/oferta"
+                element={
+                  <Diferida>
+                    <OfertaServicioPage />
+                  </Diferida>
+                }
+              />
+              <Route
+                path="/prestador/historial-modificaciones"
+                element={
+                  <Diferida>
+                    <HistorialModificacionesPage />
+                  </Diferida>
+                }
+              />
+              <Route
+                path="/prestador/asistentes"
+                element={
+                  <Diferida>
+                    <AsistentesPage />
+                  </Diferida>
+                }
+              />
+              {/* WF-33 «Calificaciones recibidas» (RF56, DEC-303). */}
+              <Route
+                path="/prestador/calificaciones"
+                element={
+                  <Diferida>
+                    <CalificacionesRecibidasPage />
+                  </Diferida>
+                }
+              />
             </Route>
             <Route element={<RutaProtegida rol="Gestor" />}>
               <Route
@@ -370,12 +513,24 @@ export function App() {
                   </Diferida>
                 }
               />
+              {/* WF-37 «Reporte de afluencia» (RF64, DEC-308). */}
+              <Route
+                path="/gestor/afluencia"
+                element={
+                  <Diferida>
+                    <ReporteAfluenciaPage />
+                  </Diferida>
+                }
+              />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
           <Route element={<DisenoAcceso />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/registro" element={<RegistroPage />} />
+            {/* RF34 (DEC-285): pedir el enlace (WF-27) y restablecer la contraseña con el token del correo (WF-28). */}
+            <Route path="/recuperar" element={<RecuperarPage />} />
+            <Route path="/restablecer" element={<RestablecerPage />} />
           </Route>
         </Routes>
       </FavoritosProvider>

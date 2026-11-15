@@ -1,0 +1,210 @@
+/* Tableros (RF14, RF31, RF64; DEC-308): WF-35, WF-36 y WF-37. Solo tokens de src/app/estilos.css. Un tono por gráfico
+   (mar-700 sobre la superficie), marcas delgadas con el extremo redondeado sobre la línea base y grilla tenue. */
+
+.tablero {
+  display: grid;
+  gap: var(--espacio-5);
+  width: min(100%, var(--ancho-maximo));
+  margin: 0 auto;
+  padding: var(--espacio-6) var(--espacio-4) var(--espacio-7);
+}
+
+.tablero h1 {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-size: var(--texto-3xl);
+  line-height: var(--interlineado-titulos);
+  color: var(--color-mar-900);
+}
+
+.tablero__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--espacio-3);
+}
+
+.tablero__filtros label {
+  display: grid;
+  gap: var(--espacio-1);
+  font-weight: 600;
+}
+
+.tablero__filtros input,
+.tablero__filtros select {
+  min-height: 2.75rem;
+  padding: var(--espacio-2) var(--espacio-3);
+  border: 1.5px solid var(--color-borde-campo);
+  border-radius: var(--radio-sm);
+  background: var(--color-superficie);
+  color: var(--color-tinta);
+  font: inherit;
+  font-weight: 400;
+}
+
+.tablero__cuadricula {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--espacio-5);
+}
+
+.tablero__error {
+  margin: 0;
+  color: var(--color-error);
+}
+
+.grafico {
+  display: grid;
+  gap: var(--espacio-2);
+  margin: 0;
+  padding: var(--espacio-4) var(--espacio-5);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-md);
+  background: var(--color-superficie);
+}
+
+.grafico__titulo {
+  font-weight: 700;
+  color: var(--color-mar-900);
+}
+
+.grafico__tooltip {
+  min-height: 1.5em;
+  margin: 0;
+  color: var(--color-tinta-suave);
+  font-size: var(--texto-sm);
+}
+
+.grafico__columnas {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 10rem;
+  border-bottom: 1px solid var(--color-borde);
+  background: repeating-linear-gradient(to top, transparent 0 calc(25% - 1px), var(--color-borde) calc(25% - 1px) 25%);
+}
+
+.grafico__columna {
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  height: 100%;
+}
+
+.grafico__barra {
+  width: 100%;
+  min-height: 1px;
+  border-radius: 4px 4px 0 0;
+  background: var(--color-mar-700);
+}
+
+.grafico__columna--activa .grafico__barra {
+  background: var(--color-mar-900);
+}
+
+.grafico__eje {
+  display: flex;
+  justify-content: space-between;
+  color: var(--color-tinta-suave);
+  font-size: var(--texto-xs);
+}
+
+.grafico__tabla summary {
+  color: var(--color-mar-700);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.grafico__tabla table,
+.tablero table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--texto-sm);
+}
+
+.grafico__tabla th,
+.grafico__tabla td,
+.tablero table th,
+.tablero table td {
+  padding: var(--espacio-1) var(--espacio-2);
+  border-bottom: 1px solid var(--color-borde);
+  text-align: left;
+}
+
+.tablero table td.numero,
+.tablero table th.numero {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.grafico__barras {
+  display: grid;
+  gap: var(--espacio-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grafico__barras li {
+  display: grid;
+  grid-template-columns: minmax(6rem, 1fr) 2fr auto;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.grafico__etiqueta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grafico__pista {
+  height: 0.75rem;
+}
+
+.grafico__barra-h {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 0 4px 4px 0;
+  background: var(--color-mar-700);
+}
+
+.grafico__valor {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.grafico__vacio {
+  margin: 0;
+  color: var(--color-tinta-suave);
+}
+
+.cifra {
+  display: grid;
+  margin: 0;
+  padding: var(--espacio-4) var(--espacio-5);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-md);
+  background: var(--color-superficie);
+}
+
+.cifra__valor {
+  font-family: var(--fuente-titulos);
+  font-size: var(--texto-3xl);
+  color: var(--color-mar-900);
+}
+
+.cifra__etiqueta {
+  color: var(--color-tinta-suave);
+}
+
+.selector-periodo {
+  display: inline-flex;
+  gap: var(--espacio-1);
+}
+
+.selector-periodo button[aria-pressed='true'] {
+  background: var(--color-mar-700);
+  color: var(--color-superficie);
+}

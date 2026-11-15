@@ -198,6 +198,16 @@ export function IconoTelefono() {
   )
 }
 
+/** Campana de notificaciones (RF63). */
+export function IconoCampana() {
+  return (
+    <Icono>
+      <path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z" />
+      <path d="M10 20a2 2 0 0 0 4 0" />
+    </Icono>
+  )
+}
+
 export function IconoInfo() {
   return (
     <Icono>
@@ -267,6 +277,65 @@ export function IconoCompartir() {
       <circle cx="6" cy="12" r="2.5" />
       <circle cx="18" cy="18.5" r="2.5" />
       <path d="m8.2 10.8 7.6-4.1M8.2 13.2l7.6 4.1" />
+    </Icono>
+  )
+}
+
+/** Asistente virtual (WF-07, RF04). */
+export function IconoAsistente() {
+  return (
+    <Icono width="28" height="28">
+      <rect x="4" y="8" width="16" height="12" rx="3" />
+      <path d="M12 4v4M9 13h.01M15 13h.01M9.5 16.5h5" />
+      <circle cx="12" cy="3.5" r="1" />
+    </Icono>
+  )
+}
+
+/** Enviar un mensaje (WF-07). */
+export function IconoEnviar() {
+  return (
+    <Icono>
+      <path d="m4 12 16-8-6 16-2.5-6.5z" />
+      <path d="M11.5 13.5 20 4" />
+    </Icono>
+  )
+}
+
+/** Descargar (WF-07, «Descargar PDF»). */
+export function IconoDescargar() {
+  return (
+    <Icono width="18" height="18">
+      <path d="M12 4v11m-4.5-4.5L12 15l4.5-4.5M5 19h14" />
+    </Icono>
+  )
+}
+
+/** Mapa (WF-07, «Ver en el mapa»; «Rutas y clima»). */
+export function IconoMapa() {
+  return (
+    <Icono width="18" height="18">
+      <path d="m3 6 6-2 6 2 6-2v14l-6 2-6-2-6 2z" />
+      <path d="M9 4v14M15 6v14" />
+    </Icono>
+  )
+}
+
+/** Pulso («Aforos en vivo», WF-07). */
+export function IconoPulso() {
+  return (
+    <Icono>
+      <path d="M3 12h4l2-5 4 10 2-5h6" />
+    </Icono>
+  )
+}
+
+/** Guardar (WF-07, «Guardar itinerario en perfil»). */
+export function IconoGuardar() {
+  return (
+    <Icono width="18" height="18">
+      <path d="M5 4h11l3 3v13H5z" />
+      <path d="M8 4v5h7V4M8 20v-6h8v6" />
     </Icono>
   )
 }

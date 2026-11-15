@@ -22,7 +22,6 @@
     "navegacion": "Main navigation",
     "inicioSesion": "Sign in",
     "busqueda": "Search",
-    "servicios": "Services",
     "asistente": "AI Assistant",
     "idioma": "Language",
     "espanol": "Spanish",
@@ -43,7 +42,17 @@
     "atractivos": "Attractions",
     "registrarAtractivo": "Register attraction",
     "eventos": "Events",
-    "registrarEvento": "Register event"
+    "registrarEvento": "Register event",
+    "auditoria": "Audit log",
+    "misItinerarios": "My itineraries",
+    "conocimiento": "Knowledge base",
+    "calificacionesRecibidas": "Ratings received",
+    "moderacion": "Moderation",
+    "tableros": "Dashboards",
+    "miPanel": "My dashboard",
+    "reporteAfluencia": "Crowd report",
+    "historialModificaciones": "Change history",
+    "asistentes": "Attendees"
   },
   "login": {
     "titulo": "Sign in to Samaria360",
@@ -69,6 +78,30 @@
       "turista": "Registration received. Sign in with your email.",
       "prestador": "Request received; it will remain pending validation."
     }
+  },
+  "recuperacion": {
+    "titulo": "Recover your password",
+    "introduccion": "Enter the email of your account and we will send you a link to choose a new password.",
+    "boton": "Send link",
+    "enviando": "Sending…",
+    "enviado": "If the email has a Samaria360 account, we sent you a link to reset the password. It expires in 30 minutes and can be used only once.",
+    "volver": "Back to sign in",
+    "correoInvalido": "Enter a valid email.",
+    "demasiadas": "Too many attempts. Wait a few minutes and try again.",
+    "sinConexion": "There is no connection to the server. Check your connection and try again.",
+    "errorGeneral": "The request could not be completed. Try again.",
+    "tituloRestablecer": "Choose a new password",
+    "contrasenaNueva": "New password",
+    "confirmar": "Confirm the password",
+    "guardar": "Save password",
+    "guardando": "Saving…",
+    "contrasenaCorta": "The password must have at least 8 characters.",
+    "noCoinciden": "The passwords do not match.",
+    "contrasenaInvalida": "The password is not valid: it must have between 8 characters and 72 bytes.",
+    "listo": "Done: your password changed and open sessions were closed. You can now sign in.",
+    "iniciarSesion": "Sign in",
+    "enlaceInvalido": "The link is not valid, was already used or expired.",
+    "pedirOtro": "Request another link"
   },
   "registro": {
     "titulo": "Create a Samaria360 account",
@@ -274,7 +307,9 @@
         "CON_CUPOS": "Available this week",
         "AGOTADO": "Sold out for the next 7 days",
         "SIN_INVENTARIO": "No dates"
-      }
+      },
+      "calificacionValor_one": "{{promedio}} ★ ({{count}})",
+      "calificacionValor_other": "{{promedio}} ★ ({{count}})"
     },
     "busqueda": {
       "cargando": "Searching for places…",
@@ -644,7 +679,8 @@
       "copiado": "Link copied.",
       "enlace": "Link to share",
       "copiaManual": "We could not copy it automatically: copy it from this field."
-    }
+    },
+    "calificar": "Rate"
   },
   "admin": {
     "titulo": "Manage accounts",
@@ -1125,7 +1161,6 @@
       "ofertaAyuda": "The days the service operates. It can be booked on those days.",
       "ofertaSinCategoria": "Choose a category: tours and accommodations register their initial offer.",
       "sinOferta": "This category does not register an initial offer.",
-      "fotosPendiente": "Service photos will arrive in a later iteration.",
       "veracidad": "I confirm the information is truthful",
       "enviar": "Submit for approval",
       "enviando": "Submitting…",
@@ -1153,6 +1188,7 @@
         "accesibilidad": "Accessibility conditions"
       },
       "errores": {
+        "CARGA_DEMASIADO_GRANDE": "The photos are too large together (30 MB at most). Remove one and try again.",
         "DATOS_INVALIDOS": "Some data is not valid. Check the form.",
         "PRESTADOR_NO_HABILITADO": "Your account is not yet enabled to register services. What you typed is kept.",
         "ACCESO_DENEGADO": "Only providers can register services.",
@@ -1213,7 +1249,8 @@
         "otro": "An unexpected error occurred while loading the service."
       },
       "actualizarPrecio": "Update price",
-      "editarDatos": "Edit business details"
+      "editarDatos": "Edit business details",
+      "gestionarOferta": "Manage availability"
     },
     "edicion": {
       "servicio": "Service",
@@ -1429,7 +1466,8 @@
         "estado": "Status",
         "capacidad": "Capacity",
         "registrado": "Registered",
-        "acciones": "Actions"
+        "acciones": "Actions",
+        "afluencia": "Crowd level"
       },
       "editar": "Edit",
       "editarDe": "Edit {{nombre}}",
@@ -1571,6 +1609,512 @@
       "noDisponible": "The calendar is not responding right now.",
       "red": "No connection. Check your network and try again.",
       "otro": "The calendar could not be loaded."
+    }
+  },
+  "notificaciones": {
+    "boton": "Notifications",
+    "botonConNuevas_one": "Notifications: {{count}} unread",
+    "botonConNuevas_other": "Notifications: {{count}} unread",
+    "titulo": "Notifications",
+    "marcarTodas": "Mark all as read",
+    "vacia": "You have no notifications.",
+    "error": "Notifications are not available right now.",
+    "noLeida": "(unread)",
+    "tipos": {
+      "RESERVA_CONFIRMADA": "Your booking of “{{servicio}}” for {{fecha}} is confirmed.",
+      "RESERVA_CANCELADA": "Your booking of “{{servicio}}” for {{fecha}} was cancelled.",
+      "RESERVA_COMPLETADA": "Your booking of “{{servicio}}” is completed. You can now rate the service.",
+      "NUEVA_RESERVA_one": "New booking of “{{servicio}}” for {{fecha}}: {{count}} person.",
+      "NUEVA_RESERVA_other": "New booking of “{{servicio}}” for {{fecha}}: {{count}} people."
+    }
+  },
+  "auditoria": {
+    "titulo": "Audit log",
+    "introduccion": "Critical actions on the platform: approvals, cancellations and role changes, with the user who made them and the date.",
+    "accion": "Action",
+    "todas": "All",
+    "desde": "From",
+    "hasta": "To",
+    "filtrar": "Filter",
+    "fecha": "Date",
+    "usuario": "User",
+    "detalle": "Detail",
+    "vacia": "No actions match those filters.",
+    "resultados_one": "{{count}} action",
+    "resultados_other": "{{count}} actions",
+    "error": "The audit log could not be loaded. Try again.",
+    "noDisponible": "The audit log is not available right now.",
+    "filtrosInvalidos": "Check the dates: “To” cannot be before “From”.",
+    "acciones": {
+      "PRESTADOR_APROBADO": "Provider approved",
+      "PRESTADOR_RECHAZADO": "Provider rejected",
+      "SERVICIO_APROBADO": "Service approved",
+      "SERVICIO_RECHAZADO": "Service rejected",
+      "ROL_CAMBIADO": "Role changed",
+      "RESERVA_CANCELADA": "Booking cancelled",
+      "CALIFICACION_OCULTADA": "Rating hidden",
+      "CALIFICACION_MOSTRADA": "Rating shown again",
+      "CALIFICACION_ELIMINADA": "Rating deleted"
+    }
+  },
+  "asistente": {
+    "titulo": "AI Virtual Assistant",
+    "enLinea": "Online",
+    "subtitulo": "answers in seconds with Samaria360 data: attractions, published services and official information from the city.",
+    "beta": "Beta assistant: recommendations use only the Samaria360 catalog and the city's knowledge base. Check capacity and trail status before you go.",
+    "cerrarBeta": "Close the notice",
+    "conversacion": "Conversation with the assistant",
+    "autorAsistente": "AI Assistant",
+    "autorTu": "You",
+    "saludo": "Hi! I'm the Samaria360 virtual assistant. Ask me about lodging, food, tours, equipment rental, beaches, nature or culture, or ask me for a multi-day itinerary.",
+    "escribiendo": "The assistant is typing…",
+    "catalogoNoDisponible": "The catalog could not be checked: this answer uses only the knowledge base.",
+    "guardar": "Save itinerary to profile",
+    "verMapa": "View on map",
+    "guardado": "Itinerary saved to your profile.",
+    "verItinerarios": "View my itineraries",
+    "sugerenciasRapidas": "Quick questions",
+    "chips": {
+      "aforo": "Live capacity",
+      "rutas": "Alternative routes",
+      "toursManana": "Tours tomorrow",
+      "alquiler": "Equipment rental"
+    },
+    "campo": "Your question",
+    "placeholder": "Type your question about Santa Marta…",
+    "enviar": "Send",
+    "restantes": "You have {{n}} of {{total}} messages left today.",
+    "limiteDiario": "You can send up to {{total}} messages a day.",
+    "itinerario": {
+      "titulo": "Suggested itinerary",
+      "vacio": "Ask the assistant for an itinerary (for example, \"a 2-day plan with beaches\") and it will show up here.",
+      "dia": "Day {{n}}",
+      "compartir": "Share",
+      "pdf": "Download PDF",
+      "copiado": "Itinerary copied to the clipboard.",
+      "sinCompartir": "This browser cannot share or copy: select the itinerary text to copy it.",
+      "nombrePorDefecto": "Itinerary of {{fecha}}"
+    },
+    "tipo": {
+      "servicio": "Service",
+      "atractivo": "Attraction"
+    },
+    "categoria": {
+      "Alojamiento": "Lodging",
+      "Gastronomia": "Food",
+      "Tour": "Tour",
+      "AlquilerEquipo": "Equipment rental",
+      "Naturaleza": "Nature",
+      "Cultura": "Culture"
+    },
+    "prestadores": "Mentioned providers",
+    "sinPrestadores": "Services suggested by the assistant will show up here.",
+    "ayuda": {
+      "titulo": "The assistant can also help you with",
+      "aforosTitulo": "Live capacity",
+      "aforos": "Which attractions are open and which are worth visiting given their status.",
+      "rutasTitulo": "Routes and weather",
+      "rutas": "City tips and rules from the knowledge base, such as weather or closures.",
+      "prestadoresTitulo": "Verified providers",
+      "prestadores": "It only suggests published services from providers approved by the Administrator."
+    },
+    "errores": {
+      "limite": "You reached today's limit of {{n}} messages. Come back tomorrow.",
+      "largo": "The message must be between 1 and {{n}} characters.",
+      "noDisponible": "The assistant is not available right now. Try again in a few minutes.",
+      "generico": "The message could not be sent. Try again.",
+      "limiteItinerarios": "You already have 20 saved itineraries: delete one from \"My itineraries\" to save another.",
+      "guardar": "The itinerary could not be saved. Try again."
+    }
+  },
+  "itinerarios": {
+    "titulo": "My itineraries",
+    "volverPerfil": "Back to My profile",
+    "contador": "{{n}} of {{limite}} itineraries",
+    "cargando": "Loading your itineraries…",
+    "errorCarga": "Your itineraries could not be loaded.",
+    "vacio": "You don't have saved itineraries yet.",
+    "irAsistente": "Ask the assistant for an itinerary",
+    "nombre": "Name",
+    "dia": "Day",
+    "quitarPaso": "Remove",
+    "guardar": "Save changes",
+    "cancelar": "Cancel",
+    "editar": "Edit",
+    "eliminar": "Delete",
+    "siEliminar": "Yes, delete",
+    "confirmarEliminar": "Delete \"{{nombre}}\"? This cannot be undone.",
+    "actualizado": "Updated on {{fecha}}",
+    "errorDatos": "Check the name (1 to 100 characters) and the steps.",
+    "errorGuardar": "The changes could not be saved.",
+    "errorEliminar": "The itinerary could not be deleted."
+  },
+  "conocimiento": {
+    "titulo": "Assistant knowledge base",
+    "descripcion": "Official information the assistant can use in its answers (RF05). Up to 500 entries.",
+    "nuevaTitulo": "New entry",
+    "editarTitulo": "Edit entry",
+    "categoria": "Category",
+    "contenido": "Content",
+    "caracteres": "{{n}} of {{max}} characters",
+    "agregar": "Add entry",
+    "guardar": "Save changes",
+    "cancelar": "Cancel",
+    "editar": "Edit",
+    "eliminar": "Delete",
+    "confirmarEliminar": "Delete this entry? The assistant will stop using it.",
+    "creada": "Entry added.",
+    "actualizada": "Entry updated.",
+    "eliminada": "Entry deleted.",
+    "errorLimite": "The base already has 500 entries: delete one to add another.",
+    "errorDatos": "Check the category (1 to 50) and the content (1 to 2000 characters).",
+    "errorGuardar": "The entry could not be saved.",
+    "errorEliminar": "The entry could not be deleted.",
+    "cargando": "Loading the knowledge base…",
+    "errorCarga": "The knowledge base could not be loaded.",
+    "total_one": "{{count}} entry",
+    "total_other": "{{count}} entries",
+    "vacia": "The knowledge base is empty.",
+    "paginacion": "Knowledge base pages",
+    "anterior": "Previous",
+    "siguiente": "Next",
+    "pagina": "Page {{n}} of {{total}}"
+  },
+  "calificaciones": {
+    "titulo": "Ratings and reviews",
+    "cargando": "Loading ratings…",
+    "noDisponibles": "Ratings are not available right now.",
+    "sinCalificaciones": "No ratings yet",
+    "resumen_one": "{{promedio}} ({{count}} rating)",
+    "resumen_other": "{{promedio}} ({{count}} ratings)",
+    "cantidad_one": "{{count}} rating",
+    "cantidad_other": "{{count}} ratings",
+    "estrellasDe": "{{n}} out of 5 stars",
+    "verMas": "See more reviews",
+    "iniciarSesion": "Sign in as a tourist to rate.",
+    "tuCalificacion": "Your rating",
+    "comentario": "Comment (optional)",
+    "caracteres": "{{n}} of {{max}} characters",
+    "enviar": "Submit rating",
+    "gracias": "Thank you! Your rating now shows on this page.",
+    "motivos": {
+      "SIN_RESERVA_COMPLETADA": "You can rate this service once you have a completed booking.",
+      "CALIFICACION_DUPLICADA": "You already rated this place. Ratings cannot be edited.",
+      "CUENTA_INACTIVA": "Your account is not active: you cannot rate.",
+      "OTRO": "You cannot rate right now."
+    },
+    "errores": {
+      "estrellas": "Choose 1 to 5 stars.",
+      "generico": "The rating could not be sent. Try again."
+    }
+  },
+  "reportes": {
+    "motivo": "Reason",
+    "elegir": "Choose a reason",
+    "descripcion": "Description (optional)",
+    "enviar": "Send report",
+    "cancelar": "Cancel",
+    "enviado": "Thank you: the report is now under the Administrator's review.",
+    "motivos": {
+      "INFORMACION_FALSA": "False information",
+      "INFORMACION_DESACTUALIZADA": "Outdated information",
+      "PRECIO_INCORRECTO": "Wrong price",
+      "UBICACION_INCORRECTA": "Wrong location",
+      "FOTOS_NO_CORRESPONDEN": "Photos don't match",
+      "OTRO": "Other"
+    },
+    "errores": {
+      "motivo": "Choose a reason.",
+      "REPORTE_DUPLICADO": "You already have a pending report for this place.",
+      "CUENTA_INACTIVA": "Your account is not active: you cannot report.",
+      "generico": "The report could not be sent. Try again."
+    }
+  },
+  "calificacionesPrestador": {
+    "titulo": "Ratings received",
+    "servicio": "Service",
+    "todos": "All",
+    "desde": "From",
+    "hasta": "To",
+    "filtrar": "Filter",
+    "cargando": "Loading ratings…",
+    "error": "Ratings could not be loaded.",
+    "promedio": "Average",
+    "porServicio": "Average per service",
+    "vacio": "No ratings match these filters.",
+    "paginacion": "Rating pages"
+  },
+  "moderacion": {
+    "titulo": "Moderation",
+    "pestanas": {
+      "calificaciones": "Ratings",
+      "reportes": "Reports"
+    },
+    "estado": "Status",
+    "todas": "All",
+    "estados": {
+      "Visible": "Visible",
+      "Oculta": "Hidden",
+      "Pendiente": "Pending",
+      "Revisado": "Reviewed"
+    },
+    "tipos": {
+      "servicio": "Service",
+      "atractivo": "Attraction"
+    },
+    "verFicha": {
+      "servicio": "View the service",
+      "atractivo": "View the attraction"
+    },
+    "cargando": "Loading…",
+    "error": "The moderation panel could not be loaded.",
+    "sinCalificaciones": "No ratings match this filter.",
+    "sinReportes": "No reports match this filter.",
+    "motivoAnterior": "Reason for the last moderation:",
+    "acciones": {
+      "ocultamiento": "Hide",
+      "visibilidad": "Show again",
+      "eliminacion": "Delete"
+    },
+    "motivoPara": {
+      "ocultamiento": "Reason to hide it",
+      "visibilidad": "Reason to show it again",
+      "eliminacion": "Reason to delete it (cannot be undone)"
+    },
+    "confirmar": {
+      "ocultamiento": "Hide rating",
+      "visibilidad": "Show again",
+      "eliminacion": "Delete permanently"
+    },
+    "hecho": {
+      "ocultamiento": "Rating hidden.",
+      "visibilidad": "Rating visible again.",
+      "eliminacion": "Rating deleted."
+    },
+    "cancelar": "Cancel",
+    "marcarRevisado": "Mark as reviewed",
+    "revisado": "Report marked as reviewed.",
+    "paginacion": "Moderation pages",
+    "errores": {
+      "ESTADO_CAMBIADO": "Another administrator already changed its status; the list was refreshed.",
+      "DATOS_INVALIDOS": "The reason must have between 1 and 500 characters.",
+      "CALIFICACION_NO_ENCONTRADA": "The rating no longer exists.",
+      "generico": "The action could not be completed."
+    }
+  },
+  "afluencia": {
+    "cargando": "Checking crowd levels…",
+    "noDisponible": "Crowd levels are not available right now.",
+    "sinDatos": "No crowd data today",
+    "niveles": {
+      "Bajo": "Low crowd",
+      "Medio": "Medium crowd",
+      "Alto": "High crowd"
+    },
+    "detalle": "({{porcentaje}} % of capacity: {{ocupacion}} of {{limite}} people, updated {{hora}})",
+    "limiteAlcanzado": "This attraction reached its capacity limit. We suggest other similar places with fewer visitors.",
+    "verAlternativos": "See alternative destinations",
+    "sinAlternativos": "There are no similar destinations with fewer visitors right now.",
+    "alternativo": "{{nivel}} ({{porcentaje}} %)",
+    "distancia": "{{km}} km away",
+    "registro": {
+      "campo": "People now at {{nombre}}",
+      "boton": "Record occupancy",
+      "hecho": "{{nivel}} ({{porcentaje}} %)",
+      "invalida": "Enter a whole number from 0 to 1,000,000.",
+      "sinLimite": "The attraction has no carrying capacity limit.",
+      "error": "The occupancy could not be recorded."
+    }
+  },
+  "tableros": {
+    "verTabla": "View the data as a table",
+    "dia": "Day",
+    "desde": "From",
+    "hasta": "To",
+    "aplicar": "Apply",
+    "cargando": "Loading the dashboard…",
+    "error": "The dashboard is not available right now.",
+    "periodo": "From {{desde}} to {{hasta}}",
+    "general": {
+      "titulo": "Dashboards",
+      "totalReservas": "Bookings in the period",
+      "reservasPorDia": "Bookings per day",
+      "reservas": "bookings",
+      "topAtractivos": "Top 3 most viewed attractions",
+      "visitantesPorZona": "Registered tourists by country",
+      "consultas_one": "{{count}} view",
+      "consultas_other": "{{count}} views",
+      "sinConsultas": "There are no attraction page views in the period yet.",
+      "sinTuristas": "There are no registered tourists yet.",
+      "sinPais": "No country"
+    },
+    "prestador": {
+      "titulo": "My dashboard",
+      "periodo": "Period",
+      "ultimos": "Last {{n}} days",
+      "vacio": "Your services had no views or bookings in the period.",
+      "tabla": "Views and bookings per service",
+      "servicio": "Service",
+      "consultas": "Views",
+      "reservas": "Bookings",
+      "consultasPorServicio": "Views per service",
+      "reservasPorServicio": "Bookings per service"
+    },
+    "afluencia": {
+      "titulo": "Crowd report",
+      "atractivo": "Attraction",
+      "todos": "All",
+      "vacio": "There are no occupancy readings in the period.",
+      "tabla": "Crowd level per attraction",
+      "lecturas": "Readings",
+      "promedio": "Average",
+      "maximo": "Maximum",
+      "ultimo": "Last level",
+      "porDia": "Average occupancy per day",
+      "porcentaje": "% of capacity"
+    }
+  },
+  "oferta": {
+    "cargando": "Loading availability…",
+    "volver": "Back to the service",
+    "titulo": "Availability of {{nombre}}",
+    "ayuda": "Adjust the spots of each date, close or open dates and add departures. You cannot go below what is already booked or close a date with confirmed bookings.",
+    "rango": "Date range",
+    "desde": "From",
+    "hasta": "To",
+    "consultar": "Search",
+    "inventario": "Dates from {{desde}} to {{hasta}}",
+    "sinFilas": "There are no dates with availability in this range.",
+    "columnas": {
+      "fecha": "Date",
+      "salida": "Departure",
+      "unidad": "Unit",
+      "cupos": "Total spots",
+      "reservados": "Booked",
+      "disponibles": "Available",
+      "estado": "Status",
+      "acciones": "Actions"
+    },
+    "estado": {
+      "abierta": "Open",
+      "cerrada": "Closed"
+    },
+    "cuposDe": "Total spots of {{fila}}",
+    "guardar": "Save spots",
+    "abrir": "Open",
+    "cerrar": "Close",
+    "guardado": "Spots updated.",
+    "abierta": "Date opened.",
+    "cerrada": "Date closed.",
+    "agregada": "Date added.",
+    "agregarSalida": "Add a departure",
+    "agregarFecha": "Add a date",
+    "elegirUnidad": "Choose a unit",
+    "agregar": "Add",
+    "verAsistentes": "View attendees",
+    "verHistorial": "View change history",
+    "dias": {
+      "Lunes": "Monday",
+      "Martes": "Tuesday",
+      "Miercoles": "Wednesday",
+      "Jueves": "Thursday",
+      "Viernes": "Friday",
+      "Sabado": "Saturday",
+      "Domingo": "Sunday"
+    },
+    "plantilla": {
+      "titulo": "Usual days and times",
+      "ayuda": "They apply to the dates that have no availability yet; published dates do not change.",
+      "dias": "Operating days",
+      "salidas": "Departure times (HH:mm, comma separated)",
+      "guardar": "Save days and times",
+      "guardada": "Days and times saved. New dates will use them."
+    },
+    "errores": {
+      "CUPOS_RESERVADOS": "You cannot leave fewer spots than those already booked ({{reservados}}).",
+      "FECHA_CON_RESERVAS": "This date has confirmed bookings and cannot be closed.",
+      "OFERTA_NO_DISPONIBLE": "This service has no editable availability (only approved tours and lodging).",
+      "DATOS_INVALIDOS": "Check the date, time and spots (1 to 10,000; future dates only).",
+      "SERVICIO_NO_DISPONIBLE": "The service is not available right now. Try again.",
+      "SIN_PERMISO": "You are not allowed to manage this service.",
+      "OTRO": "An unexpected error occurred."
+    }
+  },
+  "historialModificaciones": {
+    "titulo": "Change history",
+    "ayuda": "Price, spots, dates and times changes of your services in the last 30 days.",
+    "servicio": "Service",
+    "todos": "All",
+    "filtrar": "Filter",
+    "cargando": "Loading the history…",
+    "error": "The history could not be loaded.",
+    "vacio": "There are no changes in the last 30 days.",
+    "paginacion": "History pages",
+    "columnas": {
+      "fecha": "Date and time",
+      "servicio": "Service",
+      "tipo": "Change",
+      "detalle": "Date or unit",
+      "anterior": "Previous value",
+      "nuevo": "New value"
+    },
+    "tipos": {
+      "Precio": "Price",
+      "Cupos": "Spots",
+      "Apertura": "Date opened",
+      "Cierre": "Date closed",
+      "Plantilla": "Days and times"
+    }
+  },
+  "asistentes": {
+    "titulo": "Attendees",
+    "ayuda": "The confirmed bookings of a service on a date, with each tourist's contact.",
+    "servicio": "Service",
+    "elegirServicio": "Choose a service",
+    "fecha": "Date",
+    "salidaOpcional": "Departure (optional)",
+    "consultar": "Search",
+    "inicial": "Choose a service and a date to see the attendees.",
+    "cargando": "Loading attendees…",
+    "listado": "{{servicio}} · {{fecha}}",
+    "total_one": "{{count}} person in total",
+    "total_other": "{{count}} people in total",
+    "vacio": "There are no confirmed bookings for this date.",
+    "descargarCsv": "Download CSV",
+    "descargarPdf": "Download PDF",
+    "sinContacto": "Contact not available",
+    "columnas": {
+      "nombre": "Name",
+      "correo": "Email",
+      "telefono": "Phone",
+      "personas": "People",
+      "salida": "Departure or unit",
+      "entrada": "Check-in",
+      "salidaEstadia": "End"
+    },
+    "errores": {
+      "noDisponible": "Contact details are not available right now. Try again.",
+      "datos": "Check the service and the date.",
+      "otro": "The attendees could not be loaded."
+    }
+  },
+  "galeria": {
+    "titulo": "Gallery",
+    "ayuda": "{{n}} of {{max}} images. JPEG or PNG up to 5 MB; at least one must remain.",
+    "vacia": "This service has no images yet.",
+    "imagen": "Gallery image {{n}}",
+    "quitar": "Remove",
+    "quitarImagen": "Remove image {{n}}",
+    "elegir": "Choose an image",
+    "agregar": "Add image",
+    "agregada": "Image added.",
+    "quitada": "Image removed.",
+    "errores": {
+      "LIMITE_IMAGENES": "The gallery already has 5 images.",
+      "IMAGEN_MINIMA": "The gallery must keep at least one image.",
+      "IMAGEN_INVALIDA": "The image must be a JPEG or PNG up to 5 MB.",
+      "ESTADO_CAMBIADO": "The service is no longer published.",
+      "OTRO": "The gallery could not be updated."
     }
   }
 }

@@ -22,7 +22,6 @@
     "navegacion": "Navegación principal",
     "inicioSesion": "Inicio de sesión",
     "busqueda": "Búsqueda",
-    "servicios": "Servicios",
     "asistente": "Asistente IA",
     "idioma": "Idioma",
     "espanol": "Español",
@@ -43,7 +42,17 @@
     "atractivos": "Atractivos",
     "registrarAtractivo": "Registrar atractivo",
     "eventos": "Eventos",
-    "registrarEvento": "Registrar evento"
+    "registrarEvento": "Registrar evento",
+    "auditoria": "Auditoría",
+    "misItinerarios": "Mis itinerarios",
+    "conocimiento": "Base de conocimientos",
+    "calificacionesRecibidas": "Calificaciones recibidas",
+    "moderacion": "Moderación",
+    "tableros": "Tableros",
+    "miPanel": "Mi panel",
+    "reporteAfluencia": "Reporte de afluencia",
+    "historialModificaciones": "Historial de modificaciones",
+    "asistentes": "Asistentes"
   },
   "login": {
     "titulo": "Iniciar sesión en Samaria360",
@@ -69,6 +78,30 @@
       "turista": "Registro recibido. Inicia sesión con tu correo.",
       "prestador": "Solicitud recibida; quedará pendiente de validación."
     }
+  },
+  "recuperacion": {
+    "titulo": "Recuperar contraseña",
+    "introduccion": "Escribe el correo de tu cuenta y te enviaremos un enlace para elegir una contraseña nueva.",
+    "boton": "Enviar enlace",
+    "enviando": "Enviando…",
+    "enviado": "Si el correo tiene una cuenta en Samaria360, te enviamos un enlace para restablecer la contraseña. Vence en 30 minutos y sirve una sola vez.",
+    "volver": "Volver a iniciar sesión",
+    "correoInvalido": "Escribe un correo válido.",
+    "demasiadas": "Hiciste demasiados intentos. Espera unos minutos y vuelve a intentarlo.",
+    "sinConexion": "No hay conexión con el servidor. Revisa tu conexión e inténtalo de nuevo.",
+    "errorGeneral": "No se pudo completar la solicitud. Inténtalo de nuevo.",
+    "tituloRestablecer": "Elige una contraseña nueva",
+    "contrasenaNueva": "Contraseña nueva",
+    "confirmar": "Confirma la contraseña",
+    "guardar": "Guardar contraseña",
+    "guardando": "Guardando…",
+    "contrasenaCorta": "La contraseña debe tener al menos 8 caracteres.",
+    "noCoinciden": "Las contraseñas no coinciden.",
+    "contrasenaInvalida": "La contraseña no es válida: debe tener entre 8 caracteres y 72 bytes.",
+    "listo": "Listo: tu contraseña cambió y las sesiones abiertas se cerraron. Ya puedes iniciar sesión.",
+    "iniciarSesion": "Iniciar sesión",
+    "enlaceInvalido": "El enlace no es válido, ya se usó o venció.",
+    "pedirOtro": "Pedir otro enlace"
   },
   "registro": {
     "titulo": "Crear una cuenta en Samaria360",
@@ -274,7 +307,9 @@
         "CON_CUPOS": "Disponible esta semana",
         "AGOTADO": "Agotado los próximos 7 días",
         "SIN_INVENTARIO": "Sin fechas"
-      }
+      },
+      "calificacionValor_one": "{{promedio}} ★ ({{count}})",
+      "calificacionValor_other": "{{promedio}} ★ ({{count}})"
     },
     "busqueda": {
       "cargando": "Buscando lugares…",
@@ -644,7 +679,8 @@
       "copiado": "Enlace copiado.",
       "enlace": "Enlace para compartir",
       "copiaManual": "No pudimos copiarlo automáticamente: cópialo desde este campo."
-    }
+    },
+    "calificar": "Calificar"
   },
   "admin": {
     "titulo": "Administrar cuentas",
@@ -1125,7 +1161,6 @@
       "ofertaAyuda": "Los días en que opera el servicio. Podrás reservar en esos días.",
       "ofertaSinCategoria": "Elige una categoría: los tours y los alojamientos registran su oferta inicial.",
       "sinOferta": "Esta categoría no registra oferta inicial.",
-      "fotosPendiente": "Las fotos del servicio llegarán en una próxima iteración.",
       "veracidad": "Confirmo que la información es veraz",
       "enviar": "Enviar a aprobación",
       "enviando": "Enviando…",
@@ -1153,6 +1188,7 @@
         "accesibilidad": "Condiciones de accesibilidad"
       },
       "errores": {
+        "CARGA_DEMASIADO_GRANDE": "Las fotos pesan demasiado en conjunto (máximo 30 MB). Quita alguna e inténtalo de nuevo.",
         "DATOS_INVALIDOS": "Algunos datos no son válidos. Revisa el formulario.",
         "PRESTADOR_NO_HABILITADO": "Tu cuenta aún no está habilitada para registrar servicios. Lo que escribiste se conserva.",
         "ACCESO_DENEGADO": "Solo los prestadores pueden registrar servicios.",
@@ -1213,7 +1249,8 @@
         "otro": "Ocurrió un error inesperado al cargar el servicio."
       },
       "actualizarPrecio": "Actualizar precio",
-      "editarDatos": "Editar datos comerciales"
+      "editarDatos": "Editar datos comerciales",
+      "gestionarOferta": "Gestionar disponibilidad"
     },
     "edicion": {
       "servicio": "Servicio",
@@ -1429,7 +1466,8 @@
         "estado": "Estado",
         "capacidad": "Capacidad",
         "registrado": "Registrado",
-        "acciones": "Acciones"
+        "acciones": "Acciones",
+        "afluencia": "Afluencia"
       },
       "editar": "Editar",
       "editarDe": "Editar {{nombre}}",
@@ -1571,6 +1609,512 @@
       "noDisponible": "La agenda no responde en este momento.",
       "red": "No hay conexión. Revisa tu red e inténtalo de nuevo.",
       "otro": "No se pudo cargar la agenda."
+    }
+  },
+  "notificaciones": {
+    "boton": "Notificaciones",
+    "botonConNuevas_one": "Notificaciones: {{count}} sin leer",
+    "botonConNuevas_other": "Notificaciones: {{count}} sin leer",
+    "titulo": "Notificaciones",
+    "marcarTodas": "Marcar todas como leídas",
+    "vacia": "No tienes notificaciones.",
+    "error": "Las notificaciones no responden en este momento.",
+    "noLeida": "(sin leer)",
+    "tipos": {
+      "RESERVA_CONFIRMADA": "Tu reserva de «{{servicio}}» para el {{fecha}} quedó confirmada.",
+      "RESERVA_CANCELADA": "Tu reserva de «{{servicio}}» para el {{fecha}} quedó cancelada.",
+      "RESERVA_COMPLETADA": "Tu reserva de «{{servicio}}» quedó completada. Ya puedes calificar el servicio.",
+      "NUEVA_RESERVA_one": "Nueva reserva de «{{servicio}}» para el {{fecha}}: {{count}} persona.",
+      "NUEVA_RESERVA_other": "Nueva reserva de «{{servicio}}» para el {{fecha}}: {{count}} personas."
+    }
+  },
+  "auditoria": {
+    "titulo": "Auditoría",
+    "introduccion": "Acciones críticas de la plataforma: aprobaciones, cancelaciones y cambios de rol, con el usuario que las hizo y la fecha.",
+    "accion": "Acción",
+    "todas": "Todas",
+    "desde": "Desde",
+    "hasta": "Hasta",
+    "filtrar": "Filtrar",
+    "fecha": "Fecha",
+    "usuario": "Usuario",
+    "detalle": "Detalle",
+    "vacia": "No hay acciones con esos filtros.",
+    "resultados_one": "{{count}} acción",
+    "resultados_other": "{{count}} acciones",
+    "error": "No se pudo cargar la auditoría. Inténtalo de nuevo.",
+    "noDisponible": "La auditoría no responde en este momento.",
+    "filtrosInvalidos": "Revisa las fechas: «Hasta» no puede ser anterior a «Desde».",
+    "acciones": {
+      "PRESTADOR_APROBADO": "Prestador aprobado",
+      "PRESTADOR_RECHAZADO": "Prestador rechazado",
+      "SERVICIO_APROBADO": "Servicio aprobado",
+      "SERVICIO_RECHAZADO": "Servicio rechazado",
+      "ROL_CAMBIADO": "Rol cambiado",
+      "RESERVA_CANCELADA": "Reserva cancelada",
+      "CALIFICACION_OCULTADA": "Calificación ocultada",
+      "CALIFICACION_MOSTRADA": "Calificación mostrada de nuevo",
+      "CALIFICACION_ELIMINADA": "Calificación eliminada"
+    }
+  },
+  "asistente": {
+    "titulo": "Asistente Virtual IA",
+    "enLinea": "En línea",
+    "subtitulo": "responde en segundos con los datos de Samaria360: atractivos, servicios publicados y la información oficial del municipio.",
+    "beta": "Asistente en versión beta: las recomendaciones usan solo el catálogo de Samaria360 y la base de conocimientos del municipio. Confirma el aforo y el estado de los senderos antes de salir.",
+    "cerrarBeta": "Cerrar el aviso",
+    "conversacion": "Conversación con el asistente",
+    "autorAsistente": "Asistente IA",
+    "autorTu": "Tú",
+    "saludo": "¡Hola! Soy el asistente virtual de Samaria360. Pregúntame por alojamiento, gastronomía, tours, alquiler de equipos, playas, naturaleza o cultura, o pídeme un itinerario de varios días.",
+    "escribiendo": "El asistente está escribiendo…",
+    "catalogoNoDisponible": "No se pudo consultar el catálogo: la respuesta usa solo la base de conocimientos.",
+    "guardar": "Guardar itinerario en perfil",
+    "verMapa": "Ver en el mapa",
+    "guardado": "Itinerario guardado en tu perfil.",
+    "verItinerarios": "Ver mis itinerarios",
+    "sugerenciasRapidas": "Preguntas rápidas",
+    "chips": {
+      "aforo": "Aforo en vivo",
+      "rutas": "Rutas alternas",
+      "toursManana": "Tours mañana",
+      "alquiler": "Alquiler de equipos"
+    },
+    "campo": "Tu pregunta",
+    "placeholder": "Escribe tu pregunta sobre Santa Marta…",
+    "enviar": "Enviar",
+    "restantes": "Te quedan {{n}} de {{total}} mensajes hoy.",
+    "limiteDiario": "Puedes enviar hasta {{total}} mensajes al día.",
+    "itinerario": {
+      "titulo": "Itinerario sugerido",
+      "vacio": "Pídele al asistente un itinerario (por ejemplo, «un plan de 2 días con playas») y aparecerá aquí.",
+      "dia": "Día {{n}}",
+      "compartir": "Compartir",
+      "pdf": "Descargar PDF",
+      "copiado": "Itinerario copiado al portapapeles.",
+      "sinCompartir": "Este navegador no permite compartir ni copiar: selecciona el texto del itinerario para copiarlo.",
+      "nombrePorDefecto": "Itinerario del {{fecha}}"
+    },
+    "tipo": {
+      "servicio": "Servicio",
+      "atractivo": "Atractivo"
+    },
+    "categoria": {
+      "Alojamiento": "Alojamiento",
+      "Gastronomia": "Gastronomía",
+      "Tour": "Tour",
+      "AlquilerEquipo": "Alquiler de equipos",
+      "Naturaleza": "Naturaleza",
+      "Cultura": "Cultura"
+    },
+    "prestadores": "Prestadores mencionados",
+    "sinPrestadores": "Los servicios que sugiera el asistente aparecerán aquí.",
+    "ayuda": {
+      "titulo": "El asistente también puede ayudarte con",
+      "aforosTitulo": "Aforos en vivo",
+      "aforos": "Qué atractivos están abiertos y cuáles conviene visitar según su estado.",
+      "rutasTitulo": "Rutas y clima",
+      "rutas": "Recomendaciones y normas del municipio de la base de conocimientos, como el clima o los cierres.",
+      "prestadoresTitulo": "Prestadores verificados",
+      "prestadores": "Solo sugiere servicios publicados de prestadores aprobados por el Administrador."
+    },
+    "errores": {
+      "limite": "Llegaste al límite de {{n}} mensajes de hoy. Vuelve mañana.",
+      "largo": "El mensaje debe tener entre 1 y {{n}} caracteres.",
+      "noDisponible": "El asistente no está disponible en este momento. Intenta de nuevo en unos minutos.",
+      "generico": "No se pudo enviar el mensaje. Intenta de nuevo.",
+      "limiteItinerarios": "Ya tienes 20 itinerarios guardados: elimina uno desde «Mis itinerarios» para guardar otro.",
+      "guardar": "No se pudo guardar el itinerario. Intenta de nuevo."
+    }
+  },
+  "itinerarios": {
+    "titulo": "Mis itinerarios",
+    "volverPerfil": "Volver a Mi perfil",
+    "contador": "{{n}} de {{limite}} itinerarios",
+    "cargando": "Cargando tus itinerarios…",
+    "errorCarga": "No se pudieron cargar tus itinerarios.",
+    "vacio": "Todavía no tienes itinerarios guardados.",
+    "irAsistente": "Pedir un itinerario al asistente",
+    "nombre": "Nombre",
+    "dia": "Día",
+    "quitarPaso": "Quitar",
+    "guardar": "Guardar cambios",
+    "cancelar": "Cancelar",
+    "editar": "Editar",
+    "eliminar": "Eliminar",
+    "siEliminar": "Sí, eliminar",
+    "confirmarEliminar": "¿Eliminar «{{nombre}}»? No se puede deshacer.",
+    "actualizado": "Actualizado el {{fecha}}",
+    "errorDatos": "Revisa el nombre (1 a 100 caracteres) y los pasos.",
+    "errorGuardar": "No se pudieron guardar los cambios.",
+    "errorEliminar": "No se pudo eliminar el itinerario."
+  },
+  "conocimiento": {
+    "titulo": "Base de conocimientos del asistente",
+    "descripcion": "Información oficial que el asistente puede usar en sus respuestas (RF05). Hasta 500 entradas.",
+    "nuevaTitulo": "Nueva entrada",
+    "editarTitulo": "Editar entrada",
+    "categoria": "Categoría",
+    "contenido": "Contenido",
+    "caracteres": "{{n}} de {{max}} caracteres",
+    "agregar": "Agregar entrada",
+    "guardar": "Guardar cambios",
+    "cancelar": "Cancelar",
+    "editar": "Editar",
+    "eliminar": "Eliminar",
+    "confirmarEliminar": "¿Eliminar esta entrada? El asistente dejará de usarla.",
+    "creada": "Entrada agregada.",
+    "actualizada": "Entrada actualizada.",
+    "eliminada": "Entrada eliminada.",
+    "errorLimite": "La base ya tiene 500 entradas: elimina una para agregar otra.",
+    "errorDatos": "Revisa la categoría (1 a 50) y el contenido (1 a 2000 caracteres).",
+    "errorGuardar": "No se pudo guardar la entrada.",
+    "errorEliminar": "No se pudo eliminar la entrada.",
+    "cargando": "Cargando la base de conocimientos…",
+    "errorCarga": "No se pudo cargar la base de conocimientos.",
+    "total_one": "{{count}} entrada",
+    "total_other": "{{count}} entradas",
+    "vacia": "La base de conocimientos está vacía.",
+    "paginacion": "Páginas de la base de conocimientos",
+    "anterior": "Anterior",
+    "siguiente": "Siguiente",
+    "pagina": "Página {{n}} de {{total}}"
+  },
+  "calificaciones": {
+    "titulo": "Calificaciones y reseñas",
+    "cargando": "Cargando calificaciones…",
+    "noDisponibles": "Las calificaciones no están disponibles en este momento.",
+    "sinCalificaciones": "Sin calificaciones todavía",
+    "resumen_one": "{{promedio}} ({{count}} calificación)",
+    "resumen_other": "{{promedio}} ({{count}} calificaciones)",
+    "cantidad_one": "{{count}} calificación",
+    "cantidad_other": "{{count}} calificaciones",
+    "estrellasDe": "{{n}} de 5 estrellas",
+    "verMas": "Ver más reseñas",
+    "iniciarSesion": "Inicia sesión como turista para calificar.",
+    "tuCalificacion": "Tu calificación",
+    "comentario": "Comentario (opcional)",
+    "caracteres": "{{n}} de {{max}} caracteres",
+    "enviar": "Enviar calificación",
+    "gracias": "¡Gracias! Tu calificación ya se ve en la ficha.",
+    "motivos": {
+      "SIN_RESERVA_COMPLETADA": "Podrás calificar este servicio cuando tengas una reserva completada.",
+      "CALIFICACION_DUPLICADA": "Ya calificaste este lugar. Las calificaciones no se editan.",
+      "CUENTA_INACTIVA": "Tu cuenta no está activa: no puedes calificar.",
+      "OTRO": "No puedes calificar en este momento."
+    },
+    "errores": {
+      "estrellas": "Elige de 1 a 5 estrellas.",
+      "generico": "No se pudo enviar la calificación. Intenta de nuevo."
+    }
+  },
+  "reportes": {
+    "motivo": "Motivo",
+    "elegir": "Elige un motivo",
+    "descripcion": "Descripción (opcional)",
+    "enviar": "Enviar reporte",
+    "cancelar": "Cancelar",
+    "enviado": "Gracias: el reporte quedó en revisión del Administrador.",
+    "motivos": {
+      "INFORMACION_FALSA": "Información falsa",
+      "INFORMACION_DESACTUALIZADA": "Información desactualizada",
+      "PRECIO_INCORRECTO": "Precio incorrecto",
+      "UBICACION_INCORRECTA": "Ubicación incorrecta",
+      "FOTOS_NO_CORRESPONDEN": "Fotos que no corresponden",
+      "OTRO": "Otro"
+    },
+    "errores": {
+      "motivo": "Elige un motivo.",
+      "REPORTE_DUPLICADO": "Ya tienes un reporte pendiente para este lugar.",
+      "CUENTA_INACTIVA": "Tu cuenta no está activa: no puedes reportar.",
+      "generico": "No se pudo enviar el reporte. Intenta de nuevo."
+    }
+  },
+  "calificacionesPrestador": {
+    "titulo": "Calificaciones recibidas",
+    "servicio": "Servicio",
+    "todos": "Todos",
+    "desde": "Desde",
+    "hasta": "Hasta",
+    "filtrar": "Filtrar",
+    "cargando": "Cargando calificaciones…",
+    "error": "No se pudieron cargar las calificaciones.",
+    "promedio": "Promedio",
+    "porServicio": "Promedio por servicio",
+    "vacio": "No hay calificaciones con estos filtros.",
+    "paginacion": "Páginas de calificaciones"
+  },
+  "moderacion": {
+    "titulo": "Moderación",
+    "pestanas": {
+      "calificaciones": "Calificaciones",
+      "reportes": "Reportes"
+    },
+    "estado": "Estado",
+    "todas": "Todas",
+    "estados": {
+      "Visible": "Visible",
+      "Oculta": "Oculta",
+      "Pendiente": "Pendiente",
+      "Revisado": "Revisado"
+    },
+    "tipos": {
+      "servicio": "Servicio",
+      "atractivo": "Atractivo"
+    },
+    "verFicha": {
+      "servicio": "Ver el servicio",
+      "atractivo": "Ver el atractivo"
+    },
+    "cargando": "Cargando…",
+    "error": "No se pudo cargar el panel de moderación.",
+    "sinCalificaciones": "No hay calificaciones con este filtro.",
+    "sinReportes": "No hay reportes con este filtro.",
+    "motivoAnterior": "Motivo de la última moderación:",
+    "acciones": {
+      "ocultamiento": "Ocultar",
+      "visibilidad": "Volver a mostrar",
+      "eliminacion": "Eliminar"
+    },
+    "motivoPara": {
+      "ocultamiento": "Motivo para ocultarla",
+      "visibilidad": "Motivo para volver a mostrarla",
+      "eliminacion": "Motivo para eliminarla (no se puede deshacer)"
+    },
+    "confirmar": {
+      "ocultamiento": "Ocultar calificación",
+      "visibilidad": "Volver a mostrar",
+      "eliminacion": "Eliminar definitivamente"
+    },
+    "hecho": {
+      "ocultamiento": "Calificación oculta.",
+      "visibilidad": "Calificación visible de nuevo.",
+      "eliminacion": "Calificación eliminada."
+    },
+    "cancelar": "Cancelar",
+    "marcarRevisado": "Marcar revisado",
+    "revisado": "Reporte marcado como revisado.",
+    "paginacion": "Páginas de moderación",
+    "errores": {
+      "ESTADO_CAMBIADO": "Otro administrador ya cambió su estado; se actualizó la lista.",
+      "DATOS_INVALIDOS": "El motivo debe tener entre 1 y 500 caracteres.",
+      "CALIFICACION_NO_ENCONTRADA": "La calificación ya no existe.",
+      "generico": "No se pudo completar la acción."
+    }
+  },
+  "afluencia": {
+    "cargando": "Consultando la afluencia…",
+    "noDisponible": "La afluencia no está disponible en este momento.",
+    "sinDatos": "Sin datos de afluencia hoy",
+    "niveles": {
+      "Bajo": "Afluencia baja",
+      "Medio": "Afluencia media",
+      "Alto": "Afluencia alta"
+    },
+    "detalle": "({{porcentaje}} % de la capacidad: {{ocupacion}} de {{limite}} personas, actualizado {{hora}})",
+    "limiteAlcanzado": "Este atractivo llegó a su límite de capacidad. Te sugerimos otros destinos similares con menos visitantes.",
+    "verAlternativos": "Ver destinos alternativos",
+    "sinAlternativos": "No hay destinos similares con menor afluencia en este momento.",
+    "alternativo": "{{nivel}} ({{porcentaje}} %)",
+    "distancia": "a {{km}} km",
+    "registro": {
+      "campo": "Personas ahora en {{nombre}}",
+      "boton": "Registrar ocupación",
+      "hecho": "{{nivel}} ({{porcentaje}} %)",
+      "invalida": "Escribe un número entero de 0 a 1 000 000.",
+      "sinLimite": "El atractivo no tiene límite de capacidad de carga.",
+      "error": "No se pudo registrar la ocupación."
+    }
+  },
+  "tableros": {
+    "verTabla": "Ver los datos en una tabla",
+    "dia": "Día",
+    "desde": "Desde",
+    "hasta": "Hasta",
+    "aplicar": "Aplicar",
+    "cargando": "Cargando el tablero…",
+    "error": "El tablero no está disponible en este momento.",
+    "periodo": "Del {{desde}} al {{hasta}}",
+    "general": {
+      "titulo": "Tableros",
+      "totalReservas": "Reservas en el periodo",
+      "reservasPorDia": "Reservas por día",
+      "reservas": "reservas",
+      "topAtractivos": "Top 3 de atractivos más consultados",
+      "visitantesPorZona": "Turistas registrados por país",
+      "consultas_one": "{{count}} consulta",
+      "consultas_other": "{{count}} consultas",
+      "sinConsultas": "Todavía no hay consultas a las fichas de los atractivos en el periodo.",
+      "sinTuristas": "Todavía no hay turistas registrados.",
+      "sinPais": "Sin país"
+    },
+    "prestador": {
+      "titulo": "Mi panel",
+      "periodo": "Periodo",
+      "ultimos": "Últimos {{n}} días",
+      "vacio": "Tus servicios no tuvieron consultas ni reservas en el periodo.",
+      "tabla": "Consultas y reservas por servicio",
+      "servicio": "Servicio",
+      "consultas": "Consultas",
+      "reservas": "Reservas",
+      "consultasPorServicio": "Consultas por servicio",
+      "reservasPorServicio": "Reservas por servicio"
+    },
+    "afluencia": {
+      "titulo": "Reporte de afluencia",
+      "atractivo": "Atractivo",
+      "todos": "Todos",
+      "vacio": "No hay lecturas de ocupación en el periodo.",
+      "tabla": "Afluencia por atractivo",
+      "lecturas": "Lecturas",
+      "promedio": "Promedio",
+      "maximo": "Máximo",
+      "ultimo": "Último nivel",
+      "porDia": "Ocupación promedio por día",
+      "porcentaje": "% de la capacidad"
+    }
+  },
+  "oferta": {
+    "cargando": "Cargando la disponibilidad…",
+    "volver": "Volver al servicio",
+    "titulo": "Disponibilidad de {{nombre}}",
+    "ayuda": "Ajusta los cupos de cada fecha, cierra o abre fechas y agrega salidas. No puedes bajar de lo ya reservado ni cerrar una fecha con reservas confirmadas.",
+    "rango": "Rango de fechas",
+    "desde": "Desde",
+    "hasta": "Hasta",
+    "consultar": "Consultar",
+    "inventario": "Fechas del {{desde}} al {{hasta}}",
+    "sinFilas": "No hay fechas con disponibilidad en este rango.",
+    "columnas": {
+      "fecha": "Fecha",
+      "salida": "Salida",
+      "unidad": "Unidad",
+      "cupos": "Cupos totales",
+      "reservados": "Reservados",
+      "disponibles": "Disponibles",
+      "estado": "Estado",
+      "acciones": "Acciones"
+    },
+    "estado": {
+      "abierta": "Abierta",
+      "cerrada": "Cerrada"
+    },
+    "cuposDe": "Cupos totales de {{fila}}",
+    "guardar": "Guardar cupos",
+    "abrir": "Abrir",
+    "cerrar": "Cerrar",
+    "guardado": "Cupos actualizados.",
+    "abierta": "Fecha abierta.",
+    "cerrada": "Fecha cerrada.",
+    "agregada": "Fecha agregada.",
+    "agregarSalida": "Agregar una salida",
+    "agregarFecha": "Agregar una fecha",
+    "elegirUnidad": "Elige una unidad",
+    "agregar": "Agregar",
+    "verAsistentes": "Ver asistentes",
+    "verHistorial": "Ver historial de modificaciones",
+    "dias": {
+      "Lunes": "Lunes",
+      "Martes": "Martes",
+      "Miercoles": "Miércoles",
+      "Jueves": "Jueves",
+      "Viernes": "Viernes",
+      "Sabado": "Sábado",
+      "Domingo": "Domingo"
+    },
+    "plantilla": {
+      "titulo": "Días y horarios habituales",
+      "ayuda": "Se aplican a las fechas que todavía no tienen disponibilidad; las fechas ya publicadas no cambian.",
+      "dias": "Días de operación",
+      "salidas": "Horarios de salida (HH:mm, separados por coma)",
+      "guardar": "Guardar días y horarios",
+      "guardada": "Días y horarios guardados. Las fechas nuevas los usarán."
+    },
+    "errores": {
+      "CUPOS_RESERVADOS": "No puedes dejar menos cupos que los ya reservados ({{reservados}}).",
+      "FECHA_CON_RESERVAS": "Esta fecha tiene reservas confirmadas y no se puede cerrar.",
+      "OFERTA_NO_DISPONIBLE": "Este servicio no tiene disponibilidad editable (solo tours y alojamientos aprobados).",
+      "DATOS_INVALIDOS": "Revisa la fecha, el horario y los cupos (de 1 a 10 000; solo fechas futuras).",
+      "SERVICIO_NO_DISPONIBLE": "El servicio no está disponible en este momento. Intenta de nuevo.",
+      "SIN_PERMISO": "No tienes permiso para gestionar este servicio.",
+      "OTRO": "Ocurrió un error inesperado."
+    }
+  },
+  "historialModificaciones": {
+    "titulo": "Historial de modificaciones",
+    "ayuda": "Los cambios de precio, cupos, fechas y horarios de tus servicios en los últimos 30 días.",
+    "servicio": "Servicio",
+    "todos": "Todos",
+    "filtrar": "Filtrar",
+    "cargando": "Cargando el historial…",
+    "error": "No fue posible cargar el historial.",
+    "vacio": "No hay modificaciones en los últimos 30 días.",
+    "paginacion": "Páginas del historial",
+    "columnas": {
+      "fecha": "Fecha y hora",
+      "servicio": "Servicio",
+      "tipo": "Cambio",
+      "detalle": "Fecha o unidad",
+      "anterior": "Valor anterior",
+      "nuevo": "Valor nuevo"
+    },
+    "tipos": {
+      "Precio": "Precio",
+      "Cupos": "Cupos",
+      "Apertura": "Apertura de fecha",
+      "Cierre": "Cierre de fecha",
+      "Plantilla": "Días y horarios"
+    }
+  },
+  "asistentes": {
+    "titulo": "Asistentes",
+    "ayuda": "Las reservas confirmadas de un servicio en una fecha, con el contacto de cada turista.",
+    "servicio": "Servicio",
+    "elegirServicio": "Elige un servicio",
+    "fecha": "Fecha",
+    "salidaOpcional": "Salida (opcional)",
+    "consultar": "Consultar",
+    "inicial": "Elige un servicio y una fecha para ver los asistentes.",
+    "cargando": "Cargando los asistentes…",
+    "listado": "{{servicio}} · {{fecha}}",
+    "total_one": "{{count}} persona en total",
+    "total_other": "{{count}} personas en total",
+    "vacio": "No hay reservas confirmadas para esta fecha.",
+    "descargarCsv": "Descargar CSV",
+    "descargarPdf": "Descargar PDF",
+    "sinContacto": "Contacto no disponible",
+    "columnas": {
+      "nombre": "Nombre",
+      "correo": "Correo",
+      "telefono": "Teléfono",
+      "personas": "Personas",
+      "salida": "Salida o unidad",
+      "entrada": "Entrada",
+      "salidaEstadia": "Fin"
+    },
+    "errores": {
+      "noDisponible": "Los datos de contacto no están disponibles en este momento. Intenta de nuevo.",
+      "datos": "Revisa el servicio y la fecha.",
+      "otro": "No fue posible cargar los asistentes."
+    }
+  },
+  "galeria": {
+    "titulo": "Galería",
+    "ayuda": "{{n}} de {{max}} imágenes. JPEG o PNG de hasta 5 MB; debe quedar al menos una.",
+    "vacia": "Este servicio todavía no tiene imágenes.",
+    "imagen": "Imagen {{n}} de la galería",
+    "quitar": "Quitar",
+    "quitarImagen": "Quitar la imagen {{n}}",
+    "elegir": "Elegir una imagen",
+    "agregar": "Agregar imagen",
+    "agregada": "Imagen agregada.",
+    "quitada": "Imagen quitada.",
+    "errores": {
+      "LIMITE_IMAGENES": "La galería ya tiene 5 imágenes.",
+      "IMAGEN_MINIMA": "La galería debe conservar al menos una imagen.",
+      "IMAGEN_INVALIDA": "La imagen debe ser JPEG o PNG de hasta 5 MB.",
+      "ESTADO_CAMBIADO": "El servicio ya no está publicado.",
+      "OTRO": "No fue posible actualizar la galería."
     }
   }
 }

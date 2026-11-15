@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 import { ApiError, ERROR_RED, servicioNoDisponible } from '../../shared/api/httpClient'
@@ -15,6 +15,8 @@ import {
   validarBorrador,
   type BorradorServicio,
 } from './borradorServicio'
+import { SelectorImagenes, elegirImagenes, type ImagenElegida } from '../gestor/componentes/SelectorImagenes'
+import { MAXIMO_IMAGENES, motivoCantidad } from '../gestor/imagenesAtractivo'
 import { CamposCategoria } from './componentes/CamposCategoria'
 import { CampoServicio, ErrorGrupo } from './componentes/CampoServicio'
 import { EditorOferta } from './componentes/EditorOferta'
@@ -24,6 +26,7 @@ import { erroresAnidados, idDeCampo, textoErrorServicio, type ErroresServicio } 
 import { registrarServicio } from './serviciosPrestadorApi'
 import { usePerfilPrestador } from './usePerfilPrestador'
 import './prestador.css'
+import '../gestor/gestor.css'
 
 /** Estado de la navegación al detalle propio después del 201 (DEC-168). */
 export interface EstadoEnviado {
@@ -42,9 +45,24 @@ function aRechazo(error: unknown, conControl: readonly string[]): { campos: Erro
   // DEC-162: la cuenta no está Activa o no tiene RNT; se informa al recibir el 403, sin perder lo escrito.
   if (error.status === 403 && error.codigo === 'PRESTADOR_NO_HABILITADO') return { campos: {}, general: 'PRESTADOR_NO_HABILITADO' }
   if (error.status === 403 && error.codigo === 'ACCESO_DENEGADO') return { campos: {}, general: 'ACCESO_DENEGADO' }
+  if (error.status === 413 || error.codigo === 'CARGA_DEMASIADO_GRANDE') return { campos: {}, general: 'CARGA_DEMASIADO_GRANDE' }
   if (servicioNoDisponible(error)) return { campos: {}, general: 'SERVICIO_NO_DISPONIBLE' }
   if (error.codigo === ERROR_RED) return { campos: {}, general: 'ERROR_RED' }
   return { campos: {}, general: 'GENERICO' }
+}
+
+const esRutaImagen = (ruta: string) => ruta === 'imagenes' || ruta.startsWith('imagenes[')
+
+/** Las rutas de las fotos que tienen control en pantalla: el grupo y cada miniatura (DEC-318). */
+const rutasImagenes = (cantidad: number) => ['imagenes', ...Array.from({ length: cantidad }, (_, i) => `imagenes[${i}]`)]
+
+/** Los errores de las fotos salen de sus motivos: se recalculan con cada cambio de la lista. */
+function conErroresDeImagenes(actuales: ErroresServicio, lista: ImagenElegida[]): ErroresServicio {
+  const resto = Object.fromEntries(Object.entries(actuales).filter(([ruta]) => !esRutaImagen(ruta)))
+  lista.forEach((imagen, indice) => {
+    if (imagen.motivo) resto[`imagenes[${indice}]`] = imagen.motivo
+  })
+  return resto
 }
 
 /** Elemento de WF-08 que no está en el contrato (DEC-167): visible, deshabilitado (DEC-22) y sin acción. */
@@ -81,6 +99,12 @@ export function RegistrarServicioPage() {
   const [general, setGeneral] = useState<string | null>(null)
   const [enviando, setEnviando] = useState(false)
   const mensajeGeneral = useRef<HTMLParagraphElement>(null)
+  // «Fotos del servicio» (DEC-318): de 1 a 5, con las reglas de los atractivos y de la galería (RF48).
+  const [imagenes, setImagenes] = useState<ImagenElegida[]>([])
+  const [excedidas, setExcedidas] = useState(0)
+  const vistas = useRef<string[]>([])
+  vistas.current = imagenes.map((imagen) => imagen.vistaPrevia)
+  useEffect(() => () => vistas.current.forEach((url) => URL.revokeObjectURL(url)), [])
   const { carga: perfil } = usePerfilPrestador()
   const rnt = perfil.estado === 'ok' && perfil.perfil.rnt ? perfil.perfil.rnt : null
 
@@ -104,8 +128,30 @@ export function RegistrarServicioPage() {
     setErrores((actuales) => Object.fromEntries(Object.entries(actuales).filter(([ruta]) => !ruta.startsWith(prefijo))))
   const error = (ruta: string) => textoErrorServicio(t, ruta, errores[ruta])
 
+  const agregarImagenes = async (archivos: File[]) => {
+    const libres = Math.max(0, MAXIMO_IMAGENES - imagenes.length)
+    setExcedidas(Math.max(0, archivos.length - libres))
+    const nuevas = await elegirImagenes(archivos.slice(0, libres))
+    setImagenes((actuales) => {
+      const lista = [...actuales, ...nuevas]
+      setErrores((previos) => conErroresDeImagenes(previos, lista))
+      return lista
+    })
+  }
+
+  const quitarImagen = (indice: number) => {
+    const quitada = imagenes[indice]
+    if (quitada) URL.revokeObjectURL(quitada.vistaPrevia)
+    setExcedidas(0)
+    const lista = imagenes.filter((_, actual) => actual !== indice)
+    setImagenes(lista)
+    setErrores((actuales) => conErroresDeImagenes(actuales, lista))
+  }
+
+  const conControl = (objetivo: BorradorServicio) => [...rutasConControl(objetivo), ...rutasImagenes(imagenes.length)]
+
   const enfocarPrimero = (encontrados: ErroresServicio, objetivo: BorradorServicio) => {
-    const primera = rutasConControl(objetivo).find((ruta) => encontrados[ruta])
+    const primera = conControl(objetivo).find((ruta) => encontrados[ruta])
     if (primera) setTimeout(() => document.getElementById(idDeCampo(primera))?.focus(), 0)
   }
 
@@ -116,7 +162,9 @@ export function RegistrarServicioPage() {
     const ordenado = ordenarSalidas(borrador)
     setBorrador(ordenado)
     setGeneral(null)
-    const locales = validarBorrador(ordenado)
+    const locales = conErroresDeImagenes(validarBorrador(ordenado), imagenes)
+    const cantidad = motivoCantidad(imagenes.length)
+    if (cantidad) locales.imagenes = cantidad
     setErrores(locales)
     if (Object.keys(locales).length > 0) {
       enfocarPrimero(locales, ordenado)
@@ -124,13 +172,16 @@ export function RegistrarServicioPage() {
     }
     setEnviando(true)
     try {
-      const servicio = await registrarServicio(construirCuerpo(ordenado))
+      const servicio = await registrarServicio(
+        construirCuerpo(ordenado),
+        imagenes.map((imagen) => imagen.archivo),
+      )
       const estado: EstadoEnviado = { enviado: true }
       navegar(`/prestador/servicios/${encodeURIComponent(servicio.id)}`, { state: estado })
     } catch (fallo) {
       // Un 401 ya cerró la sesión: RutaProtegida lleva al login.
       if (fallo instanceof ApiError && fallo.status === 401) return
-      const rechazo = aRechazo(fallo, rutasConControl(ordenado))
+      const rechazo = aRechazo(fallo, conControl(ordenado))
       setErrores(rechazo.campos)
       setGeneral(rechazo.general)
       if (Object.keys(rechazo.campos).length > 0) enfocarPrimero(rechazo.campos, ordenado)
@@ -338,19 +389,14 @@ export function RegistrarServicioPage() {
           )}
         </section>
 
-        <section
-          className="tarjeta prestador__seccion prestador__seccion--no-disponible"
-          role="group"
-          aria-disabled="true"
-          aria-labelledby={`${id}-fotos`}
-        >
-          <h2 id={`${id}-fotos`}>{t('prestador.registro.secciones.fotos')}</h2>
-          <p>
-            <span aria-hidden="true">— </span>
-            {t('prestador.registro.fotosPendiente')}
-            <span className="solo-lector"> ({t('comun.noDisponible')})</span>
-          </p>
-        </section>
+        <SelectorImagenes
+          titulo={t('prestador.registro.secciones.fotos')}
+          imagenes={imagenes}
+          errores={errores}
+          excedidas={excedidas}
+          onAgregar={(archivos) => void agregarImagenes(archivos)}
+          onQuitar={quitarImagen}
+        />
 
         <section className="tarjeta prestador__seccion" aria-labelledby={`${id}-accesibilidad`}>
           <h2 id={`${id}-accesibilidad`}>{t('prestador.registro.secciones.accesibilidad')}</h2>

@@ -281,3 +281,81 @@ describe('Vencimiento por expiraEn (DEC-48)', () => {
     expect(vencimiento()).toBeNull()
   })
 })
+
+describe('Renovación de la sesión (DEC-317)', () => {
+  const RENOVACION = 'POST /api/v1/auth/sesion/renovacion'
+  const sesion = (valor: string, venceEn: number) => ({
+    token: valor,
+    tipo: 'Bearer',
+    expiraEn: new Date(venceEn).toISOString(),
+    idUsuario: USUARIO_TURISTA.idUsuario,
+    rol: 'Turista',
+  })
+
+  async function iniciar(manejadores: Record<string, () => Response>) {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.setSystemTime(AHORA)
+    const simulacion = simularFetch({
+      [LOGIN]: () => respuestaJson(200, sesion('token-1', AHORA.getTime() + 15 * MINUTO)),
+      [ME]: () => respuestaJson(200, USUARIO_TURISTA),
+      ...CATALOGO,
+      ...manejadores,
+    })
+    renderApp('/login')
+    fireEvent.change(await screen.findByLabelText('Correo electrónico'), { target: { value: 'turista@samaria360.test' } })
+    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: 'x' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Iniciar sesión' }))
+    expect(await screen.findByRole('button', { name: 'Menú de usuario de Ana Pérez' })).toBeInTheDocument()
+    return simulacion
+  }
+
+  it('con actividad del usuario, en el último minuto pide otro token y la sesión sigue después del vencimiento', async () => {
+    const { solicitudes } = await iniciar({
+      [RENOVACION]: () => respuestaJson(200, sesion('token-2', AHORA.getTime() + 29 * MINUTO)),
+    })
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(5 * MINUTO)
+    })
+    fireEvent.pointerDown(document.body)
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(9 * MINUTO + 1000)
+    })
+
+    const renovaciones = solicitudes.filter((s) => s.metodo === 'POST' && s.url === '/api/v1/auth/sesion/renovacion')
+    expect(renovaciones).toHaveLength(1)
+    expect(renovaciones[0].cabeceras.Authorization).toBe('Bearer token-1')
+    expect(token()).toBe('token-2')
+    expect(vencimiento()).toBe(String(AHORA.getTime() + 29 * MINUTO))
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(2 * MINUTO)
+    })
+    expect(screen.getByRole('button', { name: 'Menú de usuario de Ana Pérez' })).toBeInTheDocument()
+  })
+
+  it('sin actividad desde el inicio de sesión no renueva: vence a los 15 minutos', async () => {
+    const { solicitudes } = await iniciar({
+      [RENOVACION]: () => respuestaJson(200, sesion('token-2', AHORA.getTime() + 29 * MINUTO)),
+    })
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(15 * MINUTO)
+    })
+
+    expect(await screen.findByText(/Tu sesión expiró\./)).toBeInTheDocument()
+    expect(solicitudes.some((s) => s.url === '/api/v1/auth/sesion/renovacion')).toBe(false)
+  })
+
+  it('si la sesión pasó de 8 horas (401 SESION_VENCIDA), se cierra con «Tu sesión expiró»', async () => {
+    await iniciar({ [RENOVACION]: () => respuestaProblema(401, 'SESION_VENCIDA') })
+
+    fireEvent.keyDown(document.body, { key: 'a' })
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(14 * MINUTO + 1000)
+    })
+
+    expect(await screen.findByText(/Tu sesión expiró\./)).toBeInTheDocument()
+    expect(token()).toBeNull()
+  })
+})

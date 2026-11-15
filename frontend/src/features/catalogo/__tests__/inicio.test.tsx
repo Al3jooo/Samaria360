@@ -12,7 +12,7 @@ import {
 } from '../../../test/fetchSimulado'
 import { renderApp, ubicacionActual } from '../../../test/renderApp'
 
-const DESTACADOS = 'GET /api/v1/catalogo/oferta?orden=PrecioAscendente&pagina=0&tamano=3'
+const DESTACADOS = 'GET /api/v1/catalogo/oferta?orden=Calificacion&pagina=0&tamano=10'
 
 describe('Inicio WF-04', () => {
   // Límite de 15 s: medida en más de 2 s (primera del archivo: primer render de la app y 15 pulsaciones de usuario.type).
@@ -50,9 +50,16 @@ describe('Inicio WF-04', () => {
     expect(ubicacionActual()).toBe(`/explorar?categoria=${categoria}`)
   })
 
-  it('los destacados piden 3 por precio ascendente y solo muestran servicios', async () => {
+  it('los destacados son los 3 servicios mejor calificados (DEC-317): sin atractivos', async () => {
     const { solicitudes } = simularFetch({
-      [DESTACADOS]: () => respuestaJson(200, paginaOferta([TOUR_CAFE, HOTEL, CASCADA_CERRADA], { tamano: 3 })),
+      [DESTACADOS]: () =>
+        respuestaJson(
+          200,
+          paginaOferta(
+            [CASCADA_CERRADA, TOUR_CAFE, HOTEL, { ...TOUR_CAFE, id: 's-otro', nombre: 'Tercero' }, { ...HOTEL, id: 's-cuarto', nombre: 'Cuarto' }],
+            { tamano: 10 },
+          ),
+        ),
     })
     renderApp('/')
 
@@ -61,6 +68,8 @@ describe('Inicio WF-04', () => {
     expect(within(destacados).getByRole('heading', { name: 'Hotel Casa Tayrona' })).toBeInTheDocument()
     // Por seguridad, el componente descarta lo que no sea servicio.
     expect(within(destacados).queryByRole('heading', { name: 'Cascada El Salto' })).not.toBeInTheDocument()
+    expect(within(destacados).getByRole('heading', { name: 'Tercero' })).toBeInTheDocument()
+    expect(within(destacados).queryByRole('heading', { name: 'Cuarto' })).not.toBeInTheDocument()
     expect(solicitudes.some((s) => s.url === DESTACADOS.replace('GET ', ''))).toBe(true)
   })
 

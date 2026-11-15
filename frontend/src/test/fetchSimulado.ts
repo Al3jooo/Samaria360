@@ -73,10 +73,18 @@ const RESPUESTAS_TURISTA: Record<string, () => Response> = {
   'GET /api/v1/catalogo/favoritos': respuestaAvisosVacia,
   'GET /api/v1/catalogo/historial': respuestaAvisosVacia,
   'POST /api/v1/catalogo/historial': () => new Response(null, { status: 204 }),
+  // Campana de RF63 (DEC-294): sin notificaciones, salvo que la prueba simule las suyas.
+  'GET /api/v1/analytics/notificaciones': () =>
+    respuestaJson(200, { elementos: [], pagina: 0, tamano: 20, totalElementos: 0, noLeidas: 0 }),
+  // Calificaciones de WF-06 (RF17, DEC-300): sin calificaciones y sin poder calificar, salvo que la prueba simule otras.
+  'GET /api/v1/analytics/calificaciones': () =>
+    respuestaJson(200, { promedio: null, cantidad: 0, elementos: [], pagina: 0, tamano: 10, totalElementos: 0 }),
+  'GET /api/v1/analytics/calificaciones/elegibilidad': () =>
+    respuestaJson(200, { puedeCalificar: false, motivo: 'SIN_RESERVA_COMPLETADA', propia: null }),
 }
 
 export function respuestaTuristaPorDefecto(url: string, metodo: string): (() => Response) | undefined {
-  return RESPUESTAS_TURISTA[`${metodo} ${url}`]
+  return RESPUESTAS_TURISTA[`${metodo} ${url}`] ?? RESPUESTAS_TURISTA[`${metodo} ${url.split('?')[0]}`]
 }
 
 /**
@@ -95,6 +103,16 @@ export function simularFetch(rutas: Record<string, Manejador>) {
       cuerpo: typeof init?.body === 'string' ? JSON.parse(init.body) : undefined,
       cuerpoTexto: typeof init?.body === 'string' ? init.body : undefined,
       formulario: init?.body instanceof FormData ? init.body : undefined,
+    }
+    // Multipart con una parte `datos` en JSON (atractivos, DEC-230; servicios, DEC-318): su contenido, en cuerpo.
+    const datos = solicitud.formulario?.get('datos')
+    if (datos instanceof Blob) {
+      solicitud.cuerpoTexto = await new Promise<string>((resolver) => {
+        const lector = new FileReader()
+        lector.onload = () => resolver(String(lector.result))
+        lector.readAsText(datos)
+      })
+      solicitud.cuerpo = JSON.parse(solicitud.cuerpoTexto)
     }
     solicitudes.push(solicitud)
     // Primero la URL exacta; si no, la ruta sin la consulta (el manejador recibe la URL completa).

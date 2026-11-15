@@ -38,6 +38,7 @@ export function SelectorImagenes({
   excedidas,
   onAgregar,
   onQuitar,
+  titulo,
 }: {
   imagenes: ImagenElegida[]
   errores: ErroresServicio
@@ -45,6 +46,8 @@ export function SelectorImagenes({
   excedidas: number
   onAgregar: (archivos: File[]) => void
   onQuitar: (indice: number) => void
+  /** Título de la sección: «Fotos del atractivo» por defecto; WF-08 usa «Fotos del servicio» (DEC-318). */
+  titulo?: string
 }) {
   const { t } = useTranslation()
   const id = useId()
@@ -65,7 +68,7 @@ export function SelectorImagenes({
 
   return (
     <section className="tarjeta prestador__seccion" aria-labelledby={`${id}-titulo`}>
-      <h2 id={`${id}-titulo`}>{t('gestor.imagenes.titulo')}</h2>
+      <h2 id={`${id}-titulo`}>{titulo ?? t('gestor.imagenes.titulo')}</h2>
       <div
         id={idGrupo}
         tabIndex={-1}

@@ -103,7 +103,8 @@ describe('Exploración WF-05', () => {
     // Un enlace con distancia u orden por distancia no los envía a la API si no hay ubicación.
     expect(ultimaConsultaCatalogo(solicitudes)).toBe('pagina=0&tamano=10')
     expect(screen.getByRole('button', { name: /Menor afluencia/ })).toHaveAttribute('aria-disabled', 'true')
-    expect(screen.getByRole('button', { name: /Calificación/ })).toHaveAttribute('aria-disabled', 'true')
+    // RF61 (DEC-302): el orden por calificación ya funciona.
+    expect(screen.getByRole('button', { name: /Calificación/ })).not.toHaveAttribute('aria-disabled')
   })
 
   it('el atractivo cerrado muestra su insignia de estado', async () => {

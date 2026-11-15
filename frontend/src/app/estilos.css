@@ -948,3 +948,10 @@ svg {
     padding: var(--espacio-6) var(--espacio-5) var(--espacio-8);
   }
 }
+
+/* Edge y el antiguo IE dibujan su propio botón para revelar la contraseña. Junto con el botón «Mostrar contraseña» de
+   la aplicación aparecían dos ojos en el campo. Se oculta el nativo y queda solo el propio, que es accesible y traducido. */
+input[type='password']::-ms-reveal,
+input[type='password']::-ms-clear {
+  display: none;
+}

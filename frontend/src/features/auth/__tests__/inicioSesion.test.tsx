@@ -205,16 +205,16 @@ describe('Inicio de sesión (RF15)', () => {
     expect(ojo).toHaveAttribute('aria-pressed', 'false')
   }, 15_000)
 
-  // CU Registrarse (RF01, RF02): «Registrarse» dejó de estar deshabilitado y lleva a /registro (WF-02, WF-03). La
-  // recuperación de contraseña (RF34) sigue pendiente.
-  it('«Registrarse» lleva al registro y ¿Olvidaste tu contraseña? sigue deshabilitado', () => {
+  // CU Registrarse (RF01, RF02): «Registrarse» lleva a /registro (WF-02, WF-03). RF34 (DEC-285): «¿Olvidaste tu
+  // contraseña?» dejó de estar deshabilitado y lleva a /recuperar (WF-27).
+  it('«Registrarse» lleva al registro y ¿Olvidaste tu contraseña? a la recuperación', () => {
     simularFetch({})
     renderApp('/login')
 
     const pestanas = screen.getByRole('navigation', { name: 'Acceso a la cuenta' })
     expect(within(pestanas).getByRole('link', { name: 'Iniciar sesión' })).toHaveAttribute('aria-current', 'page')
     expect(within(pestanas).getByRole('link', { name: 'Registrarse' })).toHaveAttribute('href', '/registro')
-    expect(screen.getByRole('button', { name: /¿Olvidaste tu contraseña\?/ })).toHaveAttribute('aria-disabled', 'true')
+    expect(screen.getByRole('link', { name: /¿Olvidaste tu contraseña\?/ })).toHaveAttribute('href', '/recuperar')
     expect(screen.getByText('3 intentos fallidos bloquearán la cuenta por 15 minutos.')).toBeInTheDocument()
   })
 

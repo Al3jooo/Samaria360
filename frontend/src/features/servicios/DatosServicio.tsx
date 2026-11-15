@@ -33,7 +33,19 @@ const comoTexto = (valor: unknown) => (valor === null || valor === undefined ? '
  * Los datos de un servicio tal como se enviaron, con los que fijó el servidor (precio derivado y RNT): detalle propio
  * de WF-18 y revisión de WF-19 (DEC-176). Con `mapa`, la ubicación lleva además el pin en un mapa de solo lectura.
  */
-export function DatosServicio({ servicio, mapa = false }: { servicio: ServicioGestion; mapa?: boolean }) {
+/**
+ * `fotos`: las fotos del registro (DEC-318), en solo lectura, para que el Administrador las vea al revisar; el detalle de
+ * un servicio Publicado del Prestador no las repite, porque allí está la galería editable (RF48).
+ */
+export function DatosServicio({
+  servicio,
+  mapa = false,
+  fotos = true,
+}: {
+  servicio: ServicioGestion
+  mapa?: boolean
+  fotos?: boolean
+}) {
   const { t, i18n } = useTranslation()
   const dinero = (valor: unknown) => {
     const valorCentavos = centavos(valor as number | string | null)
@@ -71,6 +83,17 @@ export function DatosServicio({ servicio, mapa = false }: { servicio: ServicioGe
           </>
         )}
       </Dato>
+      {fotos && (servicio.imagenes ?? []).length > 0 && (
+        <Dato etiqueta={t('prestador.registro.secciones.fotos')}>
+          <ul className="datos-servicio__fotos">
+            {servicio.imagenes.map((ruta, indice) => (
+              <li key={ruta}>
+                <img src={ruta} alt={t('galeria.imagen', { n: indice + 1 })} loading="lazy" width={160} height={110} />
+              </li>
+            ))}
+          </ul>
+        </Dato>
+      )}
       <Dato etiqueta={t('prestador.campos.horarioAtencion')}>{servicio.horarioAtencion}</Dato>
       <Dato etiqueta={t('prestador.campos.precioBase')}>{dinero(servicio.precioBase)}</Dato>
       <Dato etiqueta={t('prestador.registro.secciones.accesibilidad')}>

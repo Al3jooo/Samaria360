@@ -1,3 +1,5 @@
+import '../../afluencia/afluencia.css'
+import { formatearPromedio } from '../../calificaciones/calificacionesApi'
 import { useId, type Ref } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
@@ -93,15 +95,28 @@ export function TarjetaOferta({
           )}
           <div>
             <dt>{t('catalogo.tarjeta.calificacion')}</dt>
-            <dd>{sinDatos}</dd>
+            <dd>
+              {resultado.calificacion != null
+                ? t('catalogo.tarjeta.calificacionValor', {
+                    promedio: formatearPromedio(resultado.calificacion, i18n.language),
+                    count: resultado.cantidadCalificaciones ?? 0,
+                  })
+                : sinDatos}
+            </dd>
           </div>
           <div>
             {/* Según el SRS: afluencia de los atractivos (RF39) y disponibilidad de cupos de los servicios (RF11). */}
             <dt>{t(resultado.tipo === 'Atractivo' ? 'catalogo.tarjeta.afluencia' : 'catalogo.tarjeta.disponibilidad')}</dt>
             <dd>
-              {resultado.tipo === 'Servicio' && disponibilidad
-                ? t(`catalogo.tarjeta.disponibilidadEstados.${disponibilidad}`)
-                : sinDatos}
+              {resultado.tipo === 'Servicio' && disponibilidad ? (
+                t(`catalogo.tarjeta.disponibilidadEstados.${disponibilidad}`)
+              ) : resultado.tipo === 'Atractivo' && resultado.afluencia ? (
+                <span className={`nivel-afluencia nivel-afluencia--${resultado.afluencia}`}>
+                  {t(`afluencia.niveles.${resultado.afluencia}`)}
+                </span>
+              ) : (
+                sinDatos
+              )}
             </dd>
           </div>
         </dl>

@@ -61,8 +61,13 @@ describe('Acceso (DEC-51)', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Sin permiso' })).toBeInTheDocument()
     expect(screen.getByRole('alert')).toHaveTextContent('Tu cuenta no tiene permiso para ver esta página.')
-    // Además de /me solo sale el GET público del banner común (DEC-72); nada de /auth/admin.
-    expect(solicitudes.map((s) => s.url).filter((url) => url !== '/api/v1/catalogo/avisos')).toEqual(['/api/v1/auth/me'])
+    // Además de /me solo salen el GET público del banner común (DEC-72) y la campana del Turista (RF63, DEC-294); nada
+    // de /auth/admin.
+    expect(
+      solicitudes
+        .map((s) => s.url)
+        .filter((url) => url !== '/api/v1/catalogo/avisos' && !url.startsWith('/api/v1/analytics/notificaciones')),
+    ).toEqual(['/api/v1/auth/me'])
   })
 
   it('un 403 ACCESO_DENEGADO de la API muestra «Sin permiso» y la sesión sigue abierta', async () => {

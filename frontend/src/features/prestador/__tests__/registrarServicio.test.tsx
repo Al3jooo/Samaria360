@@ -1,5 +1,5 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mapaVivo } from '../../../test/leafletSimulado'
 import {
   USUARIO_PRESTADOR,
@@ -21,6 +21,20 @@ const ID = '6a3000000000000000000001'
 const LENTO = { timeout: 15_000 }
 
 type Usuario = ReturnType<typeof renderApp>['usuario']
+
+const JPEG = [0xff, 0xd8, 0xff, 0xe0]
+
+function foto(nombre: string, firma = JPEG): File {
+  const bytes = new Uint8Array(64)
+  bytes.set(firma)
+  return new File([bytes], nombre, { type: 'image/jpeg' })
+}
+
+/** jsdom no tiene URL.createObjectURL: vistas previas con una URL fija por archivo. */
+beforeEach(() => {
+  let n = 0
+  vi.stubGlobal('URL', Object.assign(URL, { createObjectURL: vi.fn(() => `blob:vista-${(n += 1)}`), revokeObjectURL: vi.fn() }))
+})
 
 function conPrestador(rutas: Parameters<typeof simularFetch>[0] = {}) {
   sessionStorage.setItem('samaria360.token', 'token-guardado')
@@ -54,6 +68,8 @@ async function llenarComunes(usuario: Usuario, categoria: string) {
   escribir('Dirección', 'Iglesia de Minca')
   escribir('Latitud', '11.1432')
   escribir('Longitud', '-74.1121')
+  // DEC-318: la foto es obligatoria en el registro.
+  await usuario.upload(screen.getByLabelText('Agregar fotos'), [foto('portada.jpg')])
 }
 
 async function llenarTour(usuario: Usuario) {
@@ -323,12 +339,35 @@ describe('WF-08 «Registrar servicio comercial» (RF09, RF10, RF37)', () => {
       expect(grupo).toHaveAttribute('aria-disabled', 'true')
       expect(within(grupo).getByText('No disponible')).toHaveClass('solo-lector')
     }
-    expect(screen.getByRole('group', { name: 'Fotos del servicio' })).toHaveAttribute('aria-disabled', 'true')
     expect(screen.getByText('Se toma de tu registro de prestador.')).toBeInTheDocument()
     expect(screen.queryByText(/RNT-/)).not.toBeInTheDocument()
     // O22: el mapa nace en un efecto del selector, que puede correr después de que aparezca el título.
     const mapa = await waitFor(() => mapaVivo(), LENTO)
     expect(mapa.teselas()[0].opciones.attribution).toContain('OpenStreetMap')
+  })
+
+  it('DEC-318: las fotos van en el multipart junto a los datos; sin fotos no se envía y se marca el grupo', async () => {
+    const { solicitudes, usuario } = await abrirRegistro({
+      [REGISTRAR]: () => respuestaJson(201, servicioGestion()),
+    })
+    await llenarTour(usuario)
+    await usuario.click(screen.getByRole('button', { name: 'Quitar la foto 1' }))
+    await enviar(usuario)
+
+    expect(registros(solicitudes)).toHaveLength(0)
+    expect(screen.getByRole('group', { name: 'Fotos del servicio' })).toHaveFocus()
+
+    await usuario.upload(screen.getByLabelText('Agregar fotos'), [foto('portada.jpg'), foto('finca.jpg')])
+    await enviar(usuario)
+
+    await waitFor(() => expect(ubicacionActual()).toBe(`/prestador/servicios/${ID}`), LENTO)
+    const [registro] = registros(solicitudes)
+    expect(registro.cabeceras['Content-Type']).toBeUndefined()
+    expect((registro.formulario!.getAll('imagenes') as File[]).map((imagen) => imagen.name)).toEqual([
+      'portada.jpg',
+      'finca.jpg',
+    ])
+    expect(registro.cuerpo).toMatchObject({ nombreComercial: 'Tour de Café en Minca', categoria: 'Tour' })
   })
 
   it('O16 (DEC-203): el RNT se muestra con el de `GET /prestador/perfil` y no viaja en el cuerpo', async () => {

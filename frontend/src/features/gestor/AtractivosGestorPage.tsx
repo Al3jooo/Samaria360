@@ -1,3 +1,4 @@
+import { RegistroOcupacion } from '../afluencia/RegistroOcupacion'
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
@@ -165,6 +166,7 @@ export function AtractivosGestorPage() {
                 <th scope="col" role="columnheader">{t('gestor.panel.columnas.estado')}</th>
                 <th scope="col" role="columnheader">{t('gestor.panel.columnas.capacidad')}</th>
                 <th scope="col" role="columnheader">{t('gestor.panel.columnas.registrado')}</th>
+                <th scope="col" role="columnheader">{t('gestor.panel.columnas.afluencia')}</th>
                 <th scope="col" role="columnheader">{t('gestor.panel.columnas.acciones')}</th>
               </tr>
             </thead>
@@ -191,6 +193,10 @@ export function AtractivosGestorPage() {
                   </td>
                   <td role="cell" data-etiqueta={t('gestor.panel.columnas.registrado')}>
                     {atractivo.fechaRegistro ? formatearDia(atractivo.fechaRegistro, i18n.language) : '—'}
+                  </td>
+                  <td role="cell" data-etiqueta={t('gestor.panel.columnas.afluencia')}>
+                    {/* RF39 (DEC-306): el Gestor registra la ocupación actual del atractivo. */}
+                    <RegistroOcupacion id={atractivo.id} nombre={atractivo.nombre} />
                   </td>
                   <td role="cell" data-etiqueta={t('gestor.panel.columnas.acciones')}>
                     <div className="prestador__acciones-fila">

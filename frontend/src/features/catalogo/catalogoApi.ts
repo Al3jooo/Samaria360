@@ -8,7 +8,7 @@ export type Categoria = (typeof CATEGORIAS)[number]
 export const CONDICIONES_ACCESIBILIDAD = ['MovilidadReducida', 'Visual', 'Auditiva'] as const
 export type CondicionAccesibilidad = (typeof CONDICIONES_ACCESIBILIDAD)[number]
 
-export const ORDENES = ['Distancia', 'PrecioAscendente', 'PrecioDescendente', 'Nombre'] as const
+export const ORDENES = ['Distancia', 'PrecioAscendente', 'PrecioDescendente', 'Nombre', 'Calificacion'] as const
 export type Orden = (typeof ORDENES)[number]
 
 export type EstadoOperativo = 'Abierto' | 'Cerrado_temporalmente' | 'En_mantenimiento'
@@ -76,6 +76,11 @@ export interface ResultadoOferta {
   accesibilidad: CondicionAccesibilidad[]
   /** Solo en los atractivos (RF33). */
   estadoOperativo: EstadoOperativo | null
+  /** Promedio visible de RF17 (DEC-302); nulo o ausente sin calificaciones. */
+  calificacion?: number | null
+  cantidadCalificaciones?: number
+  /** Solo en atractivos: el nivel vigente de afluencia (RF39, DEC-304); nulo o ausente sin lectura del día. */
+  afluencia?: 'Bajo' | 'Medio' | 'Alto' | null
 }
 
 export interface PaginaOferta {

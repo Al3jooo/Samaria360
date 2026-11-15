@@ -23,7 +23,7 @@ import { useUbicacion } from './useUbicacion'
 import './catalogo.css'
 
 /** Órdenes que la API soporta; «Precio» y «Nombre» son Mejora de diseño (WF-05 no los muestra). */
-const ORDENES_DISPONIBLES: Orden[] = ['PrecioAscendente', 'PrecioDescendente', 'Nombre']
+const ORDENES_DISPONIBLES: Orden[] = ['Calificacion', 'PrecioAscendente', 'PrecioDescendente', 'Nombre']
 
 const SIN_RESULTADOS: ResultadoOferta[] = []
 
@@ -146,6 +146,8 @@ export function ExplorarPage() {
 
   const pagina = busqueda.estado === 'ok' ? busqueda.pagina : null
   const resultadosMapa = pagina ? pagina.elementos : busqueda.estado === 'error' ? SIN_RESULTADOS : null
+  // RF39 (DEC-306): la leyenda dice «Sin datos» solo si ningún atractivo de la página tiene afluencia vigente.
+  const resultadosConAfluencia = (pagina?.elementos ?? []).some((r) => r.tipo === 'Atractivo' && r.afluencia)
   const disponibilidad = useDisponibilidadResumen(pagina ? pagina.elementos : null)
 
   // «Ver detalle» del popup del mapa (RF23): como el de la tarjeta, recuerda la búsqueda para volver a ella.
@@ -259,9 +261,6 @@ export function ExplorarPage() {
               <AccionNoDisponible className="orden__opcion">
                 {t('explorar.ordenes.Afluencia')}
               </AccionNoDisponible>
-              <AccionNoDisponible className="orden__opcion">
-                {t('explorar.ordenes.Calificacion')}
-              </AccionNoDisponible>
               {ORDENES_DISPONIBLES.map((orden) => (
                 <button
                   key={orden}
@@ -345,7 +344,12 @@ export function ExplorarPage() {
           />
           <div className="leyenda-afluencia">
             <p className="leyenda-afluencia__titulo">
-              {t('explorar.leyendaAfluencia')}: <span>{t('explorar.sinDatosAfluencia')}</span>
+              {t('explorar.leyendaAfluencia')}
+              {!resultadosConAfluencia && (
+                <>
+                  : <span>{t('explorar.sinDatosAfluencia')}</span>
+                </>
+              )}
             </p>
             <ul aria-label={t('explorar.leyendaAfluencia')}>
               <li className="leyenda-afluencia__item leyenda-afluencia__item--bajo">{t('explorar.nivelBajo')}</li>

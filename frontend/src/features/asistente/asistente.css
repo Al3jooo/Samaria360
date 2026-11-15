@@ -1,0 +1,495 @@
+/* WF-07 «Asistente virtual IA», WF-31 «Mis itinerarios» y WF-32 «Base de conocimientos» (RF04, RF05, RF35, RF36,
+   RF59). Solo tokens de src/app/estilos.css. */
+
+.asistente,
+.mis-itinerarios,
+.conocimiento-admin {
+  display: grid;
+  gap: var(--espacio-5);
+  width: min(100%, var(--ancho-maximo));
+  margin: 0 auto;
+  padding: var(--espacio-6) var(--espacio-4) var(--espacio-7);
+}
+
+.mis-itinerarios,
+.conocimiento-admin {
+  width: min(100%, 56rem);
+}
+
+.asistente h1,
+.mis-itinerarios h1,
+.conocimiento-admin h1 {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-size: var(--texto-3xl);
+  line-height: var(--interlineado-titulos);
+  color: var(--color-mar-900);
+}
+
+.asistente h2,
+.mis-itinerarios h2,
+.conocimiento-admin h2 {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-size: var(--texto-xl);
+  color: var(--color-mar-900);
+}
+
+.asistente__cabecera {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espacio-4);
+}
+
+.asistente__icono {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: var(--radio-md);
+  background: var(--color-mar-900);
+  color: var(--color-sol-400);
+  box-shadow: var(--sombra-2);
+}
+
+.asistente__estado {
+  margin: var(--espacio-2) 0 0;
+  max-width: 46rem;
+  color: var(--color-tinta-suave);
+}
+
+.asistente__estado strong {
+  color: var(--color-sierra-700);
+}
+
+.asistente__punto {
+  display: inline-block;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin-right: var(--espacio-2);
+  border-radius: 50%;
+  background: var(--color-sierra-700);
+  box-shadow: 0 0 0 4px rgb(46 106 78 / 18%);
+}
+
+.asistente__beta {
+  display: flex;
+  align-items: center;
+  gap: var(--espacio-3);
+  padding: var(--espacio-3) var(--espacio-4);
+  border-left: 4px solid var(--color-sol-400);
+  border-radius: var(--radio-sm);
+  background: var(--color-sol-100);
+  color: var(--color-tinta);
+}
+
+.asistente__beta p {
+  flex: 1;
+  margin: 0;
+  font-size: var(--texto-sm);
+}
+
+.asistente__cerrar {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 0;
+  background: none;
+  color: var(--color-tinta);
+  font-size: var(--texto-xl);
+  cursor: pointer;
+}
+
+.asistente__cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--espacio-5);
+}
+
+@media (min-width: 60rem) {
+  .asistente__cuerpo {
+    grid-template-columns: minmax(0, 1.7fr) minmax(18rem, 1fr);
+    align-items: start;
+  }
+}
+
+.asistente__chat,
+.itinerario-sugerido,
+.prestadores-mencionados,
+.tarjeta-itinerario,
+.tarjeta-conocimiento {
+  display: grid;
+  gap: var(--espacio-4);
+  padding: var(--espacio-5);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-lg);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-1);
+}
+
+.asistente__mensajes {
+  display: grid;
+  gap: var(--espacio-4);
+  max-height: 32rem;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.burbuja {
+  display: grid;
+  gap: var(--espacio-1);
+  max-width: min(36rem, 92%);
+}
+
+.burbuja--turista {
+  justify-self: end;
+  text-align: right;
+}
+
+.burbuja__autor,
+.burbuja__hora {
+  color: var(--color-tinta-suave);
+  font-size: var(--texto-xs);
+}
+
+.burbuja__texto {
+  margin: 0;
+  padding: var(--espacio-3) var(--espacio-4);
+  border-radius: var(--radio-md) var(--radio-md) var(--radio-md) var(--radio-sm);
+  background: var(--color-arena-200);
+  color: var(--color-tinta);
+  white-space: pre-line;
+  text-align: left;
+}
+
+.burbuja--turista .burbuja__texto {
+  border-radius: var(--radio-md) var(--radio-md) var(--radio-sm) var(--radio-md);
+  background: var(--color-mar-700);
+  color: var(--color-superficie);
+}
+
+.burbuja--escribiendo {
+  color: var(--color-tinta-suave);
+  font-style: italic;
+}
+
+.asistente__alerta,
+.asistente__error,
+.asistente__exito,
+.itinerario-sugerido__aviso {
+  margin: 0;
+  padding: var(--espacio-3) var(--espacio-4);
+  border-radius: var(--radio-sm);
+  font-size: var(--texto-sm);
+}
+
+.asistente__alerta,
+.itinerario-sugerido__aviso {
+  background: var(--color-sol-100);
+  color: var(--color-tinta);
+}
+
+.asistente__error {
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+}
+
+.asistente__exito {
+  background: var(--color-mar-100);
+  color: var(--color-mar-900);
+}
+
+.asistente__acciones,
+.asistente__chips,
+.itinerario-sugerido__acciones,
+.tarjeta-itinerario__acciones,
+.tarjeta-conocimiento__acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-3);
+}
+
+.asistente__chips {
+  padding-top: var(--espacio-4);
+  border-top: 1px solid var(--color-borde);
+}
+
+.asistente__chips .chip:disabled,
+.boton-texto:disabled,
+.asistente__enviar:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.asistente__formulario {
+  display: grid;
+  gap: var(--espacio-2);
+}
+
+.asistente__formulario label {
+  font-weight: 600;
+}
+
+.asistente__entrada {
+  display: flex;
+  gap: var(--espacio-3);
+}
+
+.asistente__entrada input {
+  flex: 1;
+  min-width: 0;
+  min-height: 3rem;
+  padding: var(--espacio-2) var(--espacio-4);
+  border: 1.5px solid var(--color-borde-campo);
+  border-radius: var(--radio-pill);
+  background: var(--color-superficie);
+  color: var(--color-tinta);
+  font: inherit;
+}
+
+.asistente__entrada input:focus-visible,
+.asistente__enviar:focus-visible,
+.asistente__cerrar:focus-visible,
+.boton-texto:focus-visible {
+  outline: var(--foco);
+  outline-offset: 2px;
+}
+
+.asistente__enviar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-mar-900);
+  color: var(--color-superficie);
+  cursor: pointer;
+}
+
+.asistente__restantes {
+  margin: 0;
+  color: var(--color-tinta-suave);
+  font-size: var(--texto-xs);
+}
+
+.asistente__lateral {
+  display: grid;
+  gap: var(--espacio-5);
+}
+
+.itinerario-sugerido__vacio {
+  margin: 0;
+  color: var(--color-tinta-suave);
+  font-size: var(--texto-sm);
+}
+
+.itinerario-sugerido__dias,
+.itinerario-sugerido__dias ul,
+.prestadores-mencionados ul,
+.lista-itinerarios,
+.lista-conocimiento {
+  display: grid;
+  gap: var(--espacio-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.itinerario-sugerido__dias > li {
+  position: relative;
+  padding-left: var(--espacio-5);
+  border-left: 2px dashed var(--color-mar-500);
+}
+
+.itinerario-sugerido__dias > li::before {
+  position: absolute;
+  top: 0.3rem;
+  left: -0.45rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 2px solid var(--color-mar-700);
+  border-radius: 50%;
+  background: var(--color-superficie);
+  content: '';
+}
+
+.itinerario-sugerido h3,
+.asistente__ayuda h3 {
+  margin: 0 0 var(--espacio-1);
+  font-size: var(--texto-base);
+  color: var(--color-mar-900);
+}
+
+.itinerario-sugerido__dias ul li {
+  display: grid;
+}
+
+.itinerario-sugerido__dias ul span {
+  color: var(--color-tinta-suave);
+  font-size: var(--texto-xs);
+}
+
+.boton-texto {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-2);
+  min-height: 2.75rem;
+  padding: 0 var(--espacio-2);
+  border: 0;
+  background: none;
+  color: var(--color-mar-700);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.boton-texto--peligro {
+  color: var(--color-error);
+}
+
+.prestadores-mencionados__enlace {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espacio-3);
+  padding: var(--espacio-3) 0;
+  border-bottom: 1px solid var(--color-borde);
+  color: var(--color-tinta);
+  text-decoration: none;
+}
+
+.prestadores-mencionados__enlace span:first-child {
+  display: grid;
+}
+
+.prestadores-mencionados__enlace small {
+  color: var(--color-tinta-suave);
+}
+
+.prestadores-mencionados__enlace:hover strong {
+  color: var(--color-mar-700);
+  text-decoration: underline;
+}
+
+.asistente__ayuda ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: var(--espacio-5);
+  margin: var(--espacio-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.asistente__ayuda p {
+  margin: 0;
+  color: var(--color-tinta-suave);
+  font-size: var(--texto-sm);
+}
+
+.asistente__ayuda-icono {
+  display: inline-grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-bottom: var(--espacio-2);
+  border: 1.5px solid var(--color-mar-700);
+  border-radius: var(--radio-sm);
+  color: var(--color-mar-700);
+}
+
+/* WF-31 y WF-32: formularios y tarjetas. */
+.tarjeta-itinerario header,
+.tarjeta-conocimiento header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--espacio-2);
+}
+
+.tarjeta-itinerario__fecha,
+.tarjeta-conocimiento__fecha,
+.mis-itinerarios__contador,
+.conocimiento-admin__contador {
+  margin: 0;
+  color: var(--color-tinta-suave);
+  font-size: var(--texto-sm);
+}
+
+.formulario-asistente {
+  display: grid;
+  gap: var(--espacio-3);
+}
+
+.formulario-asistente label {
+  display: grid;
+  gap: var(--espacio-1);
+  font-weight: 600;
+}
+
+.formulario-asistente input,
+.formulario-asistente textarea,
+.formulario-asistente select {
+  min-height: 2.75rem;
+  padding: var(--espacio-2) var(--espacio-3);
+  border: 1.5px solid var(--color-borde-campo);
+  border-radius: var(--radio-sm);
+  background: var(--color-superficie);
+  color: var(--color-tinta);
+  font: inherit;
+  font-weight: 400;
+}
+
+.formulario-asistente textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.formulario-asistente input:focus-visible,
+.formulario-asistente textarea:focus-visible,
+.formulario-asistente select:focus-visible {
+  outline: var(--foco);
+  outline-offset: 2px;
+}
+
+.formulario-asistente__paso {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 6rem auto;
+  align-items: end;
+  gap: var(--espacio-2);
+}
+
+.campo-error {
+  color: var(--color-error);
+  font-size: var(--texto-sm);
+  font-weight: 400;
+}
+
+/* «Descargar PDF» imprime solo el itinerario sugerido: el navegador ofrece «Guardar como PDF» (DEC-298). */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .itinerario-sugerido,
+  .itinerario-sugerido * {
+    visibility: visible;
+  }
+
+  .itinerario-sugerido {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    border: 0;
+    box-shadow: none;
+  }
+
+  .itinerario-sugerido__acciones,
+  .itinerario-sugerido__aviso {
+    display: none;
+  }
+}
