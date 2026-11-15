@@ -32,7 +32,8 @@ Formato [Conventional Commits](https://www.conventionalcommits.org/es/v1.0.0/), 
 
 - **Tipos:** `feat` (funcionalidad), `fix` (defecto), `docs`, `test`, `refactor`, `build` (dependencias o Docker),
   `ci` (workflows) y `chore` (mantenimiento).
-- **Alcances:** `auth`, `catalogo`, `booking`, `gateway`, `frontend`, `infra` y `docs`; varios separados por coma.
+- **Alcances:** `auth`, `catalogo`, `booking`, `analytics`, `chatbot`, `gateway`, `frontend`, `infra`, `sad`,
+  `trazabilidad`, `readme` y `docs`; varios separados por coma.
 - Los requisitos y decisiones entre paréntesis, y la sesión de la iteración al final cuando aplique.
 
 Ejemplos del historial:
@@ -49,14 +50,14 @@ feat(booking): inventario bajo demanda desde la oferta del catalogo (DEC-135)
 |---|---|
 | `domain` | Unitarias puras, sin Spring |
 | `application` | Casos de uso con dobles (*fakes*) de los puertos |
-| `infrastructure` | Testcontainers contra PostgreSQL o MongoDB reales |
+| `infrastructure` | Testcontainers contra PostgreSQL, MongoDB o RabbitMQ reales |
 | `architecture` | Reglas de capas con ArchUnit |
 | `frontend` | Vitest y Testing Library |
 
 Antes de abrir el PR, en cada servicio que cambió:
 
 ```bash
-cd ms-auth && ./mvnw verify    # pruebas + cobertura (JaCoCo); igual en ms-catalog, ms-booking y api-gateway
+cd ms-auth && ./mvnw verify    # pruebas + cobertura (JaCoCo); igual en ms-catalog, ms-booking, ms-analytics, ms-chatbot y api-gateway
 cd frontend && npm run lint && npm run build && npm test
 ```
 
@@ -66,8 +67,9 @@ GitHub Actions corre las mismas pruebas en el PR; no se integra con el CI en roj
 
 ## Bases de datos
 
-- **Nunca se edita una migración ya aplicada** (Flyway en ms-auth y ms-booking, `infra/mongo/migraciones` en
-  catalog_db): rompe las bases de los compañeros. Cada cambio va en una migración nueva, con el siguiente número.
+- **Nunca se edita una migración ya aplicada** (Flyway en ms-auth y ms-booking; `infra/mongo/migraciones` en
+  catalog_db, `infra/mongo/analytics` en analytics_db e `infra/mongo/chatbot` en chatbot_db): rompe las bases de los
+  compañeros. Cada cambio va en una migración nueva, con el siguiente número (las próximas están en CLAUDE.md).
 - El esquema y los datos de referencia van en `db/migration` (o `esquema/`); los datos de prueba, en `db/semilla`
   (o `semilla/`).
 - Ningún servicio lee ni escribe la base de otro.
@@ -78,11 +80,14 @@ GitHub Actions corre las mismas pruebas en el PR; no se integra con el CI en roj
   [`docs/trazabilidad.md`](docs/trazabilidad.md) y sus decisiones (DEC) en el archivo de su iteración en
   [`docs/trazabilidad/`](docs/trazabilidad/).
 - Las decisiones de arquitectura van como ADR en `docs/sad/adr/` y los contratos de la API en `docs/sad/api/`.
+- Un evento nuevo de RabbitMQ se agrega **antes** del código a `docs/sad/api/eventos.md` y a su JSON Schema
+  (decisión 8 del equipo), sin datos personales.
 - Un elemento de pantalla que no está en el wireframe y tiene función se registra como «Mejora de diseño» en la
   trazabilidad.
 
 ## Lo que nunca se sube
 
-- `.env` ni nada de `infra/keys/` salvo su README: los secretos se quedan en cada máquina.
+- `.env` ni nada de `infra/keys/` salvo su README: los secretos se quedan en cada máquina (también
+  `GEMINI_API_KEY` y la contraseña SMTP).
 - Grabaciones, fotos o datos personales de las entrevistas.
 - Dependencias nuevas sin justificar en el PR por qué hacen falta.
