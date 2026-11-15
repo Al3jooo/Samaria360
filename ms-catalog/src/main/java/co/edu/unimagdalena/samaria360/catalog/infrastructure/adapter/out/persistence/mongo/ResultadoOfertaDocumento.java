@@ -25,5 +25,10 @@ public record ResultadoOfertaDocumento(
         List<Double> coordenadas,
         Double distanciaMetros,
         List<String> condicionesAccesibilidad,
-        String estadoOperativo) {
+        String estadoOperativo,
+        Double calificacion,
+        Long cantidadCalificaciones,
+        Integer ocupacion,
+        java.time.Instant fechaOcupacion,
+        Integer limite) {
 }

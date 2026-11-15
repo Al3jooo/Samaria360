@@ -114,6 +114,11 @@ public class ManejadorErrores extends ResponseEntityExceptionHandler {
     }
 
     /** Otro Administrador ya aprobó o rechazó el servicio (DEC-128): el estado que tiene ahora. */
+    @ExceptionHandler(co.edu.unimagdalena.samaria360.catalog.domain.exception.GaleriaServicioException.class)
+    ProblemDetail galeria(co.edu.unimagdalena.samaria360.catalog.domain.exception.GaleriaServicioException ex) {
+        return Problemas.crear(HttpStatus.CONFLICT, CodigoError.valueOf(ex.getCodigo()), ex.getMessage());
+    }
+
     @ExceptionHandler(EstadoServicioCambiadoException.class)
     ProblemDetail estadoServicioCambiado(EstadoServicioCambiadoException ex) {
         ProblemDetail problema = Problemas.crear(HttpStatus.CONFLICT, CodigoError.ESTADO_CAMBIADO, ex.getMessage());

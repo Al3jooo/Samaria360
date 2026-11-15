@@ -27,9 +27,34 @@ spring:
       # authSource=admin. Sin CATALOG_DB_USER en .env (arranque local antiguo), el usuario raíz.
       # Si la contraseña tiene caracteres especiales (@ : / ? # %), debe ir codificada para URL en .env.
       # MONGO_HOST: localhost con ./mvnw; "mongo" dentro de Docker Compose.
-      uri: mongodb://${CATALOG_DB_USER:${MONGO_USER}}:${CATALOG_DB_PASSWORD:${MONGO_PASSWORD}}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/catalog_db?authSource=admin
+      uri: mongodb://${CATALOG_DB_USER:${MONGO_USER}}:${CATALOG_DB_PASSWORD:${MONGO_PASSWORD}}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/catalog_db?authSource=admin${MONGO_OPCIONES:&directConnection=true}
       # Explícito: en pruebas, la conexión de Testcontainers apunta a otra base por defecto.
       database: catalog_db
+  # Eventos del catálogo en RabbitMQ (ADR-011, DEC-293): usuario propio, que escribe en el exchange y lee su cola.
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ms-catalog
+    password: ${RABBITMQ_CATALOG_PASSWORD:}
+    virtual-host: samaria360
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    connection-timeout: 2s
+    # Consume ms-catalog.eventos.v1 (PromedioActualizado, DEC-302): idempotente por versión; un mensaje inválido va a la
+    # .dlq sin reintentos (ADR-011). Si la cola no existe todavía, el servicio arranca igual.
+    listener:
+      simple:
+        concurrency: 1
+        max-concurrency: 1
+        default-requeue-rejected: false
+        missing-queues-fatal: false
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 1s
+          multiplier: 5
 
 samaria360:
   seguridad:
@@ -38,6 +63,10 @@ samaria360:
     emisor: samaria360-auth
     # aud de los tokens de servicio que ms-auth usa en /internal/** (ADR-008)
     audiencia: ms-catalog
+  # Relevo del outbox hacia RabbitMQ (ADR-011). Si RabbitMQ no está, los eventos esperan en outbox_eventos.
+  eventos:
+    habilitado: true
+    cada: PT1S
 
 # Solo /actuator/health (healthcheck de Docker Compose), igual que ms-booking y api-gateway.
 management:
@@ -45,6 +74,10 @@ management:
     web:
       exposure:
         include: health
+  # RabbitMQ no cuenta para la salud: si falta, los eventos esperan en el outbox (ADR-011).
+  health:
+    rabbit:
+      enabled: false
 
 # Swagger solo en dev (ver documento de perfil dev más abajo)
 springdoc:

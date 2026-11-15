@@ -13,6 +13,17 @@
       "version"
     ],
     "properties": {
+      "calificacion": {
+        "bsonType": "object",
+        "description": "Promedio visible de RF17, copiado de PromedioActualizado de ms-analytics (DEC-302); solo avanza con una version mayor",
+        "required": ["cantidad", "version"],
+        "additionalProperties": false,
+        "properties": {
+          "promedio": { "bsonType": ["double", "null"], "minimum": 1, "maximum": 5 },
+          "cantidad": { "bsonType": ["int", "long"], "minimum": 0 },
+          "version": { "bsonType": ["int", "long"], "minimum": 1 }
+        }
+      },
       "_id": { "bsonType": "objectId" },
       "prestadorId": { "bsonType": "string", "description": "UUID — referencia a Auth Service, sin FK física" },
       "nombreComercial": { "bsonType": "string", "minLength": 1, "maxLength": 150 },

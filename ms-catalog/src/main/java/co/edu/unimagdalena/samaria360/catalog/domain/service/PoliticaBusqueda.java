@@ -103,6 +103,8 @@ public final class PoliticaBusqueda {
             case PrecioDescendente -> Comparator.comparing(ResultadoOferta::precio,
                     Comparator.nullsLast(Comparator.<BigDecimal>reverseOrder()));
             case Nombre -> Comparator.comparing(ResultadoOferta::nombre, colacionEspanol());
+            case Calificacion -> Comparator.comparing(ResultadoOferta::calificacion,
+                    Comparator.nullsLast(Comparator.<Double>reverseOrder()));
         };
         return principal.thenComparing(ResultadoOferta::id);
     }

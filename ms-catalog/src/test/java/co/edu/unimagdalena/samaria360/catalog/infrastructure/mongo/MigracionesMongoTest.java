@@ -49,10 +49,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class MigracionesMongoTest {
 
     private static final Path ESQUEMAS = Path.of("../docs/sad/modelo-nosql");
-    private static final Path VALIDADOR_M011_SERVICIOS =
-            MongoDePrueba.MIGRACIONES.resolve("esquema/M011__servicios.v4.schema.json");
-    private static final Path VALIDADOR_M012_ATRACTIVOS =
-            MongoDePrueba.MIGRACIONES.resolve("esquema/M012__atractivos.v2.schema.json");
+    /** DEC-302: M015 agrega calificacion a servicios (v5); DEC-304: M016, ocupacionActual a atractivos (v4). */
+    private static final Path VALIDADOR_M015_SERVICIOS =
+            MongoDePrueba.MIGRACIONES.resolve("esquema/M015__servicios.v5.schema.json");
+    private static final Path VALIDADOR_M016_ATRACTIVOS =
+            MongoDePrueba.MIGRACIONES.resolve("esquema/M016__atractivos.v4.schema.json");
     private static final Path VALIDADOR_M008_CUENTAS =
             MongoDePrueba.MIGRACIONES.resolve("esquema/M008__cuentas.v2.schema.json");
     private static final Path VALIDADOR_M005_FAQ = MongoDePrueba.MIGRACIONES.resolve("esquema/M005__faq.v1.schema.json");
@@ -68,7 +69,8 @@ class MigracionesMongoTest {
             "M002__semilla-suite-casa-tayrona", "M003__cuentas", "M004__indice-servicios-prestador",
             "M005__faq-avisos", "M006__semilla-faq-avisos", "M007__favoritos-historial", "M008__registro-servicios",
             "M009__semilla-direccion-rnt", "M010__coordenadas-rodadero", "M011__servicios-version",
-            "M012__atractivos-gestion", "M013__eventos");
+            "M012__atractivos-gestion", "M013__eventos", "M014__outbox-eventos", "M015__calificacion", "M016__afluencia",
+            "M017__historial-modificaciones");
     /** Fuera del plano básico: un punto de código, dos unidades UTF-16. */
     private static final String EMOJI = "🌴";
     private static final int VALIDACION_DOCUMENTO_FALLIDA = 121;
@@ -129,7 +131,7 @@ class MigracionesMongoTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"servicios", "atractivos", "cuentas", "faq", "avisos", "favoritos", "historial_busqueda",
-            "eventos"})
+            "eventos", "ocupaciones", "historial_modificaciones"})
     void despuesDeLasMigracionesElValidadorEsElDeDocs(String coleccion) throws IOException {
         Document esperado = Document.parse(Files.readString(ESQUEMAS.resolve(coleccion + ".schema.json")));
 
@@ -138,10 +140,10 @@ class MigracionesMongoTest {
         assertThat(opciones(nuevo, coleccion).getString("validationAction")).isEqualTo("error");
     }
 
-    /** Mientras no exista una migración posterior que cambie servicios, la copia de M011 (v4) es la última versión. */
+    /** Mientras no exista una migración posterior que cambie servicios, la copia de M015 (v5) es la última versión. */
     @Test
-    void laCopiaDelValidadorDeServiciosDeM011EsLaUltimaVersion() throws IOException {
-        assertThat(Document.parse(Files.readString(VALIDADOR_M011_SERVICIOS)))
+    void laCopiaDelValidadorDeServiciosDeM015EsLaUltimaVersion() throws IOException {
+        assertThat(Document.parse(Files.readString(VALIDADOR_M015_SERVICIOS)))
                 .isEqualTo(Document.parse(Files.readString(ESQUEMAS.resolve("servicios.schema.json"))));
     }
 
@@ -671,10 +673,10 @@ class MigracionesMongoTest {
 
     // ------------------------------------------------------------------ atractivos (M012, iteración E)
 
-    /** Mientras no exista una migración posterior que cambie atractivos, la copia de M012 (v2) es la última versión. */
+    /** Mientras no exista una migración posterior que cambie atractivos, la copia de M016 (v4) es la última versión. */
     @Test
-    void laCopiaDelValidadorDeAtractivosDeM012EsLaUltimaVersion() throws IOException {
-        assertThat(Document.parse(Files.readString(VALIDADOR_M012_ATRACTIVOS)))
+    void laCopiaDelValidadorDeAtractivosDeM016EsLaUltimaVersion() throws IOException {
+        assertThat(Document.parse(Files.readString(VALIDADOR_M016_ATRACTIVOS)))
                 .isEqualTo(Document.parse(Files.readString(ESQUEMAS.resolve("atractivos.schema.json"))));
     }
 
@@ -945,7 +947,8 @@ class MigracionesMongoTest {
         assertThat(idsMigraciones(errores)).containsExactly("M001__unidades-alojamiento", "M003__cuentas",
                 "M004__indice-servicios-prestador", "M005__faq-avisos", "M007__favoritos-historial",
                 "M008__registro-servicios", "M011__servicios-version", "M012__atractivos-gestion",
-                "M013__eventos");
+                "M013__eventos", "M014__outbox-eventos", "M015__calificacion", "M016__afluencia",
+            "M017__historial-modificaciones");
         assertThat(errores.getCollection("faq").countDocuments()).isZero();
         assertThat(unidadesDe(errores, "Hotel Casa Tayrona")).hasSize(1);
     }

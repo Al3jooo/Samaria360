@@ -218,7 +218,7 @@ class OfertaApiIntegracionTest {
             "lng=-74.21",
             "lat=200&lng=-74.21",
             "categoria=Inexistente",
-            "orden=Calificacion",
+            "orden=Popularidad",
             "accesibilidad=Rampa"
     })
     void criteriosInvalidosResponden400(String parametros) throws Exception {

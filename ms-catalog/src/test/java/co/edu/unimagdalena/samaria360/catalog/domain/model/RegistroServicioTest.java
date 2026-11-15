@@ -289,4 +289,43 @@ class RegistroServicioTest {
                 b.coordenadas(), b.contacto(), b.condicionesAccesibilidad(), b.horarioAtencion(), b.precioBase(),
                 b.detalleCategoria(), oferta);
     }
+
+    /** DEC-318: el registro con fotos guarda las rutas públicas en el orden recibido. */
+    @Test
+    void conFotosElServicioLlevaLasRutasDeLasImagenesEnOrden() {
+        byte[] jpeg = java.util.Arrays.copyOf(new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF}, 32);
+        java.util.Iterator<String> ids = List.of("6a0000000000000000000a01", "6a0000000000000000000a02").iterator();
+
+        RegistroServicio.Registro registro = RegistroServicio.registrarConImagenes(Borradores.tour(),
+                List.of(new ImagenSubida("a.jpg", jpeg), new ImagenSubida("b.jpg", jpeg)), Unidades.nuevoId(),
+                Unidades::nuevoId, ids::next, PRESTADOR, "RNT-777", true, AHORA);
+
+        assertThat(registro.servicio().getImagenes()).containsExactly("/api/v1/catalogo/imagenes/6a0000000000000000000a01",
+                "/api/v1/catalogo/imagenes/6a0000000000000000000a02");
+        assertThat(registro.imagenes()).extracting(RegistroAtractivo.ImagenPorGuardar::nombre).containsExactly("a.jpg", "b.jpg");
+    }
+
+    /** Los errores de las fotos van en el mismo 400 que los de los datos, y sin imágenes válidas no se pide ningún id. */
+    @Test
+    void sinFotosOConUnArchivoQueNoEsImagenSonErroresJuntoConLosDeLosDatos() {
+        BorradorServicio b = Borradores.tour();
+        BorradorServicio sinNombre = new BorradorServicio(null, b.categoria(), b.descripcion(), b.direccion(),
+                b.coordenadas(), b.contacto(), b.condicionesAccesibilidad(), b.horarioAtencion(), b.precioBase(),
+                b.detalleCategoria(), b.oferta());
+
+        for (List<ImagenSubida> imagenes : List.of(List.<ImagenSubida>of(),
+                List.of(new ImagenSubida("texto.txt", "hola".getBytes())))) {
+            try {
+                RegistroServicio.registrarConImagenes(sinNombre, imagenes, Unidades.nuevoId(), Unidades::nuevoId,
+                        () -> {
+                            throw new AssertionError("no debe pedir ids");
+                        }, PRESTADOR, "RNT-777", true, AHORA);
+                throw new AssertionError("Se esperaba ContenidoInvalidoException");
+            } catch (ContenidoInvalidoException e) {
+                assertThat(e.getCampos()).containsKey("nombreComercial");
+                assertThat(e.getCampos()).containsAnyOf(entry("imagenes", MotivoInvalido.REQUERIDO),
+                        entry("imagenes[0]", MotivoInvalido.FORMATO));
+            }
+        }
+    }
 }

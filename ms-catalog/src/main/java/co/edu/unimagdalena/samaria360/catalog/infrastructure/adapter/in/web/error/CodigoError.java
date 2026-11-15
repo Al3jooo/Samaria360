@@ -47,6 +47,10 @@ public enum CodigoError {
     IMAGEN_NO_ENCONTRADA,
     /** La petición multipart supera los topes del servidor (30 MB en total, 6 MB por parte; ADR-009). Es un 413. */
     CARGA_DEMASIADO_GRANDE,
+    /** RF48 (DEC-313): la galería ya tiene 5 imágenes. */
+    LIMITE_IMAGENES,
+    /** RF48 (DEC-313): la galería debe quedar con al menos una imagen. */
+    IMAGEN_MINIMA,
     ACCESO_DENEGADO,
     SOLICITUD_INVALIDA,
     ERROR_INTERNO

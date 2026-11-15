@@ -1,0 +1,60 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "servicioId",
+      "prestadorId",
+      "tipo",
+      "valorNuevo",
+      "fecha"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "servicioId": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{24}$"
+      },
+      "prestadorId": {
+        "bsonType": "string",
+        "description": "UUID del Prestador (auth_db), sin FK física"
+      },
+      "nombreServicio": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 150
+      },
+      "tipo": {
+        "enum": [
+          "Precio",
+          "Cupos",
+          "Apertura",
+          "Cierre",
+          "Plantilla"
+        ]
+      },
+      "detalle": {
+        "bsonType": "string",
+        "maxLength": 200
+      },
+      "valorAnterior": {
+        "bsonType": "string",
+        "maxLength": 200
+      },
+      "valorNuevo": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 200
+      },
+      "fecha": {
+        "bsonType": "date"
+      },
+      "idEvento": {
+        "bsonType": "string",
+        "description": "idEvento de OfertaModificada (deduplicación)"
+      }
+    }
+  }
+}

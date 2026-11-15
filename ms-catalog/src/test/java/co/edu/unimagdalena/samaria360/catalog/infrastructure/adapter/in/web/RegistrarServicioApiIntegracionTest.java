@@ -287,6 +287,39 @@ class RegistrarServicioApiIntegracionTest {
 
     // ---- auxiliares ------------------------------------------------------------------------------------------
 
+    /** DEC-318: multipart con la parte datos y las fotos; las imágenes quedan servidas por la ruta pública. */
+    @Test
+    void elRegistroConFotosGuardaLasImagenesYLasSirve() throws Exception {
+        byte[] jpeg = SolicitudesAtractivo.imagen(SolicitudesAtractivo.FIRMA_JPEG, 2048);
+        MvcResult resultado = mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                .multipart(RUTA)
+                .file(SolicitudesAtractivo.parteDatos(SolicitudesServicio.tour(nombre)))
+                .file(SolicitudesAtractivo.parteImagen("portada.jpg", jpeg))
+                .header(HttpHeaders.AUTHORIZATION, token(prestador, 2))).andReturn();
+
+        assertThat(resultado.getResponse().getStatus()).isEqualTo(201);
+        List<String> imagenes = JsonPath.read(cuerpo(resultado), "$.imagenes");
+        assertThat(imagenes).hasSize(1).allMatch(ruta -> ruta.startsWith("/api/v1/catalogo/imagenes/"));
+        MvcResult imagen = mvc.perform(get(imagenes.get(0))).andReturn();
+        assertThat(imagen.getResponse().getStatus()).isEqualTo(200);
+        assertThat(imagen.getResponse().getContentAsByteArray()).isEqualTo(jpeg);
+        mongo.getCollection("imagenes.files").deleteOne(Filters.eq("_id",
+                new ObjectId(imagenes.get(0).substring("/api/v1/catalogo/imagenes/".length()))));
+    }
+
+    @Test
+    void elRegistroMultipartSinFotosEs400ConImagenesRequerido() throws Exception {
+        MvcResult resultado = mvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+                .multipart(RUTA)
+                .file(SolicitudesAtractivo.parteDatos(SolicitudesServicio.tour(nombre)))
+                .header(HttpHeaders.AUTHORIZATION, token(prestador, 2))).andReturn();
+
+        assertThat(resultado.getResponse().getStatus()).isEqualTo(400);
+        assertThat(JsonPath.<String>read(cuerpo(resultado), "$.campos.imagenes")).isEqualTo("REQUERIDO");
+        assertThat(mongo.getCollection("servicios").countDocuments(Filters.eq("prestadorId", prestador.toString())))
+                .isZero();
+    }
+
     private MvcResult registrar(Map<String, Object> cuerpo, String token) throws Exception {
         return mvc.perform(post(RUTA).header(HttpHeaders.AUTHORIZATION, token)
                 .contentType(MediaType.APPLICATION_JSON).content(json(cuerpo))).andReturn();

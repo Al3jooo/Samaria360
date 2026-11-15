@@ -1,5 +1,7 @@
 package co.edu.unimagdalena.samaria360.catalog.infrastructure.adapter.in.web;
 
+import co.edu.unimagdalena.samaria360.catalog.application.port.in.AfluenciaUseCase;
+import co.edu.unimagdalena.samaria360.catalog.infrastructure.adapter.in.web.dto.RespuestaAfluencia;
 import co.edu.unimagdalena.samaria360.catalog.application.port.in.ActualizarAtractivoUseCase;
 import co.edu.unimagdalena.samaria360.catalog.application.port.in.ConsultarAtractivosGestorUseCase;
 import co.edu.unimagdalena.samaria360.catalog.application.port.in.RegistrarAtractivoUseCase;
@@ -46,12 +48,25 @@ public class AtractivoGestorController {
     private final RegistrarAtractivoUseCase registrar;
     private final ConsultarAtractivosGestorUseCase consultar;
     private final ActualizarAtractivoUseCase actualizar;
+    private final AfluenciaUseCase afluencia;
 
     public AtractivoGestorController(RegistrarAtractivoUseCase registrar, ConsultarAtractivosGestorUseCase consultar,
-                                     ActualizarAtractivoUseCase actualizar) {
+                                     ActualizarAtractivoUseCase actualizar, AfluenciaUseCase afluencia) {
         this.registrar = registrar;
         this.consultar = consultar;
         this.actualizar = actualizar;
+        this.afluencia = afluencia;
+    }
+
+    public record SolicitudOcupacion(Integer ocupacion) {
+    }
+
+    /** RF39 (decisión 2 del equipo, DEC-304): el Gestor registra la ocupación actual; responde el nivel calculado. */
+    @PostMapping("/{id}/ocupacion")
+    public RespuestaAfluencia.AfluenciaDto registrarOcupacion(@AuthenticationPrincipal Jwt jwt, @PathVariable String id,
+                                                             @RequestBody SolicitudOcupacion solicitud) {
+        return RespuestaAfluencia.AfluenciaDto.de(afluencia.registrar(id, UUID.fromString(jwt.getSubject()),
+                solicitud.ocupacion()));
     }
 
     /**

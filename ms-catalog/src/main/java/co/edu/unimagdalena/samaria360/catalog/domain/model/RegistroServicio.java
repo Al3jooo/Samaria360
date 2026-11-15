@@ -5,6 +5,8 @@ import co.edu.unimagdalena.samaria360.catalog.domain.model.BorradorServicio.Dato
 import co.edu.unimagdalena.samaria360.catalog.domain.model.BorradorServicio.DatosDetalle;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.BorradorServicio.DatosOferta;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.BorradorServicio.DatosUnidad;
+import co.edu.unimagdalena.samaria360.catalog.domain.model.RegistroAtractivo.ImagenPorGuardar;
+import co.edu.unimagdalena.samaria360.catalog.domain.service.PoliticaImagen;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -41,6 +43,10 @@ public final class RegistroServicio {
 
     private final CamposServicio campos = new CamposServicio();
 
+    /** El servicio nuevo y las imágenes que hay que guardar antes de insertarlo, en el orden recibido (DEC-318). */
+    public record Registro(ServicioComercial servicio, List<ImagenPorGuardar> imagenes) {
+    }
+
     private RegistroServicio() {
     }
 
@@ -54,12 +60,33 @@ public final class RegistroServicio {
     public static ServicioComercial registrar(BorradorServicio borrador, String id, Supplier<String> idsUnidad,
                                               UUID prestadorId, String rnt, boolean prestadorActivo,
                                               Instant fechaRegistro) {
-        return new RegistroServicio().validar(borrador, id, idsUnidad, prestadorId, rnt, prestadorActivo,
-                fechaRegistro);
+        return new RegistroServicio().validar(borrador, null, id, idsUnidad, () -> {
+            throw new IllegalStateException("Sin imágenes no se generan ids de imagen");
+        }, prestadorId, rnt, prestadorActivo, fechaRegistro).servicio();
     }
 
-    private ServicioComercial validar(BorradorServicio b, String id, Supplier<String> idsUnidad, UUID prestadorId,
-                                      String rnt, boolean prestadorActivo, Instant fechaRegistro) {
+    /**
+     * Registro con fotos (WF-08, DEC-318): de 1 a 5 imágenes JPEG o PNG de hasta 5 MB, con las reglas de la galería
+     * (RF48). Los errores de las imágenes ({@code imagenes}, {@code imagenes[i]}) van en el mismo 400 que los de los
+     * datos.
+     *
+     * @param idsImagen genera el id de cada imagen; solo se llama si todo es válido
+     * @throws ContenidoInvalidoException con un motivo por cada campo inválido
+     */
+    public static Registro registrarConImagenes(BorradorServicio borrador, List<ImagenSubida> imagenes, String id,
+                                                Supplier<String> idsUnidad, Supplier<String> idsImagen,
+                                                UUID prestadorId, String rnt, boolean prestadorActivo,
+                                                Instant fechaRegistro) {
+        return new RegistroServicio().validar(borrador, imagenes == null ? List.of() : imagenes, id, idsUnidad,
+                idsImagen, prestadorId, rnt, prestadorActivo, fechaRegistro);
+    }
+
+    /** {@code imagenes} nulo: el registro por JSON, sin fotos (anterior a DEC-318). */
+    private Registro validar(BorradorServicio borrador, List<ImagenSubida> imagenes, String id,
+                             Supplier<String> idsUnidad, Supplier<String> idsImagen, UUID prestadorId, String rnt,
+                             boolean prestadorActivo, Instant fechaRegistro) {
+        BorradorServicio b = borrador == null
+                ? new BorradorServicio(null, null, null, null, null, null, null, null, null, null, null) : borrador;
         String nombre = campos.texto("nombreComercial", b.nombreComercial(), ServicioComercial.LONGITUD_MAXIMA_NOMBRE);
         Categoria categoria = categoria(b.categoria());
         String descripcion = campos.texto("descripcion", b.descripcion(), DESCRIPCION_MAXIMA);
@@ -78,10 +105,33 @@ public final class RegistroServicio {
                     : campos.decimal("precioBase", b.precioBase(), PRECIO_MAXIMO);
             oferta = oferta(categoria, b.oferta());
         }
+        if (imagenes != null) {
+            validarImagenes(imagenes);
+        }
         campos.lanzarSiHayErrores();
-        return new ServicioComercial(id, prestadorId, nombre, categoria, detalle, descripcion, coordenada, contacto,
-                EstadoPublicacion.Pendiente, prestadorActivo, accesibilidad, horario, precio, List.of(), direccion,
-                oferta, rnt, fechaRegistro, null);
+        List<ImagenPorGuardar> porGuardar = new ArrayList<>();
+        List<String> rutas = new ArrayList<>();
+        for (ImagenSubida imagen : imagenes == null ? List.<ImagenSubida>of() : imagenes) {
+            ImagenPorGuardar guardar = new ImagenPorGuardar(idsImagen.get(),
+                    FormatoImagen.detectar(imagen.contenido()).orElseThrow(), imagen.nombre(), imagen.contenido());
+            porGuardar.add(guardar);
+            rutas.add(RegistroAtractivo.RUTA_IMAGENES + guardar.id());
+        }
+        return new Registro(new ServicioComercial(id, prestadorId, nombre, categoria, detalle, descripcion, coordenada,
+                contacto, EstadoPublicacion.Pendiente, prestadorActivo, accesibilidad, horario, precio, rutas, direccion,
+                oferta, rnt, fechaRegistro, null), porGuardar);
+    }
+
+    /** Las mismas reglas que las fotos de un atractivo y la galería (RF48): cantidad y cada archivo. */
+    private void validarImagenes(List<ImagenSubida> imagenes) {
+        PoliticaImagen.motivoCantidad(imagenes.size()).ifPresent(motivo -> campos.agregar("imagenes", motivo));
+        if (imagenes.size() > PoliticaImagen.MAXIMO) {
+            return;
+        }
+        for (int i = 0; i < imagenes.size(); i++) {
+            String campo = "imagenes[" + i + "]";
+            PoliticaImagen.motivo(imagenes.get(i)).ifPresent(motivo -> campos.agregar(campo, motivo));
+        }
     }
 
     // ------------------------------------------------------------------ datos generales (RF09)

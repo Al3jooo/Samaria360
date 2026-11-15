@@ -67,6 +67,14 @@
             <version>${springdoc.version}</version>
         </dependency>
 
+        <!-- ============ Eventos en RabbitMQ (ADR-003 nivel 3, ADR-011, DEC-293) ============ -->
+        <dependency>
+            <!-- Outbox y publisher confirms; desde la iteración H, también el consumidor del promedio (RF61). Versión
+                 gestionada por Spring Boot. -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
         <!-- ============ Pruebas ============ -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -93,6 +101,19 @@
             <!-- mongo:7.0, la misma imagen de docker-compose: ejecuta los scripts de infra/mongo/init -->
             <groupId>org.testcontainers</groupId>
             <artifactId>mongodb</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- RabbitMQ real en las pruebas del relevo de eventos (ADR-011). -->
+            <groupId>org.testcontainers</groupId>
+            <artifactId>rabbitmq</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- Valida cada evento publicado contra docs/sad/api/eventos.schema.json (ADR-011). Solo pruebas. -->
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>1.5.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>

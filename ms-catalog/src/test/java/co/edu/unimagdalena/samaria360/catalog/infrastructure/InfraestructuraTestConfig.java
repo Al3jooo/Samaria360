@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.DynamicPropertyRegistrar;
 import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.utility.MountableFile;
 
 import java.time.Instant;
 
@@ -26,6 +28,35 @@ public class InfraestructuraTestConfig {
         mongo.start();
         MongoDePrueba.prepararCatalogoCompleto(mongo);
         return mongo;
+    }
+
+    /** RabbitMQ real con la topología de infra/rabbitmq/definiciones.json (ADR-011), con el usuario guest. */
+    @Bean
+    RabbitMQContainer rabbitmq() {
+        RabbitMQContainer rabbit = new RabbitMQContainer("rabbitmq:4.1.4-management-alpine")
+                .withCopyFileToContainer(MountableFile.forHostPath("../infra/rabbitmq/definiciones.json"),
+                        "/tmp/definiciones.json");
+        rabbit.start();
+        try {
+            rabbit.execInContainer("rabbitmqctl", "import_definitions", "/tmp/definiciones.json");
+            rabbit.execInContainer("rabbitmqctl", "set_permissions", "-p", "samaria360", "guest", ".*", ".*", ".*");
+        } catch (java.io.IOException e) {
+            throw new java.io.UncheckedIOException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(e);
+        }
+        return rabbit;
+    }
+
+    @Bean
+    DynamicPropertyRegistrar rabbitmqDePrueba(RabbitMQContainer rabbit) {
+        return registro -> {
+            registro.add("spring.rabbitmq.host", rabbit::getHost);
+            registro.add("spring.rabbitmq.port", rabbit::getAmqpPort);
+            registro.add("spring.rabbitmq.username", () -> "guest");
+            registro.add("spring.rabbitmq.password", () -> "guest");
+        };
     }
 
     /** Hora fija para {@code fechaActualizacion} y {@code fechaPublicacion}: cada prueba la ajusta. */

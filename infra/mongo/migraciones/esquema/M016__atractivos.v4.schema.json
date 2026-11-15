@@ -1,0 +1,106 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": ["gestorId", "nombre", "coordenadas", "limiteCapacidadCarga", "fechaRegistro", "version"],
+    "properties": {
+      "ocupacionActual": {
+        "bsonType": "object",
+        "description": "Última ocupación que registró el Gestor (RF39, DEC-304); su historial está en la colección ocupaciones",
+        "required": ["valor", "fecha"],
+        "additionalProperties": false,
+        "properties": {
+          "valor": { "bsonType": "int", "minimum": 0, "maximum": 1000000 },
+          "fecha": { "bsonType": "date" }
+        }
+      },
+      "calificacion": {
+        "bsonType": "object",
+        "description": "Promedio visible de RF17, copiado de PromedioActualizado de ms-analytics (DEC-302); solo avanza con una version mayor",
+        "required": ["cantidad", "version"],
+        "additionalProperties": false,
+        "properties": {
+          "promedio": { "bsonType": ["double", "null"], "minimum": 1, "maximum": 5 },
+          "cantidad": { "bsonType": ["int", "long"], "minimum": 0 },
+          "version": { "bsonType": ["int", "long"], "minimum": 1 }
+        }
+      },
+      "_id": { "bsonType": "objectId" },
+      "gestorId": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "id_usuario del Gestor que registró el atractivo (DEC-206) — referencia a Auth Service, sin FK física"
+      },
+      "nombre": { "bsonType": "string", "minLength": 1, "maxLength": 120 },
+      "coordenadas": {
+        "bsonType": "object",
+        "required": ["type", "coordinates"],
+        "properties": {
+          "type": { "enum": ["Point"] },
+          "coordinates": {
+            "bsonType": "array",
+            "description": "¡ALERTA GEOJSON! El orden exacto debe ser [longitud, latitud]. Rango válido: longitud (-180 a 180), latitud (-90 a 90).",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": { "bsonType": "double" }
+          }
+        }
+      },
+      "descripcion": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 1000,
+        "description": "RF06. Obligatoria en los registros nuevos (DEC-207)"
+      },
+      "categoria": {
+        "enum": ["Naturaleza", "Cultura"],
+        "description": "RF06. Vocabulario decidido por el equipo, no por el SRS (DEC-214). Obligatoria en los registros nuevos"
+      },
+      "imagenes": {
+        "bsonType": "array",
+        "maxItems": 5,
+        "description": "Rutas públicas de las imágenes (RF06, DEC-209): /api/v1/catalogo/imagenes/{id} (GridFS) o, en la semilla, /imagenes/catalogo/*.webp. De 1 a 5 en los registros nuevos",
+        "items": { "bsonType": "string", "minLength": 1 }
+      },
+      "limiteCapacidadCarga": {
+        "bsonType": "int",
+        "minimum": 1,
+        "maximum": 100000,
+        "description": "Capacidad de carga máxima (RF07, DEC-212)"
+      },
+      "estadoOperativo": {
+        "enum": ["Abierto", "Cerrado_temporalmente", "En_mantenimiento"],
+        "description": "RF33 (DEC-210). Obligatorio en los registros nuevos"
+      },
+      "normasAmbientales": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 1000,
+        "description": "Normas ambientales (RF24); máximo de WF-09"
+      },
+      "horarioAtencion": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 500,
+        "description": "Días y horarios de atención como texto (RF58, DEC-208; cierra HC4)"
+      },
+      "condicionesAccesibilidad": {
+        "bsonType": "array",
+        "uniqueItems": true,
+        "items": { "bsonType": "string", "enum": ["MovilidadReducida", "Visual", "Auditiva"] }
+      },
+      "fechaRegistro": {
+        "bsonType": "date",
+        "description": "Instante del registro (RelojPort). Los atractivos anteriores a M012 la toman del _id"
+      },
+      "fechaActualizacion": {
+        "bsonType": "date",
+        "description": "Instante de la última edición o cambio de estado del Gestor"
+      },
+      "version": {
+        "bsonType": "int",
+        "minimum": 0,
+        "description": "Versión del documento (DEC-207, como DEC-186): la sube cada edición y cada cambio de estado del Gestor. Los atractivos anteriores la reciben en 0 (M012)"
+      }
+    }
+  }
+}

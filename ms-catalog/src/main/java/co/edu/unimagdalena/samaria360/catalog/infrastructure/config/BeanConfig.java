@@ -1,5 +1,9 @@
 package co.edu.unimagdalena.samaria360.catalog.infrastructure.config;
 
+import co.edu.unimagdalena.samaria360.catalog.application.port.in.OfertaServicioUseCase;
+import co.edu.unimagdalena.samaria360.catalog.application.port.out.HistorialModificacionesPort;
+import co.edu.unimagdalena.samaria360.catalog.application.port.out.OfertaServicioPort;
+import co.edu.unimagdalena.samaria360.catalog.application.service.OfertaServicioService;
 import co.edu.unimagdalena.samaria360.catalog.application.port.in.ActualizarAtractivoUseCase;
 import co.edu.unimagdalena.samaria360.catalog.application.port.in.ActualizarCuentaUseCase;
 import co.edu.unimagdalena.samaria360.catalog.application.port.in.ConsultarAtractivoUseCase;
@@ -46,6 +50,7 @@ import co.edu.unimagdalena.samaria360.catalog.application.port.out.VisibilidadPr
 import co.edu.unimagdalena.samaria360.catalog.application.service.ActualizarCuentaService;
 import co.edu.unimagdalena.samaria360.catalog.application.service.ActualizarServicioService;
 import co.edu.unimagdalena.samaria360.catalog.application.service.AdministrarServiciosService;
+import co.edu.unimagdalena.samaria360.catalog.application.port.out.OutboxEventosPort;
 import co.edu.unimagdalena.samaria360.catalog.application.service.ConsultarMisServiciosService;
 import co.edu.unimagdalena.samaria360.catalog.application.service.RegistrarServicioService;
 import co.edu.unimagdalena.samaria360.catalog.application.service.BuscarOfertaService;
@@ -65,8 +70,8 @@ import org.springframework.context.annotation.Configuration;
 public class BeanConfig {
 
     @Bean
-    public BuscarOfertaUseCase buscarOfertaUseCase(OfertaRepositoryPort ofertas) {
-        return new BuscarOfertaService(ofertas);
+    public BuscarOfertaUseCase buscarOfertaUseCase(OfertaRepositoryPort ofertas, RelojPort reloj) {
+        return new BuscarOfertaService(ofertas, reloj);
     }
 
     @Bean
@@ -120,8 +125,9 @@ public class BeanConfig {
 
     @Bean
     public RegistrarServicioUseCase registrarServicioUseCase(GestionServiciosPort servicios,
-                                                             CuentaRepositoryPort cuentas, RelojPort reloj) {
-        return new RegistrarServicioService(servicios, cuentas, reloj);
+                                                             CuentaRepositoryPort cuentas, RelojPort reloj,
+                                                             AlmacenImagenesPort imagenes) {
+        return new RegistrarServicioService(servicios, cuentas, reloj, imagenes);
     }
 
     @Bean
@@ -130,8 +136,12 @@ public class BeanConfig {
     }
 
     @Bean
-    public ActualizarServicioUseCase actualizarServicioUseCase(GestionServiciosPort servicios) {
-        return new ActualizarServicioService(servicios);
+    public ActualizarServicioUseCase actualizarServicioUseCase(GestionServiciosPort servicios,
+                                                               HistorialModificacionesPort historial, RelojPort reloj,
+                                                               org.springframework.data.mongodb.MongoTransactionManager transacciones) {
+        // RF41 (DEC-311): el cambio de precio y su entrada del historial, en una transacción.
+        return HistorialTransaccional.edicion(new ActualizarServicioService(servicios, historial, reloj),
+                new org.springframework.transaction.support.TransactionTemplate(transacciones));
     }
 
     @Bean
@@ -170,9 +180,23 @@ public class BeanConfig {
         return new ConsultarAgendaService(eventos, reloj);
     }
 
+    /** Aprobación de servicios (RF21): la decisión y su evento en una transacción de MongoDB (DEC-293). */
     @Bean
     public AdministrarServiciosUseCase administrarServiciosUseCase(GestionServiciosPort servicios,
-                                                                   CuentaRepositoryPort cuentas, RelojPort reloj) {
-        return new AdministrarServiciosService(servicios, cuentas, reloj);
+                                                                   CuentaRepositoryPort cuentas, RelojPort reloj,
+                                                                   OutboxEventosPort outbox,
+                                                                   org.springframework.data.mongodb.MongoTransactionManager transacciones) {
+        return new AdministrarServiciosTransaccional(new AdministrarServiciosService(servicios, cuentas, reloj, outbox),
+                new org.springframework.transaction.support.TransactionTemplate(transacciones));
+    }
+
+    /** RF41, RF19 (plantilla) y RF48 (DEC-311, DEC-313). */
+    @Bean
+    public OfertaServicioUseCase ofertaServicioUseCase(GestionServiciosPort servicios, OfertaServicioPort oferta,
+                                                       HistorialModificacionesPort historial,
+                                                       AlmacenImagenesPort imagenes, RelojPort reloj,
+                                                       org.springframework.data.mongodb.MongoTransactionManager transacciones) {
+        return HistorialTransaccional.oferta(new OfertaServicioService(servicios, oferta, historial, imagenes, reloj),
+                new org.springframework.transaction.support.TransactionTemplate(transacciones));
     }
 }

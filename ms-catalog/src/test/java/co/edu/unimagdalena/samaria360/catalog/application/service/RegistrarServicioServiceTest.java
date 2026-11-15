@@ -108,4 +108,39 @@ class RegistrarServicioServiceTest {
         assertThat(conCarrera.guardado(servicio.getId().orElseThrow()).isPrestadorActivo()).isFalse();
         assertThat(conCarrera.guardado(servicio.getId().orElseThrow()).esVisibleEnBusquedaPublica()).isFalse();
     }
+
+    private static final byte[] JPEG = java.util.Arrays.copyOf(new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF}, 32);
+
+    /** DEC-318: con fotos, se guardan en el almacén y el servicio lleva sus rutas. */
+    @Test
+    void conFotosGuardaLasImagenesYElServicioLasReferencia() {
+        cuentas.agregar(new Cuenta(PRESTADOR, RolCuenta.Prestador, EstadoCuenta.Activo, 3, "RNT-54321"));
+        co.edu.unimagdalena.samaria360.catalog.application.fake.AlmacenImagenesEnMemoria almacen =
+                new co.edu.unimagdalena.samaria360.catalog.application.fake.AlmacenImagenesEnMemoria();
+        RegistrarServicioService conFotos = new RegistrarServicioService(servicios, cuentas, new RelojFijo(AHORA), almacen);
+
+        ServicioComercial servicio = conFotos.registrar(PRESTADOR, Borradores.tour(), java.util.List.of(
+                new co.edu.unimagdalena.samaria360.catalog.domain.model.ImagenSubida("a.jpg", JPEG)));
+
+        assertThat(almacen.ids()).hasSize(1);
+        assertThat(servicio.getImagenes()).containsExactly("/api/v1/catalogo/imagenes/" + almacen.ids().iterator().next());
+        assertThat(servicios.guardado(servicio.getId().orElseThrow()).getImagenes()).hasSize(1);
+    }
+
+    /** Si una imagen no se guarda, se borran las anteriores y el servicio no se inserta (compensación). */
+    @Test
+    void siFallaUnaImagenSeBorranLasGuardadasYNoQuedaElServicio() {
+        cuentas.agregar(new Cuenta(PRESTADOR, RolCuenta.Prestador, EstadoCuenta.Activo, 3, "RNT-54321"));
+        co.edu.unimagdalena.samaria360.catalog.application.fake.AlmacenImagenesEnMemoria almacen =
+                new co.edu.unimagdalena.samaria360.catalog.application.fake.AlmacenImagenesEnMemoria();
+        almacen.fallarAlGuardarLaNumero(2, new IllegalStateException("GridFS caído"));
+        RegistrarServicioService conFotos = new RegistrarServicioService(servicios, cuentas, new RelojFijo(AHORA), almacen);
+        co.edu.unimagdalena.samaria360.catalog.domain.model.ImagenSubida imagen =
+                new co.edu.unimagdalena.samaria360.catalog.domain.model.ImagenSubida("a.jpg", JPEG);
+
+        assertThatThrownBy(() -> conFotos.registrar(PRESTADOR, Borradores.tour(), java.util.List.of(imagen, imagen)))
+                .isInstanceOf(IllegalStateException.class);
+        assertThat(almacen.ids()).isEmpty();
+        assertThat(servicios.todos()).isEmpty();
+    }
 }
