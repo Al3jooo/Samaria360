@@ -24,7 +24,7 @@ Fase de Construcción (RUP). Caso de uso implementado antes del plan del 60 % (D
 Reglas que el SRS no fija y que decidió el equipo (`docs/trazabilidad.md`):
 - **D3 (orden):** solo el bloqueo (423) se responde antes de verificar la contraseña; una contraseña incorrecta responde 401 con el mismo mensaje que un correo inexistente y suma un intento, sea cual sea el estado de la cuenta; el estado (403) solo se revela con la contraseña correcta, y entonces el conteo vuelve a 0.
 - **ADR-006:** con un correo inexistente se compara igual un hash BCrypt ficticio, para que el tiempo de respuesta no revele qué correos existen. El 423 sí revela que la cuenta existe: riesgo residual aceptado (mitigación pendiente: límite de tasa en el gateway).
-- **DEC-29:** el token vence a los 15 minutos y lleva el claim `ver`; no hay token de refresco («Pendientes»).
+- **DEC-29:** el token vence a los 15 minutos y lleva el claim `ver`. **DEC-317:** no hay token de refresco; con el usuario activo, el cliente renueva el token en su último minuto (`POST /api/v1/auth/sesion/renovacion`), hasta 8 horas desde el inicio de sesión (claim `ini`).
 - **DEC-47 a DEC-50:** la sesión se guarda en `sessionStorage`; se cierra al llegar a `expiraEn`, con un 401 o con un 403 `CUENTA_INACTIVA` de una petición autenticada, y avisa por qué.
 
 ## Diagrama de casos de uso

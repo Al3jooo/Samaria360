@@ -292,7 +292,7 @@ BIC ..> [JWKS] : valida firma
 
 - **RF45** (asignar, modificar o revocar el rol de Gestor o Administrador): es el CU [«Cambiar rol de cuenta»](CU-cambiar-rol-cuenta.md). Usa el mismo mecanismo: el evento lleva el rol y la versión sube con cada cambio de rol, así que un cambio de rol invalida los tokens viejos.
 - **Reactivar a un prestador inactivo o rechazado** (DEC-37).
-- **Notificar** al prestador o al turista del cambio (RF30, RF63, RF34): ms-notificaciones.
+- **Notificar** al prestador o al turista del cambio: sin RF en el SRS (RF30 y RF63 cubren solo las reservas y RF34 solo la recuperación de contraseña); el correo saldría de ms-auth por SMTP directo y el aviso interno, de ms-analytics vía RabbitMQ.
 - **Registro de auditoría** (log de RF29): solo se guarda la última revisión del prestador (`revisado_en`, `revisado_por`).
 - **Token de refresco:** el turista vuelve a iniciar sesión cada 15 minutos hasta que exista (ADR-008).
 - **La pantalla WF-12:** la implementa la sesión B de la iteración.

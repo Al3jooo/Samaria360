@@ -157,5 +157,5 @@ GW --> FE
 ## Fuera de alcance de este CU
 
 - **Cambiar el correo o la contraseña** (DEC-79): no hay RF que lo pida, y cambiar el correo abriría la enumeración de cuentas.
-- **Notificar el cambio** al turista (RF34, ms-notificaciones).
+- **Notificar el cambio** al turista (sin RF en el SRS: RF34 es la recuperación de contraseña; el correo saldría de ms-auth por SMTP directo).
 - **La pantalla WF-16:** la implementa la sesión B de la iteración.

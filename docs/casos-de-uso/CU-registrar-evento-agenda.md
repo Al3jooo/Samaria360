@@ -182,5 +182,5 @@ EventoTuristico ..> TextoAcotado
 
 - Editar, borrar o despublicar un evento (DEC-215).
 - Vincular un evento a un atractivo: el §2.4 guarda la ubicación como texto.
-- Notificar a los turistas de un evento nuevo (ms-notificaciones).
+- Notificar a los turistas de un evento nuevo (sin RF en el SRS; si se agrega, ms-analytics vía RabbitMQ).
 - Las pantallas (sesión B2).

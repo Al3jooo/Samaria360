@@ -51,7 +51,7 @@ RR ..> VD : <<include>>
 RR ..> NC : <<include>>
 CR ..> NC : <<include>>
 CR ..> VA : <<include>>
-note right of NC : Pendiente: llega con\nms-notificaciones
+note right of NC : Pendiente: llega con\nms-analytics (RabbitMQ)
 @enduml
 ```
 
@@ -245,7 +245,7 @@ stop
 
 ## Fuera de alcance
 
-- «Notificar cambios de reserva» (RF13, RF30, RF63; ms-notificaciones).
+- «Notificar cambios de reserva» (RF13, RF30, RF63; ms-analytics vía RabbitMQ).
 - Modificar fechas, horarios y cupos de un servicio ya registrado, y reconciliar las filas ya materializadas con una oferta nueva (RF19, DEC-34, DEC-130).
 - Pagos y «Notificarme si se libera» de WF-10 (sin requisito).
 - «Cancelar reserva» (RF18, RF44): implementada, pero sin documento de CU propio (HC1).

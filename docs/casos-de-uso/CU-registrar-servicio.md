@@ -72,10 +72,10 @@ note right of CMS : Flujo de consulta del resultado\nde «Registrar servicio com
 **Flujo básico:**
 1. El Prestador abre WF-08 desde «Mis servicios» y elige la categoría.
 2. El sistema muestra los datos generales (RF09), los campos de la categoría (RF10), el precio «desde» (RF37), la accesibilidad (RF27), el horario (RF58), la dirección, el pin en el mapa y, en Tour y Alojamiento, la oferta inicial.
-3. El Prestador completa el formulario (en Alojamiento, una o más unidades) y elige **Enviar a aprobación**.
-4. El sistema envía `POST /api/v1/catalogo/prestador/servicios`.
+3. El Prestador completa el formulario (en Alojamiento, una o más unidades), agrega de 1 a 5 fotos (DEC-318) y elige **Enviar a aprobación**.
+4. El sistema envía `POST /api/v1/catalogo/prestador/servicios` en multipart: los datos y las fotos.
 5. ms-catalog lee la fila del prestador en `cuentas` y comprueba que esté `Activo` y tenga RNT.
-6. ms-catalog valida cada campo y genera el id del servicio y los `idUnidad`.
+6. ms-catalog valida cada campo y cada foto, genera el id del servicio y los `idUnidad`, y guarda las fotos en GridFS (si algo falla después, las borra).
 7. ms-catalog guarda el servicio `Pendiente`, con `prestadorId` = `sub`, la copia del RNT, `prestadorActivo` de la proyección y `fechaRegistro`. En Alojamiento, `precioBase` es el menor `precioNoche`.
 8. ms-catalog relee la proyección: si el prestador se inactivó mientras tanto, oculta el servicio (DEC-142).
 9. El sistema responde 201 con el servicio y `Location`. La pantalla lleva al detalle propio del servicio (WF-18) con el aviso «Enviado a aprobación» y el estado «Pendiente de aprobación» (DEC-168).
@@ -93,6 +93,7 @@ note right of CMS : Flujo de consulta del resultado\nde «Registrar servicio com
 - **FA5. Campos del servidor en el cuerpo.** `prestadorId`, `estadoPublicacion`, `prestadorActivo`, `rnt`, `idUnidad` o el `precioBase` de un alojamiento se ignoran (DEC-141).
 - **FA6. El prestador se inactiva durante el registro (RF22, DEC-142).** El servicio queda guardado con `prestadorActivo = false`: no se verá aunque se apruebe.
 - **FA7. Detalle de un servicio ajeno o inexistente.** 404 `SERVICIO_NO_ENCONTRADO`.
+- **FA9. Fotos inválidas (DEC-318).** Sin fotos, más de 5, un archivo que no es JPEG ni PNG o de más de 5 MB → 400 `DATOS_INVALIDOS` con `campos.imagenes` o `campos["imagenes[i]"]`, junto con los errores de los datos. No se guarda nada.
 - **FA8. Estado o página inválidos en «Mis servicios».** 400 `DATOS_INVALIDOS` con `campos.estado` (`NO_PERMITIDO`) o `campos.pagina` (`FORMATO`).
 
 **Postcondiciones:**
@@ -111,6 +112,7 @@ note right of CMS : Flujo de consulta del resultado\nde «Registrar servicio com
 | C6 | 401 sin token o con `ver` viejo; 403 a otro rol y a un prestador sin fila, no Activo o sin RNT | `RegistrarServicioApiIntegracionTest` |
 | C7 | «Mis servicios»: solo los propios, filtro por estado, páginas de 10, motivo del rechazo | `AprobacionServicioApiIntegracionTest`, `ConsultarMisServiciosServiceTest` |
 | C8 | La carrera con RF22 nunca deja visible un servicio de un prestador inactivo | `RegistrarServicioServiceTest`, `CarreraRegistroInactivacionTest` |
+| C9 | Con fotos (DEC-318): se guardan y se sirven; sin fotos, 400 `imagenes`; si una no se guarda, se borran las anteriores y no queda el servicio | `RegistroServicioTest`, `RegistrarServicioServiceTest`, `RegistrarServicioApiIntegracionTest`, `registrarServicio.test.tsx` |
 
 ## Secuencia
 
@@ -209,7 +211,6 @@ DecisionServicio ..> EstadoPublicacion : estadoDestino
 ## Fuera de alcance
 
 - Editar o reenviar un servicio rechazado (iteración D); `Rechazado` es final en C.
-- Imágenes del servicio (RF48, GridFS en la iteración E, DEC-55): el registro guarda `imagenes` vacía.
 - Modificar fechas, horarios y cupos de un servicio ya registrado (RF19, DEC-34).
 - Materializar el inventario (ms-booking, sesión A2, DEC-135).
 - Oferta de Gastronomía y Alquiler: no son reservables (D2 de «Reservar servicio», DEC-136).

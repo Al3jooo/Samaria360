@@ -191,7 +191,7 @@ end
 - **Vigencia automática** de los avisos (DEC-58): exigiría un programador sin un requisito que lo respalde.
 - **Editar o borrar** un aviso (DEC-64).
 - **«Noticias»** del pie de página (columna «Municipio»): RF40 no la define; sigue deshabilitada.
-- **Notificar** los avisos por otros canales (RF30, RF63): ms-notificaciones.
+- **Notificar** los avisos por otros canales: sin RF en el SRS (RF30 y RF63 cubren solo las reservas); si se agrega, ms-analytics vía RabbitMQ.
 - **Registro de auditoría** (RF13).
 - **Mensajes en varios idiomas** (DEC-69).
 - **Las pantallas** (gestión WF-14 y banner): las implementa la sesión B de la iteración.

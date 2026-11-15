@@ -231,6 +231,6 @@ end
 
 - **Cambiar el rol de un Prestador** (DEC-82; diferencia con el SRS, DEC-113).
 - **Desactivar a un Gestor o a un Administrador:** RF62 solo aplica al turista, y la ruta de turistas responde 404 para el personal.
-- **Notificar** a la cuenta del cambio de rol (RF13, RF30, RF63): ms-notificaciones.
+- **Auditar** el cambio de rol (RF13): ms-analytics vía RabbitMQ. **Notificar** a la cuenta del cambio: sin RF en el SRS (RF30 y RF63 cubren solo las reservas).
 - **Registro de auditoría** de los cambios de rol: el outbox guarda los eventos, pero no es un registro de auditoría (RF29 no aplica aquí).
 - **Las pantallas** de WF-12 (pestaña «Personal», «Asignar rol», diálogos y mensajes): sesión B de la iteración.
