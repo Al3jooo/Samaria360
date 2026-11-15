@@ -4,7 +4,8 @@
 - **Fecha:** 2026-11-05
 - **Fase:** Construcción (RUP), después de la iteración E «Atractivos y agenda»
 - **Componentes:** `ms-auth`, `ms-catalog`, `ms-booking` y `api-gateway` (Spring Boot 3.5.16; Spring Cloud 2025.0.3 en
-  `ms-booking` y `api-gateway`; Java 17)
+  `ms-booking` y `api-gateway`; Java 17). **Enmienda DEC-324:** `ms-analytics` y `ms-chatbot` (plan del 100 %) nacieron
+  en la misma línea, Spring Boot 3.5.16 con Java 17 y sin Spring Cloud; la decisión vale para los seis servicios
 - **Requisitos:** RNF05 (seguridad), RNF01 (disponibilidad)
 
 ## Contexto
