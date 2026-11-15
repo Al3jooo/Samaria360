@@ -19,8 +19,8 @@ import java.util.Map;
 
 /**
  * Redactor con Gemini, el «Proveedor LLM» de la figura 20 (decisión 5 del equipo; DEC-297). La llave va en la cabecera
- * {@code x-goog-api-key} (nunca en la URL ni en los logs). Se envía solo el mensaje, las sugerencias y la base de
- * conocimientos: ningún dato personal (el nivel gratuito puede usar lo enviado). La instrucción del sistema restringe el
+ * {@code x-goog-api-key} (nunca en la URL ni en los logs). Se envía solo el mensaje, las sugerencias (sin su
+ * justificación, que delataría los intereses del turista) y la base de conocimientos: ningún dato personal (el nivel gratuito puede usar lo enviado). La instrucción del sistema restringe el
  * modelo a ese contexto, en el idioma de la interfaz (RF59), y le pide decir que no sabe si no está ahí (RF05). Tope de
  * tokens por respuesta. Si Gemini falla o tarda, redacta con las reglas.
  */
@@ -90,10 +90,12 @@ public class RedactorGeminiAdapter implements ModeloLenguajePort {
         if (!contexto.catalogoDisponible()) {
             texto.append("- El catálogo no está disponible en este momento.\n");
         }
-        texto.append("Opciones del catálogo (con su justificación):\n");
+        // Sin la justificación de RF36 ni el criterio: «Coincide con tus intereses (Naturaleza)» revelaría los
+        // intereses del turista (DEC-297). La pantalla muestra la justificación de cada sugerencia aparte.
+        texto.append("Opciones del catálogo:\n");
         for (Sugerencia s : contexto.sugerencias()) {
             texto.append("- ").append(s.item().nombre()).append(" (").append(s.item().categoria()).append("): ")
-                    .append(s.item().descripcionCorta()).append(" Justificación: ").append(s.justificacion()).append('\n');
+                    .append(s.item().descripcionCorta()).append('\n');
         }
         if (!contexto.itinerario().isEmpty()) {
             texto.append("Itinerario propuesto:\n");
