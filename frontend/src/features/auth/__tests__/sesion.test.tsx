@@ -112,12 +112,15 @@ describe('Menú del avatar', () => {
     expect(opciones.map((opcion) => opcion.textContent)).toEqual([
       'Mi perfil',
       'Mis favoritos',
+      'Mis itinerarios',
       'Mis reservas',
       'Cerrar sesión',
     ])
-    expect(opciones[2]).toHaveAttribute('href', '/mis-reservas')
+    // DEC-298: «Mis itinerarios» (WF-31) va con el perfil.
+    expect(opciones[2]).toHaveAttribute('href', '/perfil/itinerarios')
+    expect(opciones[3]).toHaveAttribute('href', '/mis-reservas')
 
-    await usuario.click(opciones[2])
+    await usuario.click(opciones[3])
     // La navegación va en una transición: la ruta cambia cuando llega la página diferida.
     await waitFor(() => expect(ubicacionActual()).toBe('/mis-reservas'))
     expect(screen.queryByRole('menu')).not.toBeInTheDocument()
@@ -128,19 +131,23 @@ describe('Menú del avatar', () => {
     await usuario.click(avatar)
 
     // DEC-161: el Prestador tiene sus propias pantallas (WF-18 y WF-08), pero no «Mis reservas»; DEC-197: su
-    // historial de reservas (WF-23) y su perfil comercial (WF-22).
+    // historial de reservas (WF-23) y su perfil comercial (WF-22); DEC-311 y DEC-312: WF-39 y WF-40.
     const opciones = within(screen.getByRole('menu')).getAllByRole('menuitem')
     expect(opciones.map((opcion) => opcion.textContent)).toEqual([
       'Mis servicios',
       'Registrar servicio',
       'Historial de reservas',
       'Mi perfil comercial',
+      'Calificaciones recibidas',
+      'Mi panel',
+      'Historial de modificaciones',
+      'Asistentes',
       'Cerrar sesión',
     ])
     await waitFor(() => expect(opciones[0]).toHaveFocus())
   })
 
-  it('para el Administrador, sus cuatro pantallas van antes de «Cerrar sesión» (WF-12 a WF-14 y WF-19, DEC-70, DEC-174)', async () => {
+  it('para el Administrador, sus pantallas van antes de «Cerrar sesión» (WF-12 a WF-14, WF-19 y WF-30, DEC-70, DEC-174, DEC-294)', async () => {
     const { usuario, avatar } = await abrirMenu(USUARIO_ADMIN)
     await usuario.click(avatar)
 
@@ -150,12 +157,23 @@ describe('Menú del avatar', () => {
       'Aprobar servicios',
       'Preguntas frecuentes',
       'Avisos',
+      'Moderación',
+      'Base de conocimientos',
+      'Auditoría',
+      'Tableros',
       'Cerrar sesión',
     ])
     expect(opciones[0]).toHaveAttribute('href', '/admin/cuentas')
     expect(opciones[1]).toHaveAttribute('href', '/admin/servicios')
     expect(opciones[2]).toHaveAttribute('href', '/admin/preguntas-frecuentes')
     expect(opciones[3]).toHaveAttribute('href', '/admin/avisos')
+    // DEC-297: la base de conocimientos del asistente (WF-32).
+    // DEC-303: el panel de moderación (WF-34).
+    expect(opciones[4]).toHaveAttribute('href', '/admin/moderacion')
+    expect(opciones[5]).toHaveAttribute('href', '/admin/conocimiento')
+    expect(opciones[6]).toHaveAttribute('href', '/admin/auditoria')
+    // DEC-308: los tableros (WF-35, RF14).
+    expect(opciones[7]).toHaveAttribute('href', '/tableros')
     // El foco inicial va a la primera opción, «Administrar cuentas».
     await waitFor(() => expect(opciones[0]).toHaveFocus())
   })

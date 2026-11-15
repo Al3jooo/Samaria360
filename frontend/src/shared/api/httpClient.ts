@@ -96,6 +96,11 @@ export async function solicitar<T>(ruta: string, opciones: OpcionesSolicitud = {
   if (respuesta.status === 204) {
     return undefined as T
   }
+  // 202 puede llegar sin cuerpo (PUT de la plantilla de RF19, DEC-310) o con él (registro, ADR-006).
+  if (respuesta.status === 202) {
+    const texto = await respuesta.text()
+    return (texto === '' ? undefined : JSON.parse(texto)) as T
+  }
   return (await respuesta.json()) as T
 }
 

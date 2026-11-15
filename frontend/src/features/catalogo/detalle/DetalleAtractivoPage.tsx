@@ -1,3 +1,5 @@
+import { AlertaAfluencia, DestinosAlternativos } from '../../afluencia/SeccionesAfluencia'
+import { useAfluencia } from '../../afluencia/afluenciaApi'
 import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useParams } from 'react-router-dom'
@@ -9,6 +11,10 @@ import { MapaSoloLectura } from '../../servicios/MapaSoloLectura'
 import { ImagenOferta } from '../componentes/ImagenOferta'
 import { InsigniaEstadoOperativo } from '../componentes/InsigniaEstadoOperativo'
 import { etiquetaCategoria } from '../componentes/etiquetas'
+import { BotonReportar } from '../../calificaciones/BotonReportar'
+import { ResumenCalificacion } from '../../calificaciones/Estrellas'
+import { SeccionCalificaciones } from '../../calificaciones/SeccionCalificaciones'
+import { useCalificacionesEntidad } from '../../calificaciones/useCalificacionesEntidad'
 import { useDetalleAtractivo, type DetalleAtractivo } from './atractivoApi'
 import { NoDisponible, RegionDeshabilitada } from './DetalleServicioPage'
 import { leerVolverA } from './navegacionDetalle'
@@ -67,6 +73,10 @@ function FichaAtractivo({ atractivo }: { atractivo: DetalleAtractivo }) {
   const [portada, ...resto] = atractivo.imagenes
   const miniaturas = resto.slice(0, MAXIMO_MINIATURAS)
   const { condicionesAccesibilidad, normasAmbientales, horarioAtencion } = atractivo
+  // RF17 (DEC-303): cualquier turista con la cuenta Activa califica un atractivo.
+  const calificaciones = useCalificacionesEntidad('atractivo', atractivo.id)
+  // RF39, RF08 y RF51 (DEC-306): el nivel vigente, el límite y los alternativos, de ms-catalog.
+  const afluencia = useAfluencia(atractivo.id)
 
   return (
     <article className="detalle__ficha" aria-labelledby={idTitulo}>
@@ -80,7 +90,7 @@ function FichaAtractivo({ atractivo }: { atractivo: DetalleAtractivo }) {
             </span>
             <span aria-hidden="true"> · </span>
             <span>
-              {t('detalle.calificacion')} <NoDisponible />
+              {t('detalle.calificacion')} <ResumenCalificacion resultado={calificaciones.resultado} />
             </span>
           </p>
           {atractivo.estadoOperativo && <InsigniaEstadoOperativo estado={atractivo.estadoOperativo} />}
@@ -134,7 +144,7 @@ function FichaAtractivo({ atractivo }: { atractivo: DetalleAtractivo }) {
         )}
       </div>
 
-      <RegionDeshabilitada id={`${idTitulo}-afluencia`} titulo={t('detalle.alertaAfluencia')} />
+      <AlertaAfluencia resultado={afluencia} />
 
       <div className="detalle__cuerpo">
         <section aria-labelledby={`${idTitulo}-descripcion`}>
@@ -190,7 +200,13 @@ function FichaAtractivo({ atractivo }: { atractivo: DetalleAtractivo }) {
         </section>
       </div>
 
-      <RegionDeshabilitada id={`${idTitulo}-alternativos`} titulo={t('detalle.alternativos')} />
+      <SeccionCalificaciones tipo="atractivo" id={atractivo.id} {...calificaciones} />
+      {/* RF57 (DEC-301): también en la ficha del atractivo. */}
+      <p className="detalle__reportar">
+        <BotonReportar tipo="atractivo" id={atractivo.id} />
+      </p>
+
+      <DestinosAlternativos resultado={afluencia} />
     </article>
   )
 }

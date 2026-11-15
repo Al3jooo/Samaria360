@@ -68,3 +68,21 @@
 .mapa-oferta.mapa-servicio .mapa-oferta__lienzo {
   height: 16rem;
 }
+
+/* Fotos del registro en solo lectura (DEC-318). */
+.datos-servicio__fotos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-2, 0.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.datos-servicio__fotos img {
+  display: block;
+  width: 160px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: var(--radio-sm, 6px);
+}

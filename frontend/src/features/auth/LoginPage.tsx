@@ -9,7 +9,6 @@ import {
   IconoRayo,
   IconoSobre,
 } from '../../shared/components/Iconos'
-import { AccionNoDisponible } from '../../shared/components/BotonNoDisponible'
 import { RUTA_POLITICA_PRIVACIDAD, RUTA_TERMINOS } from '../../shared/rutasLegales'
 import { destinoTrasLogin } from './destinoTrasLogin'
 import { esEstadoTrasRegistro } from './estadoAcceso'
@@ -22,8 +21,8 @@ import './LoginPage.css'
 type Campo = 'correo' | 'contrasena'
 
 /**
- * WF-01: Inicio de sesión (RF15). «Registrarse» lleva a /registro (WF-02, WF-03); recuperar la contraseña (RF34) queda
- * visible pero deshabilitado. Después de registrarse llega con un mensaje y el correo escrito (por el estado del router).
+ * WF-01: Inicio de sesión (RF15). «Registrarse» lleva a /registro (WF-02, WF-03) y «¿Olvidaste tu contraseña?», a
+ * /recuperar (RF34, WF-27). Después de registrarse llega con un mensaje y el correo escrito (por el estado del router).
  */
 export function LoginPage() {
   const { t, i18n } = useTranslation()
@@ -160,7 +159,10 @@ export function LoginPage() {
               {errorDeCampo('contrasena')}
             </div>
 
-            <AccionNoDisponible className="enlace-olvido">{t('login.olvido')}</AccionNoDisponible>
+            {/* RF34 (DEC-285): antes deshabilitado; ahora lleva a pedir el enlace de recuperación. */}
+            <Link to="/recuperar" className="enlace-olvido">
+              {t('login.olvido')}
+            </Link>
 
             <p className="aviso-intentos">
               <IconoRayo />

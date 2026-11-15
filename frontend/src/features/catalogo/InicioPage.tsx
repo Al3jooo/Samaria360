@@ -23,11 +23,12 @@ const CATEGORIAS_INICIO: { categoria: Categoria; Icono: () => ReactNode }[] = [
 ]
 
 /**
- * «Destacados esta semana»: criterio PROVISIONAL (pendiente en docs/trazabilidad.md). Con orden por precio
- * ascendente, los atractivos (sin precio) van al final por la decisión 4, así que salen servicios; el criterio real
- * (p. ej. calificación o marca del gestor) lo debe definir el equipo.
+ * «Destacados esta semana» (DEC-317, decisión del equipo): los servicios mejor calificados (RF17, `orden=Calificacion`).
+ * La búsqueda mezcla servicios y atractivos y no filtra por tipo, así que se piden 10 y se muestran los 3 primeros
+ * servicios.
  */
-const CRITERIOS_DESTACADOS: CriteriosBusqueda = { accesibilidad: [], orden: 'PrecioAscendente', pagina: 1, tamano: 3 }
+const CRITERIOS_DESTACADOS: CriteriosBusqueda = { accesibilidad: [], orden: 'Calificacion', pagina: 1, tamano: 10 }
+const DESTACADOS_VISIBLES = 3
 
 /** WF-04: inicio y búsqueda (pública). El banner de avisos (RF40) no se muestra: no existe el modelo de avisos. */
 export function InicioPage() {
@@ -42,8 +43,10 @@ export function InicioPage() {
     navegar(buscado ? `/explorar?${new URLSearchParams({ texto: buscado })}` : '/explorar')
   }
 
-  // Por seguridad, solo servicios: el criterio provisional no filtra por tipo.
-  const servicios = destacados.estado === 'ok' ? destacados.pagina.elementos.filter((e) => e.tipo === 'Servicio') : []
+  const servicios =
+    destacados.estado === 'ok'
+      ? destacados.pagina.elementos.filter((e) => e.tipo === 'Servicio').slice(0, DESTACADOS_VISIBLES)
+      : []
   const disponibilidad = useDisponibilidadResumen(destacados.estado === 'ok' ? servicios : null)
 
   return (

@@ -7,7 +7,8 @@ import { SinPermiso } from '../shared/components/SinPermiso'
  * Sin sesión, cualquier ruta privada lleva al login y recuerda a dónde se quería ir. Con `rol` (DEC-51), una sesión de
  * otro rol ve «Sin permiso» y la página no se monta: no se descarga ni llama a la API (RNF06).
  */
-export function RutaProtegida({ rol }: { rol?: string }) {
+/** `rol` puede ser una lista: RF14 es del Administrador y del Gestor (DEC-308). */
+export function RutaProtegida({ rol }: { rol?: string | string[] }) {
   const { t } = useTranslation()
   const { sesion } = useSesion()
   const ubicacion = useLocation()
@@ -23,7 +24,7 @@ export function RutaProtegida({ rol }: { rol?: string }) {
     // Ruta completa (con ?consulta y #ancla) para volver exactamente a donde se quería ir.
     return <Navigate to="/login" replace state={{ desde: ubicacion.pathname + ubicacion.search + ubicacion.hash }} />
   }
-  if (rol && sesion.usuario.rol !== rol) {
+  if (rol && !(Array.isArray(rol) ? rol : [rol]).includes(sesion.usuario.rol)) {
     return <SinPermiso />
   }
   return <Outlet />

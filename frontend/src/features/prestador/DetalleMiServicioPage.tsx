@@ -3,6 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { BotonNoDisponible } from '../../shared/components/BotonNoDisponible'
 import { SinPermiso } from '../../shared/components/SinPermiso'
 import { formatearDia } from '../../shared/formato'
+import { GaleriaServicio } from '../oferta/GaleriaServicio'
 import { DatosServicio } from '../servicios/DatosServicio'
 import { InsigniaEstadoServicio } from '../servicios/InsigniaEstadoServicio'
 import { esEditable, type EstadoAnuncio } from './edicionServicio'
@@ -89,7 +90,11 @@ export function DetalleMiServicioPage() {
             </section>
           )}
           <h2>{t('prestador.detalle.datosEnviados')}</h2>
-          <DatosServicio servicio={servicio.datos} />
+          <DatosServicio servicio={servicio.datos} fotos={servicio.datos.estadoPublicacion !== 'Publicado'} />
+          {/* RF48 (DEC-313): la galería de un servicio aprobado se edita aquí, sin nueva aprobación. */}
+          {servicio.datos.estadoPublicacion === 'Publicado' && (
+            <GaleriaServicio idServicio={servicio.datos.id} imagenesIniciales={servicio.datos.imagenes ?? []} />
+          )}
           <div className="prestador__acciones">
             <Link className="boton-secundario" to="/prestador/servicios">
               {t('prestador.detalle.volver')}
@@ -110,6 +115,15 @@ export function DetalleMiServicioPage() {
                 >
                   {t('prestador.detalle.editarDatos')}
                 </Link>
+                {/* RF19 (DEC-310): cupos, fechas, horarios y plantilla; solo Tour y Alojamiento tienen oferta. */}
+                {servicio.datos.oferta && servicio.datos.estadoPublicacion === 'Publicado' && (
+                  <Link
+                    className="boton-secundario"
+                    to={`/prestador/servicios/${encodeURIComponent(servicio.datos.id)}/oferta`}
+                  >
+                    {t('prestador.detalle.gestionarOferta')}
+                  </Link>
+                )}
               </>
             )}
             {/* «Editar y reenviar»: fuera de la iteración D y siempre deshabilitado; solo en Rechazado (DEC-193). */}

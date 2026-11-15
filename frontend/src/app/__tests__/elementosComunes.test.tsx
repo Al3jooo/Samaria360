@@ -13,15 +13,16 @@ const CATALOGO = { 'GET /api/v1/catalogo/oferta': () => respuestaJson(200, pagin
 
 /** Elementos comunes de docs/wireframes/README.md, versión 2. */
 describe('Pantallas de la plataforma (WF-04 a WF-10)', () => {
-  it('el encabezado tiene Búsqueda, Servicios y Asistente IA, y ya no el icono de búsqueda', () => {
+  it('el encabezado tiene Búsqueda y Asistente IA (enlace a WF-07), sin «Servicios» (DEC-317) ni el icono de búsqueda', () => {
     simularFetch(CATALOGO)
     renderApp('/')
 
     const encabezado = screen.getByRole('banner')
     const navegacion = within(encabezado).getByRole('navigation', { name: 'Navegación principal' })
     expect(within(navegacion).getByRole('link', { name: 'Búsqueda' })).toHaveAttribute('href', '/explorar')
-    expect(within(navegacion).getByRole('button', { name: /^Servicios/ })).toHaveAttribute('aria-disabled', 'true')
-    expect(within(navegacion).getByRole('button', { name: /^Asistente IA/ })).toHaveAttribute('aria-disabled', 'true')
+    expect(within(navegacion).queryByText(/^Servicios/)).not.toBeInTheDocument()
+    // DEC-298: Asistente IA lleva a WF-07.
+    expect(within(navegacion).getByRole('link', { name: 'Asistente IA' })).toHaveAttribute('href', '/asistente')
     // Sin sesión, el prototipo agrega «Inicio de sesión» (los wireframes solo dibujan el estado con sesión).
     expect(within(navegacion).getByRole('link', { name: 'Inicio de sesión' })).toBeInTheDocument()
     // La v1 tenía un icono de búsqueda deshabilitado junto a ES / EN; la v2 no.
@@ -120,7 +121,7 @@ describe('Sin botón flotante del asistente', () => {
     if (ruta === '/login') {
       expect(navegacion).not.toBeInTheDocument()
     } else {
-      expect(within(navegacion!).getByRole('button', { name: /^Asistente IA/ })).toHaveAttribute('aria-disabled', 'true')
+      expect(within(navegacion!).getByRole('link', { name: 'Asistente IA' })).toHaveAttribute('href', '/asistente')
     }
   })
 })

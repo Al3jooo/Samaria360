@@ -1,0 +1,145 @@
+/* Afluencia (RF39, RF08, RF51): WF-05, WF-06 para atractivos y WF-24. Solo tokens de src/app/estilos.css. Los colores
+   de los niveles son los de la leyenda de WF-05 (sierra, sol y atardecer). */
+
+.alerta-afluencia,
+.destinos-alternativos {
+  display: grid;
+  gap: var(--espacio-3);
+  padding: var(--espacio-4) var(--espacio-5);
+  border: 1px solid var(--color-borde);
+  border-left: 6px solid var(--color-borde-campo);
+  border-radius: var(--radio-md);
+  background: var(--color-superficie);
+}
+
+.destinos-alternativos {
+  border-left-width: 1px;
+}
+
+.alerta-afluencia h2,
+.destinos-alternativos h2 {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-size: var(--texto-xl);
+  color: var(--color-mar-900);
+}
+
+.alerta-afluencia p {
+  margin: 0;
+}
+
+.alerta-afluencia--bajo {
+  border-left-color: var(--color-sierra-700);
+}
+
+.alerta-afluencia--medio {
+  border-left-color: var(--color-sol-400);
+}
+
+.alerta-afluencia--alto {
+  border-left-color: var(--color-atardecer-600);
+}
+
+.alerta-afluencia__nivel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.alerta-afluencia__punto,
+.nivel-afluencia::before {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: var(--color-borde-campo);
+}
+
+.alerta-afluencia--bajo .alerta-afluencia__punto,
+.nivel-afluencia--Bajo::before {
+  background: var(--color-sierra-700);
+}
+
+.alerta-afluencia--medio .alerta-afluencia__punto,
+.nivel-afluencia--Medio::before {
+  background: var(--color-sol-400);
+}
+
+.alerta-afluencia--alto .alerta-afluencia__punto,
+.nivel-afluencia--Alto::before {
+  background: var(--color-atardecer-600);
+}
+
+.nivel-afluencia {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espacio-1);
+}
+
+.nivel-afluencia::before {
+  content: '';
+}
+
+.alerta-afluencia__limite {
+  padding: var(--espacio-3) var(--espacio-4);
+  border-radius: var(--radio-sm);
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.destinos-alternativos ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: var(--espacio-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.destinos-alternativos li {
+  display: grid;
+  gap: var(--espacio-1);
+}
+
+.destinos-alternativos li span {
+  color: var(--color-tinta-suave);
+  font-size: var(--texto-sm);
+}
+
+/* Marcadores del mapa de WF-05 con el color del nivel (la leyenda). */
+.marcador--afluencia-bajo {
+  color: var(--color-sierra-700);
+}
+
+.marcador--afluencia-medio {
+  color: var(--color-sol-400);
+}
+
+.marcador--afluencia-alto {
+  color: var(--color-atardecer-600);
+}
+
+.registro-ocupacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--espacio-2);
+}
+
+.registro-ocupacion label {
+  display: grid;
+  gap: var(--espacio-1);
+  font-size: var(--texto-sm);
+  font-weight: 600;
+}
+
+.registro-ocupacion input {
+  width: 8rem;
+  min-height: 2.5rem;
+  padding: var(--espacio-1) var(--espacio-2);
+  border: 1.5px solid var(--color-borde-campo);
+  border-radius: var(--radio-sm);
+  font: inherit;
+}

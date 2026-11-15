@@ -1,5 +1,5 @@
 import { screen, waitFor, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   DETALLE_HOTEL,
   DETALLE_RESTAURANTE,
@@ -58,6 +58,8 @@ describe('Detalle de un servicio (WF-06)', () => {
       'Información de contacto',
       'Precio',
       'Horarios de atención',
+      // RF17 (DEC-303): las reseñas, antes de los destinos alternativos.
+      'Calificaciones y reseñas',
       'Destinos alternativos con menor afluencia',
     ])
   })
@@ -97,7 +99,12 @@ describe('Detalle de un servicio (WF-06)', () => {
     expect(within(ficha).queryByText(/Próximamente/)).not.toBeInTheDocument()
 
     // El favorito ya no está pendiente (RF54, B1): lo prueba favoritos.test.tsx. «Compartir» sigue deshabilitado (DEC-90).
-    for (const nombre of ['Compartir', 'Reportar información falsa o desactualizada']) {
+    // RF57 (DEC-301): sin sesión, «Reportar…» lleva al inicio de sesión.
+    expect(screen.getByRole('link', { name: 'Reportar información falsa o desactualizada' })).toHaveAttribute(
+      'href',
+      '/login',
+    )
+    for (const nombre of ['Compartir']) {
       // jsdom une el texto del span solo-lector sin el espacio inicial; un navegador lo conserva.
       const boton = screen.getByRole('button', { name: new RegExp(`^${nombre} ?\\(No disponible\\)$`) })
       expect(boton).toHaveAttribute('aria-disabled', 'true')
@@ -121,7 +128,8 @@ describe('Detalle de un servicio (WF-06)', () => {
 
     // Ubicación y calificación del subtítulo, y WhatsApp, dirección y RNT del contacto: «—» + «No disponible».
     expect(screen.getByText('Ubicación')).toHaveTextContent('Ubicación —No disponible')
-    expect(screen.getByText('Calificación y reseñas')).toHaveTextContent('Calificación y reseñas —No disponible')
+    // RF17 (DEC-303): el subtítulo muestra el promedio de ms-analytics; sin calificaciones, lo dice.
+    expect(screen.getByText('Calificación y reseñas')).toHaveTextContent('Calificación y reseñas Sin calificaciones todavía')
     const contacto = screen.getByRole('region', { name: 'Información de contacto' })
     for (const campo of ['WhatsApp', 'Dirección', 'Registro RNT']) {
       const valor = within(contacto).getByText(campo).nextElementSibling as HTMLElement
@@ -145,6 +153,21 @@ describe('Detalle de un servicio (WF-06)', () => {
     expect(within(precio).getByRole('link', { name: 'Ver disponibilidad y reservar' })).toBeInTheDocument()
   })
 
+  it('«Calificar» de «Mis reservas» (#calificaciones) lleva a las reseñas cuando la ficha termina de cargar', async () => {
+    const desplazar = vi.fn()
+    Element.prototype.scrollIntoView = desplazar
+    try {
+      simularFetch({ [`${DETALLE}/s-tour-cafe`]: () => respuestaJson(200, DETALLE_TOUR) })
+      renderApp('/servicios/s-tour-cafe#calificaciones')
+
+      await screen.findByRole('region', { name: 'Descripción' })
+      await waitFor(() => expect(desplazar).toHaveBeenCalled())
+      expect((desplazar.mock.contexts[0] as Element).id).toBe('calificaciones')
+    } finally {
+      delete (Element.prototype as Partial<Element>).scrollIntoView
+    }
+  })
+
   it('una categoría que no se reserva (Gastronomía) no tiene botón de reserva; lo que falta queda deshabilitado', async () => {
     simularFetch({ [`${DETALLE}/s-restaurante`]: () => respuestaJson(200, DETALLE_RESTAURANTE) })
     renderApp('/servicios/s-restaurante')
@@ -161,7 +184,10 @@ describe('Detalle de un servicio (WF-06)', () => {
 
     // Sin contacto, horario ni accesibilidad: visibles, con el mismo estado deshabilitado que lo pendiente.
     const contacto = screen.getByRole('region', { name: 'Información de contacto' })
-    expect(within(contacto).queryByRole('link')).not.toBeInTheDocument()
+    // El único enlace es «Reportar…» (RF57), que sin sesión lleva al inicio de sesión.
+    expect(within(contacto).getAllByRole('link').map((enlace) => enlace.textContent)).toEqual([
+      'Reportar información falsa o desactualizada',
+    ])
     expect(within(contacto).getByText('Teléfono').parentElement).toHaveTextContent('Teléfono—No disponible')
     expect(within(contacto).getByText('Correo').parentElement).toHaveTextContent('Correo—No disponible')
     const horarios = screen.getByRole('group', { name: 'Horarios de atención' })

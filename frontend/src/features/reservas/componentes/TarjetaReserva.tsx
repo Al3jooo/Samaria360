@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useEffect, useId, useRef, useState, type Ref } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IconoCalendario, IconoCompartir } from '../../../shared/components/Iconos'
@@ -131,6 +132,10 @@ export function TarjetaReserva({
 
       {reserva.estado === 'Completada' && (
         <div className="tarjeta-reserva__acciones">
+          {/* RF17 (DEC-303): con la reserva Completada, el turista califica el servicio en su ficha. */}
+          <Link className="boton-secundario" to={`/servicios/${encodeURIComponent(reserva.idServicio)}#calificaciones`}>
+            {t('misReservas.calificar')}
+          </Link>
           <button
             type="button"
             className="boton-secundario boton-compartir"

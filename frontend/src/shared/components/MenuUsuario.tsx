@@ -20,6 +20,8 @@ const OPCIONES_POR_ROL: Record<string, { ruta: string; texto: string }[]> = {
   Turista: [
     { ruta: '/perfil', texto: 'encabezado.miPerfil' },
     { ruta: '/perfil/favoritos', texto: 'encabezado.misFavoritos' },
+    // DEC-298: los itinerarios guardados desde el asistente (WF-31, RF35).
+    { ruta: '/perfil/itinerarios', texto: 'encabezado.misItinerarios' },
     { ruta: '/mis-reservas', texto: 'encabezado.misReservas' },
   ],
   // DEC-161: «Mis servicios» (WF-18) y el registro de un servicio (WF-08); DEC-197: el historial de reservas (WF-23,
@@ -29,6 +31,13 @@ const OPCIONES_POR_ROL: Record<string, { ruta: string; texto: string }[]> = {
     { ruta: '/prestador/servicios/nuevo', texto: 'encabezado.registrarServicio' },
     { ruta: '/prestador/reservas', texto: 'encabezado.historialReservas' },
     { ruta: '/prestador/perfil', texto: 'encabezado.perfilComercial' },
+    // DEC-303: las calificaciones recibidas (WF-33, RF56).
+    { ruta: '/prestador/calificaciones', texto: 'encabezado.calificacionesRecibidas' },
+    // DEC-308: el panel de consultas y reservas (WF-36, RF31).
+    { ruta: '/prestador/panel', texto: 'encabezado.miPanel' },
+    // DEC-311 y DEC-312: el historial de modificaciones (WF-39, RF41) y los asistentes (WF-40, RF42).
+    { ruta: '/prestador/historial-modificaciones', texto: 'encabezado.historialModificaciones' },
+    { ruta: '/prestador/asistentes', texto: 'encabezado.asistentes' },
   ],
   // DEC-70: cuentas (WF-12), preguntas frecuentes (WF-13) y avisos (WF-14); DEC-174: servicios por aprobar (WF-19).
   Administrador: [
@@ -36,6 +45,14 @@ const OPCIONES_POR_ROL: Record<string, { ruta: string; texto: string }[]> = {
     { ruta: '/admin/servicios', texto: 'encabezado.aprobarServicios' },
     { ruta: '/admin/preguntas-frecuentes', texto: 'encabezado.administrarPreguntas' },
     { ruta: '/admin/avisos', texto: 'encabezado.administrarAvisos' },
+    // DEC-303: el panel de moderación (WF-34, RF29 y RF57).
+    { ruta: '/admin/moderacion', texto: 'encabezado.moderacion' },
+    // DEC-297: la base de conocimientos del asistente (WF-32, RF05).
+    { ruta: '/admin/conocimiento', texto: 'encabezado.conocimiento' },
+    // DEC-294: el log de auditoría (WF-30, RF13).
+    { ruta: '/admin/auditoria', texto: 'encabezado.auditoria' },
+    // DEC-308: los tableros (WF-35, RF14).
+    { ruta: '/tableros', texto: 'encabezado.tableros' },
   ],
   // DEC-233 (cierra N4 para el Gestor): el panel «Atractivos» (WF-24) y el registro de un atractivo (WF-09); DEC-251:
   // el panel de eventos y el registro de un evento (WF-25, RF25).
@@ -44,6 +61,9 @@ const OPCIONES_POR_ROL: Record<string, { ruta: string; texto: string }[]> = {
     { ruta: '/gestor/atractivos/nuevo', texto: 'encabezado.registrarAtractivo' },
     { ruta: '/gestor/eventos', texto: 'encabezado.eventos' },
     { ruta: '/gestor/eventos/nuevo', texto: 'encabezado.registrarEvento' },
+    // DEC-308: los tableros (WF-35, RF14) y el reporte de afluencia (WF-37, RF64).
+    { ruta: '/tableros', texto: 'encabezado.tableros' },
+    { ruta: '/gestor/afluencia', texto: 'encabezado.reporteAfluencia' },
   ],
 }
 

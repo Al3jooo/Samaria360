@@ -1,3 +1,4 @@
+import '../../afluencia/afluencia.css'
 import type { TFunction } from 'i18next'
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -29,9 +30,11 @@ export function claveResultado(resultado: Pick<ResultadoOferta, 'tipo' | 'id'>):
   return `${resultado.tipo}-${resultado.id}`
 }
 
-function iconoResultado(tipo: ResultadoOferta['tipo']): L.DivIcon {
+/** Los atractivos con afluencia vigente toman el color de su nivel (la leyenda de WF-05; RF39, DEC-306). */
+function iconoResultado(tipo: ResultadoOferta['tipo'], afluencia?: ResultadoOferta['afluencia']): L.DivIcon {
+  const nivel = tipo === 'Atractivo' && afluencia ? ` marcador--afluencia-${afluencia.toLowerCase()}` : ''
   return L.divIcon({
-    className: `marcador marcador--${tipo === 'Servicio' ? 'servicio' : 'atractivo'}`,
+    className: `marcador marcador--${tipo === 'Servicio' ? 'servicio' : 'atractivo'}${nivel}`,
     html: SVG_PIN,
     iconSize: [28, 36],
     iconAnchor: [14, 35],
@@ -286,7 +289,7 @@ export function MapaOferta({
     marcadores.current.clear()
     for (const resultado of resultados) {
       const clave = claveResultado(resultado)
-      const marcador = agregarMarcador(capa, resultado.coordenada, iconoResultado(resultado.tipo), resultado.nombre, 0, () =>
+      const marcador = agregarMarcador(capa, resultado.coordenada, iconoResultado(resultado.tipo, resultado.afluencia), resultado.nombre, 0, () =>
         contenidoPopup(
           resultado,
           traducir.current,

@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom'
 import { AvisoSesion } from '../features/auth/AvisoSesion'
 import { useSesion } from '../features/auth/useSesion'
 import { BannerAvisos } from '../features/contenido/BannerAvisos'
+import { CampanaNotificaciones } from '../features/notificaciones/CampanaNotificaciones'
 import { Encabezado } from '../shared/components/Encabezado'
 import { PiePagina } from '../shared/components/PiePagina'
 
@@ -25,6 +26,12 @@ export function DisenoPrincipal() {
         usuario={sesion.estado === 'autenticado' ? sesion.usuario : null}
         // Solo sin sesión: con sesión o mientras se valida la guardada, el enlace no se muestra.
         mostrarInicioSesion={sesion.estado === 'anonimo'}
+        // RF63 (DEC-294): la campana, solo para el Turista y el Prestador.
+        campana={
+          sesion.estado === 'autenticado' && ['Turista', 'Prestador'].includes(sesion.usuario.rol) ? (
+            <CampanaNotificaciones />
+          ) : null
+        }
         onCerrarSesion={() => {
           cerrarSesion()
           navegar('/login', { replace: true })

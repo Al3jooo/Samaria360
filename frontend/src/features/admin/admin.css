@@ -588,3 +588,103 @@
   background: var(--color-sol-100);
   color: var(--color-cafe-700);
 }
+
+/* WF-30 «Auditoría» (RF13): filtros en fila (en columna por debajo de 40 rem) y tabla que pasa a tarjetas. */
+.admin {
+  display: grid;
+  gap: var(--espacio-4);
+  inline-size: min(100%, var(--ancho-maximo));
+  margin-inline: auto;
+  padding: var(--espacio-5) var(--espacio-4);
+}
+
+.admin h1 {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  font-size: var(--texto-2xl);
+}
+
+.admin__introduccion {
+  margin: 0;
+  color: var(--color-tinta-suave);
+}
+
+.admin__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--espacio-3);
+}
+
+.admin__filtros label {
+  display: grid;
+  gap: var(--espacio-1);
+  font-size: var(--texto-sm);
+}
+
+.admin__filtros select,
+.admin__filtros input {
+  min-block-size: 2.5rem;
+  padding: 0 var(--espacio-2);
+  border: 1px solid var(--color-borde-campo);
+  border-radius: var(--radio-sm);
+  background: var(--color-superficie);
+  font: inherit;
+}
+
+.admin__tabla {
+  inline-size: 100%;
+  border-collapse: collapse;
+  background: var(--color-superficie);
+  border-radius: var(--radio-md);
+  box-shadow: var(--sombra-1);
+}
+
+.admin__tabla th,
+.admin__tabla td {
+  padding: var(--espacio-3);
+  border-block-end: 1px solid var(--color-arena-200);
+  text-align: start;
+  vertical-align: top;
+  font-size: var(--texto-sm);
+}
+
+.admin__tabla th {
+  color: var(--color-tinta-suave);
+  font-weight: 600;
+}
+
+@media (max-width: 40rem) {
+  .admin__filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin__tabla thead {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .admin__tabla tr {
+    display: grid;
+    padding: var(--espacio-2) 0;
+    border-block-end: 1px solid var(--color-borde);
+  }
+
+  .admin__tabla td {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: var(--espacio-2);
+    border: 0;
+    padding-block: var(--espacio-1);
+  }
+
+  .admin__tabla td::before {
+    content: attr(data-titulo);
+    color: var(--color-tinta-suave);
+    font-weight: 600;
+  }
+}

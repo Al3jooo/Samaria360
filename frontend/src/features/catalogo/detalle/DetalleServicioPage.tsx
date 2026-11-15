@@ -1,8 +1,12 @@
-import { useId, type ReactNode } from 'react'
+import { useEffect, useId, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { BotonNoDisponible } from '../../../shared/components/BotonNoDisponible'
 import { ICONOS_ACCESIBILIDAD } from '../../../shared/components/Iconos'
+import { BotonReportar } from '../../calificaciones/BotonReportar'
+import { ResumenCalificacion } from '../../calificaciones/Estrellas'
+import { SeccionCalificaciones } from '../../calificaciones/SeccionCalificaciones'
+import { useCalificacionesEntidad } from '../../calificaciones/useCalificacionesEntidad'
 import { centavos, formatearCentavos } from '../../reservas/dinero'
 import { AvisoFavoritos } from '../../favoritos/AvisoFavoritos'
 import { BotonFavorito } from '../../favoritos/BotonFavorito'
@@ -106,6 +110,16 @@ function FichaServicio({ servicio, volverA }: { servicio: DetalleServicio; volve
   const diasOferta = oferta?.diasOperacion ?? []
   const salidasOferta = oferta?.salidas ?? []
   const hayOferta = diasOferta.length > 0 || salidasOferta.length > 0
+  // RF17 (DEC-303): el promedio del subtítulo y la sección de reseñas salen de ms-analytics.
+  const calificaciones = useCalificacionesEntidad('servicio', servicio.id)
+  // «Calificar» de «Mis reservas» llega con `#calificaciones`: la ficha se pinta después de cargar, así que el
+  // navegador ya no encuentra el ancla por su cuenta y hay que llevarla a la vista al montar.
+  const { hash } = useLocation()
+  useEffect(() => {
+    if (!hash) return
+    // jsdom no implementa scrollIntoView.
+    document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView?.({ block: 'start' })
+  }, [hash])
   const datoContacto = (etiqueta: string, valor?: ReactNode) => (
     <div key={etiqueta}>
       <dt>{etiqueta}</dt>
@@ -126,7 +140,7 @@ function FichaServicio({ servicio, volverA }: { servicio: DetalleServicio; volve
             </span>
             <span aria-hidden="true"> · </span>
             <span>
-              {t('detalle.calificacion')} <NoDisponible />
+              {t('detalle.calificacion')} <ResumenCalificacion resultado={calificaciones.resultado} />
             </span>
           </p>
           {condicionesAccesibilidad.length > 0 ? (
@@ -222,7 +236,7 @@ function FichaServicio({ servicio, volverA }: { servicio: DetalleServicio; volve
             {datoContacto(t('detalle.rnt'), rnt || undefined)}
           </dl>
           <p className="detalle__reportar">
-            <BotonNoDisponible>{t('detalle.reportar')}</BotonNoDisponible>
+            <BotonReportar tipo="servicio" id={servicio.id} />
           </p>
         </section>
 
@@ -263,6 +277,8 @@ function FichaServicio({ servicio, volverA }: { servicio: DetalleServicio; volve
           <RegionDeshabilitada id={`${idTitulo}-horarios`} titulo={t('detalle.horarios')} />
         )}
       </div>
+
+      <SeccionCalificaciones tipo="servicio" id={servicio.id} {...calificaciones} />
 
       <RegionDeshabilitada id={`${idTitulo}-alternativos`} titulo={t('detalle.alternativos')} />
     </article>

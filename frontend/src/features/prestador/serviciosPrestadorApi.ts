@@ -34,8 +34,12 @@ export interface PaginaServicios {
 const RUTA = '/api/v1/catalogo/prestador/servicios'
 
 /** RF09, RF10, RF37: el servicio nace Pendiente. 201 con Location y la forma de gestión. */
-export function registrarServicio(cuerpo: unknown): Promise<ServicioGestion> {
-  return solicitar<ServicioGestion>(RUTA, { method: 'POST', cuerpo })
+/** Multipart (DEC-318), como el registro de atractivos: la parte `datos` (el JSON) y de 1 a 5 partes `imagenes`. */
+export function registrarServicio(cuerpo: unknown, imagenes: File[]): Promise<ServicioGestion> {
+  const formulario = new FormData()
+  formulario.append('datos', new Blob([JSON.stringify(cuerpo)], { type: 'application/json' }))
+  for (const imagen of imagenes) formulario.append('imagenes', imagen, imagen.name)
+  return solicitar<ServicioGestion>(RUTA, { method: 'POST', formulario })
 }
 
 /** «Consultar mis servicios» (DEC-129): `pagina` desde 1 en la pantalla, desde 0 en la API. Sin estado, todos. */

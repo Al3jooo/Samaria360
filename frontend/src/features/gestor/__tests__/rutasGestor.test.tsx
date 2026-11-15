@@ -73,12 +73,17 @@ describe('Rutas y menú del Gestor (C6)', () => {
       'Registrar atractivo',
       'Eventos',
       'Registrar evento',
+      'Tableros',
+      'Reporte de afluencia',
       'Cerrar sesión',
     ])
     expect(menu.getByRole('menuitem', { name: 'Atractivos' })).toHaveAttribute('href', '/gestor/atractivos')
     expect(menu.getByRole('menuitem', { name: 'Registrar atractivo' })).toHaveAttribute('href', '/gestor/atractivos/nuevo')
     expect(menu.getByRole('menuitem', { name: 'Eventos' })).toHaveAttribute('href', '/gestor/eventos')
     expect(menu.getByRole('menuitem', { name: 'Registrar evento' })).toHaveAttribute('href', '/gestor/eventos/nuevo')
+    // DEC-308: RF14 y RF64.
+    expect(menu.getByRole('menuitem', { name: 'Tableros' })).toHaveAttribute('href', '/tableros')
+    expect(menu.getByRole('menuitem', { name: 'Reporte de afluencia' })).toHaveAttribute('href', '/gestor/afluencia')
   })
 
   it('el Gestor abre su panel', async () => {

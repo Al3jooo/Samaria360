@@ -1,0 +1,222 @@
+/* Iteración I del Prestador (DEC-310 a DEC-313): WF-38 «Oferta y disponibilidad», WF-39 «Historial de
+   modificaciones», WF-40 «Asistentes» y la galería de WF-18. Solo tokens de src/app/estilos.css. */
+
+.oferta {
+  display: grid;
+  gap: var(--espacio-5);
+  width: min(100%, 64rem);
+  margin: 0 auto;
+  padding: var(--espacio-6) var(--espacio-4) var(--espacio-7);
+}
+
+.oferta h1,
+.oferta h2,
+.galeria-servicio h2 {
+  margin: 0;
+  font-family: var(--fuente-titulos);
+  line-height: var(--interlineado-titulos);
+  color: var(--color-mar-900);
+}
+
+.oferta h1 {
+  font-size: var(--texto-3xl);
+}
+
+.oferta h2,
+.galeria-servicio h2 {
+  font-size: var(--texto-xl);
+}
+
+.oferta__volver,
+.oferta__ayuda,
+.oferta__enlaces {
+  margin: 0;
+  color: var(--color-tinta-suave);
+}
+
+.oferta__volver a,
+.oferta__enlaces a {
+  color: var(--color-mar-700);
+  font-weight: 600;
+}
+
+.oferta__seccion {
+  display: grid;
+  gap: var(--espacio-4);
+}
+
+.oferta__aviso {
+  margin: 0;
+  padding: var(--espacio-3) var(--espacio-4);
+  border-left: 4px solid var(--color-sierra-700);
+  border-radius: var(--radio-sm);
+  background: var(--color-arena-200);
+  color: var(--color-mar-900);
+}
+
+.oferta__aviso--error {
+  border-left-color: var(--color-error);
+  background: var(--color-error-fondo);
+  color: var(--color-error);
+}
+
+.oferta__filtros,
+.oferta__formulario {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--espacio-3);
+}
+
+.oferta__filtros label,
+.oferta__formulario label {
+  display: grid;
+  gap: var(--espacio-1);
+  font-weight: 600;
+  color: var(--color-tinta);
+}
+
+.oferta__filtros input,
+.oferta__filtros select,
+.oferta__formulario input,
+.oferta__formulario select,
+.oferta__cupos {
+  min-height: 2.5rem;
+  padding: var(--espacio-2) var(--espacio-3);
+  border: 1px solid var(--color-borde-campo);
+  border-radius: var(--radio-sm);
+  background: var(--color-superficie);
+  color: var(--color-tinta);
+  font: inherit;
+}
+
+.oferta__cupos {
+  width: 6rem;
+}
+
+.oferta__tabla-contenedor {
+  overflow-x: auto;
+}
+
+.oferta__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--texto-sm);
+}
+
+.oferta__tabla th,
+.oferta__tabla td {
+  padding: var(--espacio-2) var(--espacio-3);
+  border-bottom: 1px solid var(--color-borde);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.oferta__tabla th {
+  color: var(--color-tinta-suave);
+  font-weight: 600;
+}
+
+.oferta__fila--cerrada td {
+  color: var(--color-deshabilitado);
+  background: var(--color-arena);
+}
+
+.oferta__acciones-fila,
+.oferta__acciones,
+.oferta__paginacion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espacio-2);
+}
+
+.oferta__dias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espacio-3);
+  margin: 0;
+  padding: var(--espacio-3);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-sm);
+}
+
+.oferta__dias legend {
+  font-weight: 600;
+}
+
+.oferta__dia {
+  display: inline-flex !important;
+  align-items: center;
+  gap: var(--espacio-1);
+  font-weight: 400 !important;
+}
+
+.oferta__vacio {
+  margin: 0;
+  color: var(--color-tinta-suave);
+}
+
+.galeria-servicio {
+  display: grid;
+  gap: var(--espacio-3);
+}
+
+.galeria-servicio__lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--espacio-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galeria-servicio__lista li {
+  display: grid;
+  gap: var(--espacio-2);
+}
+
+.galeria-servicio__lista img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radio-sm);
+  background: var(--color-arena-200);
+}
+
+.galeria-servicio > .boton-principal {
+  justify-self: start;
+}
+
+/* «Descargar PDF» de WF-40: la hoja impresa lleva solo el listado. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .asistentes,
+  .asistentes * {
+    visibility: visible;
+  }
+
+  .asistentes {
+    position: absolute;
+    inset: 0;
+  }
+
+  .asistentes .no-imprimir {
+    display: none;
+  }
+}
+
+/* Un botón deshabilitado (cerrar una fecha con reservas, quitar la última imagen, agregar la sexta) debe verse como tal.
+   El tooltip explica el motivo. */
+.oferta .boton-secundario:disabled,
+.oferta .boton-principal:disabled,
+.galeria-servicio .boton-secundario:disabled,
+.galeria-servicio .boton-principal:disabled {
+  border-color: var(--color-borde);
+  background: var(--color-arena-200);
+  color: var(--color-deshabilitado);
+  cursor: not-allowed;
+}
