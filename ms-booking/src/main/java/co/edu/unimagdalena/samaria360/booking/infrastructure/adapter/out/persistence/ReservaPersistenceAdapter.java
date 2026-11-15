@@ -112,8 +112,16 @@ public class ReservaPersistenceAdapter implements ReservaRepositoryPort {
     }
 
     @Override
-    public int completarTerminadas(Instant ahora) {
-        return repositorio.completarTerminadas(ahora, EstadoReserva.Completada, EstadoReserva.Confirmada);
+    public List<Reserva> completarTerminadas(Instant ahora) {
+        // Un solo UPDATE condicional e idempotente (RF52), que devuelve las que cambiaron para sus eventos (ADR-011).
+        List<UUID> ids = jdbc.queryForList("""
+                UPDATE reserva SET estado = 'Completada'
+                WHERE estado = 'Confirmada' AND fecha_fin <= ?
+                RETURNING id_reserva
+                """, UUID.class, java.sql.Timestamp.from(ahora));
+        return ids.stream()
+                .map(id -> repositorio.findById(id).map(ReservaPersistenceAdapter::aDominio).orElseThrow())
+                .toList();
     }
 
     @Override

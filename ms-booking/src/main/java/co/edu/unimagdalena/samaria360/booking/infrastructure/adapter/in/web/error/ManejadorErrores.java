@@ -105,6 +105,29 @@ public class ManejadorErrores extends ResponseEntityExceptionHandler {
     }
 
     /** El mismo significado que el fallback del gateway: el servicio que no responde es ms-catalog. */
+    @ExceptionHandler(co.edu.unimagdalena.samaria360.booking.domain.exception.CuposReservadosException.class)
+    ProblemDetail cuposReservados(co.edu.unimagdalena.samaria360.booking.domain.exception.CuposReservadosException ex) {
+        ProblemDetail problema = Problemas.crear(HttpStatus.CONFLICT, CodigoError.CUPOS_RESERVADOS, ex.getMessage());
+        problema.setProperty("reservados", ex.getReservados());
+        return problema;
+    }
+
+    @ExceptionHandler(co.edu.unimagdalena.samaria360.booking.domain.exception.FechaConReservasException.class)
+    ProblemDetail fechaConReservas(co.edu.unimagdalena.samaria360.booking.domain.exception.FechaConReservasException ex) {
+        return Problemas.crear(HttpStatus.CONFLICT, CodigoError.FECHA_CON_RESERVAS, ex.getMessage());
+    }
+
+    /** RF42: ms-auth no respondió los contactos (DEC-312). */
+    @ExceptionHandler(co.edu.unimagdalena.samaria360.booking.domain.exception.ContactosNoDisponiblesException.class)
+    ProblemDetail contactosNoDisponibles(
+            co.edu.unimagdalena.samaria360.booking.domain.exception.ContactosNoDisponiblesException ex) {
+        LOG.warn("ms-auth no disponible: {}", ex.getMessage());
+        ProblemDetail problema = Problemas.crear(HttpStatus.SERVICE_UNAVAILABLE, CodigoError.SERVICIO_NO_DISPONIBLE,
+                "Los contactos no están disponibles en este momento");
+        problema.setProperty("servicio", "ms-auth");
+        return problema;
+    }
+
     @ExceptionHandler(CatalogoNoDisponibleException.class)
     ProblemDetail catalogoNoDisponible(CatalogoNoDisponibleException ex) {
         LOG.warn("ms-catalog no disponible: {}", ex.getCause() == null ? ex.getMessage() : ex.getCause().toString());

@@ -21,6 +21,10 @@ public enum CodigoError {
     RESERVA_NO_CANCELABLE,
     IDEMPOTENCIA_CONFLICTO,
     SERVICIO_NO_DISPONIBLE,
+    /** RF19 (DEC-310): los cupos nuevos bajan de lo reservado; lleva {@code reservados}. */
+    CUPOS_RESERVADOS,
+    /** RF19 (DEC-310): la fecha u horario tiene reservas confirmadas y no se cierra. */
+    FECHA_CON_RESERVAS,
     SOLICITUD_INVALIDA,
     ERROR_INTERNO
 }

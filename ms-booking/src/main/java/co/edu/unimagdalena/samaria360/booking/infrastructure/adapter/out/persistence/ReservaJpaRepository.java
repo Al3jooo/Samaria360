@@ -41,9 +41,5 @@ interface ReservaJpaRepository extends Repository<ReservaEntity, UUID>, JpaSpeci
      * propia transacción (o se une a la que exista). Lo acelera el índice parcial de V3.
      */
     @Transactional
-    @Modifying(flushAutomatically = true, clearAutomatically = true)
-    @Query("update ReservaEntity r set r.estado = :completada"
-            + " where r.estado = :confirmada and r.fechaFin <= :ahora")
-    int completarTerminadas(@Param("ahora") Instant ahora, @Param("completada") EstadoReserva completada,
-                            @Param("confirmada") EstadoReserva confirmada);
+    Optional<ReservaEntity> findById(UUID idReserva);
 }

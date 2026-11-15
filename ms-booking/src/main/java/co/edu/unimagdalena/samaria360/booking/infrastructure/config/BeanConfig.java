@@ -1,5 +1,13 @@
 package co.edu.unimagdalena.samaria360.booking.infrastructure.config;
 
+import co.edu.unimagdalena.samaria360.booking.application.port.in.GestionarOfertaPrestadorUseCase;
+import co.edu.unimagdalena.samaria360.booking.application.port.in.ConsultarAsistentesUseCase;
+import co.edu.unimagdalena.samaria360.booking.application.port.out.InventarioPrestadorPort;
+import co.edu.unimagdalena.samaria360.booking.application.port.out.OutboxModificacionesPort;
+import co.edu.unimagdalena.samaria360.booking.application.port.out.AsistentesPort;
+import co.edu.unimagdalena.samaria360.booking.application.port.out.ContactosTuristasPort;
+import co.edu.unimagdalena.samaria360.booking.application.service.GestionarOfertaPrestadorService;
+import co.edu.unimagdalena.samaria360.booking.application.service.ConsultarAsistentesService;
 import co.edu.unimagdalena.samaria360.booking.application.port.in.ActualizarCuentaUseCase;
 import co.edu.unimagdalena.samaria360.booking.application.port.in.CancelarReservaUseCase;
 import co.edu.unimagdalena.samaria360.booking.application.port.in.ResumirDisponibilidadUseCase;
@@ -27,6 +35,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.transaction.PlatformTransactionManager;
+import co.edu.unimagdalena.samaria360.booking.application.port.in.CompletarReservasUseCase;
+import co.edu.unimagdalena.samaria360.booking.application.port.in.PublicarEventosUseCase;
+import co.edu.unimagdalena.samaria360.booking.application.port.out.OutboxEventosPort;
+import co.edu.unimagdalena.samaria360.booking.application.port.out.PublicadorEventosPort;
+import co.edu.unimagdalena.samaria360.booking.application.service.PublicarEventosService;
+import co.edu.unimagdalena.samaria360.booking.domain.service.PoliticaReintento;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.Duration;
@@ -59,8 +73,9 @@ public class BeanConfig {
     public ReservarServicioService reservarServicioService(ReservaRepositoryPort reservas, InventarioPort inventario,
                                                            CatalogoPort catalogo,
                                                            MaterializarInventarioService materializacion,
-                                                           RelojPort reloj, PoliticaReserva politica) {
-        return new ReservarServicioService(reservas, inventario, catalogo, materializacion, reloj, politica);
+                                                           RelojPort reloj, PoliticaReserva politica,
+                                                           OutboxEventosPort outbox) {
+        return new ReservarServicioService(reservas, inventario, catalogo, materializacion, reloj, politica, outbox);
     }
 
     /** El que reciben los adaptadores de entrada: las fases del servicio coordinadas con las transacciones. */
@@ -73,8 +88,8 @@ public class BeanConfig {
 
     @Bean
     public CancelarReservaService cancelarReservaService(ReservaRepositoryPort reservas, InventarioPort inventario,
-                                                         RelojPort reloj) {
-        return new CancelarReservaService(reservas, inventario, reloj);
+                                                         RelojPort reloj, OutboxEventosPort outbox) {
+        return new CancelarReservaService(reservas, inventario, reloj, outbox);
     }
 
     @Bean
@@ -105,10 +120,32 @@ public class BeanConfig {
         return new ResumenDisponibilidadConPlazo(servicio, plazo);
     }
 
-    /** RF52: un único UPDATE condicional; la transacción la abre el repositorio. */
+    /** RF52: un único UPDATE condicional más los eventos de las que cambiaron (ADR-011). */
     @Bean
-    public CompletarReservasService completarReservasService(ReservaRepositoryPort reservas, RelojPort reloj) {
-        return new CompletarReservasService(reservas, reloj);
+    public CompletarReservasService completarReservasService(ReservaRepositoryPort reservas, RelojPort reloj,
+                                                             OutboxEventosPort outbox) {
+        return new CompletarReservasService(reservas, reloj, outbox);
+    }
+
+    /** El que recibe el programador: el UPDATE y los eventos en una sola transacción (DEC-291). */
+    @Bean
+    @Primary
+    public CompletarReservasUseCase completarReservasUseCase(CompletarReservasService servicio,
+                                                             PlatformTransactionManager transacciones) {
+        TransactionTemplate transaccion = new TransactionTemplate(transacciones);
+        return () -> transaccion.execute(estado -> servicio.completar());
+    }
+
+    @Bean
+    public PoliticaReintento politicaReintento() {
+        return new PoliticaReintento();
+    }
+
+    /** Relevo del outbox hacia RabbitMQ (ADR-011, DEC-291). */
+    @Bean
+    public PublicarEventosUseCase publicarEventosUseCase(OutboxEventosPort outbox, PublicadorEventosPort publicador,
+                                                         RelojPort reloj, PoliticaReintento politica) {
+        return new PublicarEventosService(outbox, publicador, reloj, politica);
     }
 
     @Bean
@@ -125,5 +162,24 @@ public class BeanConfig {
     @Bean
     public ActualizarCuentaUseCase actualizarCuentaUseCase(CuentaRepositoryPort cuentas, RelojPort reloj) {
         return new ActualizarCuentaService(cuentas, reloj);
+    }
+
+    /** RF19 (DEC-310): catálogo y materialización fuera de la transacción; el cambio y el outbox, dentro. */
+    @Bean
+    public GestionarOfertaPrestadorUseCase gestionarOfertaPrestadorUseCase(CatalogoPort catalogo,
+                                                                           MaterializarInventarioService materializar,
+                                                                           InventarioPrestadorPort inventario,
+                                                                           OutboxModificacionesPort outbox,
+                                                                           RelojPort reloj,
+                                                                           PlatformTransactionManager transacciones) {
+        return new OfertaPrestadorTransaccional(new GestionarOfertaPrestadorService(catalogo, materializar, inventario,
+                outbox, reloj), new TransactionTemplate(transacciones));
+    }
+
+    /** RF42 (DEC-312). */
+    @Bean
+    public ConsultarAsistentesUseCase consultarAsistentesUseCase(AsistentesPort asistentes,
+                                                                 ContactosTuristasPort contactos) {
+        return new ConsultarAsistentesService(asistentes, contactos);
     }
 }

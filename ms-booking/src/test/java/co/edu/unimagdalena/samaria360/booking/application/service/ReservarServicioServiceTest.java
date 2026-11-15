@@ -1,5 +1,6 @@
 package co.edu.unimagdalena.samaria360.booking.application.service;
 
+import co.edu.unimagdalena.samaria360.booking.application.fake.OutboxEventosEnMemoria;
 import co.edu.unimagdalena.samaria360.booking.application.fake.CatalogoFalso;
 import co.edu.unimagdalena.samaria360.booking.application.fake.Eventos;
 import co.edu.unimagdalena.samaria360.booking.application.fake.InventarioEnMemoria;
@@ -54,9 +55,10 @@ class ReservarServicioServiceTest {
     private final ReservaRepositoryEnMemoria reservas = new ReservaRepositoryEnMemoria(eventos);
     private final OfertaMaterializadaEnMemoria marcas = new OfertaMaterializadaEnMemoria(eventos);
     private final RelojFijo reloj = new RelojFijo(Ofertas.AHORA);
+    private final OutboxEventosEnMemoria outbox = new OutboxEventosEnMemoria();
     private final ReservarServicioService servicio = new ReservarServicioService(reservas, inventario, catalogo,
             new MaterializarInventarioService(catalogo, inventario, marcas, reloj), reloj,
-            new PoliticaReserva(HorarioReservas.POR_DEFECTO));
+            new PoliticaReserva(HorarioReservas.POR_DEFECTO), outbox);
 
     @BeforeEach
     void inventarioDeDosNochesPorUnidad() {

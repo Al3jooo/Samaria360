@@ -6,6 +6,7 @@ import co.edu.unimagdalena.samaria360.booking.application.port.in.ResultadoReser
 import co.edu.unimagdalena.samaria360.booking.application.port.out.CatalogoPort;
 import co.edu.unimagdalena.samaria360.booking.application.port.out.ClaveIdempotenciaRepetidaException;
 import co.edu.unimagdalena.samaria360.booking.application.port.out.InventarioPort;
+import co.edu.unimagdalena.samaria360.booking.application.port.out.OutboxEventosPort;
 import co.edu.unimagdalena.samaria360.booking.application.port.out.RelojPort;
 import co.edu.unimagdalena.samaria360.booking.application.port.out.ReservaRepositoryPort;
 import co.edu.unimagdalena.samaria360.booking.domain.exception.CupoAgotadoException;
@@ -14,6 +15,7 @@ import co.edu.unimagdalena.samaria360.booking.domain.exception.IdempotenciaConfl
 import co.edu.unimagdalena.samaria360.booking.domain.exception.OfertaNoDisponibleException;
 import co.edu.unimagdalena.samaria360.booking.domain.model.CupoDescontado;
 import co.edu.unimagdalena.samaria360.booking.domain.model.DiaInventario;
+import co.edu.unimagdalena.samaria360.booking.domain.model.EventoReserva;
 import co.edu.unimagdalena.samaria360.booking.domain.model.FilaInventario;
 import co.edu.unimagdalena.samaria360.booking.domain.model.OfertaReservable;
 import co.edu.unimagdalena.samaria360.booking.domain.model.Reserva;
@@ -53,9 +55,12 @@ public class ReservarServicioService implements ReservarServicioUseCase {
     private final RelojPort reloj;
     private final PoliticaReserva politica;
 
+    private final OutboxEventosPort outbox;
+
     public ReservarServicioService(ReservaRepositoryPort reservas, InventarioPort inventario, CatalogoPort catalogo,
                                    MaterializarInventarioService materializacion, RelojPort reloj,
-                                   PoliticaReserva politica) {
+                                   PoliticaReserva politica, OutboxEventosPort outbox) {
+        this.outbox = Objects.requireNonNull(outbox);
         this.reservas = Objects.requireNonNull(reservas);
         this.inventario = Objects.requireNonNull(inventario);
         this.catalogo = Objects.requireNonNull(catalogo);
@@ -116,6 +121,8 @@ public class ReservarServicioService implements ReservarServicioUseCase {
                     plan.cantidad()));
         }
         reservas.registrarDescuentos(reserva.idReserva(), descuentos);
+        // ADR-011 (DEC-291): en la misma transacción; ms-analytics avisa al Prestador (RF30, RF63) y al Turista.
+        outbox.registrar(EventoReserva.confirmada(reserva, reserva.fechaCreacion()));
         return reserva;
     }
 

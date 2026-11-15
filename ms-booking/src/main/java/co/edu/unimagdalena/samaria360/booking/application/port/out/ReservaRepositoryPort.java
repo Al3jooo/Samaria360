@@ -33,9 +33,9 @@ public interface ReservaRepositoryPort {
     /**
      * RF52: UPDATE condicional {@code estado = 'Confirmada' AND fecha_fin <= ahora} → Completada. Idempotente.
      *
-     * @return cuántas reservas cambiaron
+     * @return las reservas que cambiaron, ya Completadas (para sus eventos, ADR-011)
      */
-    int completarTerminadas(Instant ahora);
+    List<Reserva> completarTerminadas(Instant ahora);
 
     void registrarDescuentos(UUID idReserva, List<CupoDescontado> descuentos);
 

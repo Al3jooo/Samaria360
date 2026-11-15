@@ -96,6 +96,13 @@
             <version>${springdoc.version}</version>
         </dependency>
 
+        <!-- ============ Adaptador de salida: eventos de reservas en RabbitMQ ============ -->
+        <dependency>
+            <!-- Nivel 3 de ADR-003: outbox y publisher confirms (ADR-011, DEC-291). Versión gestionada por Spring Boot. -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
         <!-- ============ Pruebas ============ -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -121,6 +128,19 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- RabbitMQ real en las pruebas del relevo de eventos (ADR-011). -->
+            <groupId>org.testcontainers</groupId>
+            <artifactId>rabbitmq</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- Valida cada evento publicado contra docs/sad/api/eventos.schema.json (ADR-011). Solo pruebas. -->
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>1.5.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
