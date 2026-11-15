@@ -1,0 +1,29 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "turistaId",
+      "dia",
+      "mensajes"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "turistaId": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+      },
+      "dia": {
+        "bsonType": "string",
+        "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+      },
+      "mensajes": {
+        "bsonType": "int",
+        "minimum": 1,
+        "maximum": 20
+      }
+    }
+  }
+}
