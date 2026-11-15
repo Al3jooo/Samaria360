@@ -17,8 +17,12 @@ public enum CodigoError {
     /** Registro sin aceptar la Política de Privacidad (turista y prestador). */
     POLITICAS_NO_ACEPTADAS,
     NO_AUTENTICADO,
+    /** Cliente interno desconocido o secreto incorrecto al pedir un token de servicio (DEC-280). */
+    CREDENCIALES_SERVICIO_INVALIDAS,
     /** Token de antes de un cambio de estado o de rol de la cuenta: su claim ver es menor que version_cuenta (DEC-29). */
     SESION_INVALIDADA,
+    /** La sesión superó su duración máxima y no se renueva (DEC-317): hay que iniciar sesión de nuevo. */
+    SESION_VENCIDA,
     /** La cuenta ya no está en el estado desde el que se pidió el cambio (DEC-39). */
     ESTADO_CAMBIADO,
     /** No existe un turista o prestador con ese id (administración de cuentas), o ninguna cuenta (cambio de rol). */
@@ -31,6 +35,8 @@ public enum CodigoError {
     CAMBIO_ROL_PROPIO,
     /** El cambio dejaría el sistema sin Administradores activos (DEC-82). */
     ULTIMO_ADMINISTRADOR,
+    /** Token de recuperación de contraseña inexistente, usado o vencido (RF34): un solo código para los tres casos. */
+    TOKEN_INVALIDO,
     ACCESO_DENEGADO,
     DATOS_INVALIDOS,
     SOLICITUD_INVALIDA,

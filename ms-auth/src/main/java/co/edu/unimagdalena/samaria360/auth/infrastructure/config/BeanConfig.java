@@ -5,6 +5,7 @@ import co.edu.unimagdalena.samaria360.auth.application.port.in.CambiarRolUseCase
 import co.edu.unimagdalena.samaria360.auth.application.port.in.GestionarPerfilPrestadorUseCase;
 import co.edu.unimagdalena.samaria360.auth.application.port.in.GestionarPerfilUseCase;
 import co.edu.unimagdalena.samaria360.auth.application.port.in.IniciarSesionUseCase;
+import co.edu.unimagdalena.samaria360.auth.application.port.in.RenovarSesionUseCase;
 import co.edu.unimagdalena.samaria360.auth.application.port.in.RegistrarPrestadorUseCase;
 import co.edu.unimagdalena.samaria360.auth.application.port.in.RegistrarTuristaUseCase;
 import co.edu.unimagdalena.samaria360.auth.application.port.out.CambioRolRepositoryPort;
@@ -28,10 +29,25 @@ import co.edu.unimagdalena.samaria360.auth.application.service.ConsultarUsuarioA
 import co.edu.unimagdalena.samaria360.auth.application.service.GestionarPerfilPrestadorService;
 import co.edu.unimagdalena.samaria360.auth.application.service.GestionarPerfilService;
 import co.edu.unimagdalena.samaria360.auth.application.service.IniciarSesionService;
+import co.edu.unimagdalena.samaria360.auth.application.service.RenovarSesionService;
 import co.edu.unimagdalena.samaria360.auth.application.service.RegistrarPrestadorService;
 import co.edu.unimagdalena.samaria360.auth.application.service.RegistrarTuristaService;
 import co.edu.unimagdalena.samaria360.auth.application.service.PurgarOutboxService;
 import co.edu.unimagdalena.samaria360.auth.application.service.RelevarCuentasService;
+import co.edu.unimagdalena.samaria360.auth.application.service.PublicarEventosService;
+import co.edu.unimagdalena.samaria360.auth.application.service.EmitirTokenServicioService;
+import co.edu.unimagdalena.samaria360.auth.application.service.ConsultarContactosService;
+import co.edu.unimagdalena.samaria360.auth.application.port.in.EmitirTokenServicioUseCase;
+import co.edu.unimagdalena.samaria360.auth.application.port.in.ConsultarContactosUseCase;
+import co.edu.unimagdalena.samaria360.auth.application.port.out.ClientesServicioPort;
+import co.edu.unimagdalena.samaria360.auth.application.port.out.ContactosRepositoryPort;
+import co.edu.unimagdalena.samaria360.auth.application.port.out.TokenServicioPort;
+import co.edu.unimagdalena.samaria360.auth.application.service.RestablecerContrasenaService;
+import co.edu.unimagdalena.samaria360.auth.application.service.SolicitarRecuperacionService;
+import co.edu.unimagdalena.samaria360.auth.application.port.in.RestablecerContrasenaUseCase;
+import co.edu.unimagdalena.samaria360.auth.application.port.out.GeneradorTokenPort;
+import co.edu.unimagdalena.samaria360.auth.application.port.out.PublicadorEventosPort;
+import co.edu.unimagdalena.samaria360.auth.application.port.out.RecuperacionRepositoryPort;
 import co.edu.unimagdalena.samaria360.auth.application.service.VerificarSesionService;
 import co.edu.unimagdalena.samaria360.auth.domain.service.PoliticaAcceso;
 import co.edu.unimagdalena.samaria360.auth.domain.service.PoliticaAdministradores;
@@ -76,21 +92,29 @@ public class BeanConfig {
     }
 
     @Bean
+    public RenovarSesionUseCase renovarSesionUseCase(
+            UsuarioRepositoryPort usuarios, TokenProviderPort tokens, RelojPort reloj) {
+        return new RenovarSesionService(usuarios, tokens, reloj);
+    }
+
+    @Bean
     public ConsultarUsuarioActualService consultarUsuarioActualService(UsuarioRepositoryPort usuarios) {
         return new ConsultarUsuarioActualService(usuarios);
     }
 
     @Bean
     public RegistrarTuristaService registrarTuristaService(RegistroRepositoryPort registros, PasswordHasherPort hasher,
-                                                           NotificadorCuentaPort notificador, RelojPort reloj) {
-        return new RegistrarTuristaService(registros, hasher, notificador, reloj);
+                                                           NotificadorCuentaPort notificador, RelojPort reloj,
+                                                           OutboxPort outbox) {
+        return new RegistrarTuristaService(registros, hasher, notificador, reloj, outbox);
     }
 
     @Bean
     public RegistrarPrestadorService registrarPrestadorService(RegistroRepositoryPort registros,
                                                                PasswordHasherPort hasher,
-                                                               NotificadorCuentaPort notificador, RelojPort reloj) {
-        return new RegistrarPrestadorService(registros, hasher, notificador, reloj);
+                                                               NotificadorCuentaPort notificador, RelojPort reloj,
+                                                               OutboxPort outbox) {
+        return new RegistrarPrestadorService(registros, hasher, notificador, reloj, outbox);
     }
 
     /** Los que reciben los adaptadores de entrada: cada servicio envuelto en su transacción (con reintento por carrera). */
@@ -200,5 +224,50 @@ public class BeanConfig {
     public RelevarCuentasService relevarCuentasService(OutboxPort outbox, DestinoCuentasPort destinos, RelojPort reloj,
                                                        PoliticaReintento politica) {
         return new RelevarCuentasService(outbox, destinos, reloj, politica);
+    }
+
+    /** Token de servicio para los clientes internos (DEC-280). */
+    @Bean
+    public EmitirTokenServicioUseCase emitirTokenServicioUseCase(ClientesServicioPort clientes, TokenServicioPort tokens,
+                                                                 RelojPort reloj) {
+        return new EmitirTokenServicioService(clientes, tokens, reloj);
+    }
+
+    /** Contactos para los clientes internos (DEC-280). */
+    @Bean
+    public ConsultarContactosUseCase consultarContactosUseCase(ClientesServicioPort clientes,
+                                                               ContactosRepositoryPort contactos) {
+        return new ConsultarContactosService(clientes, contactos);
+    }
+
+    /** Relevo del outbox hacia RabbitMQ (ADR-011). */
+    @Bean
+    public PublicarEventosService publicarEventosService(OutboxPort outbox, PublicadorEventosPort publicador,
+                                                         RelojPort reloj, PoliticaReintento politica) {
+        return new PublicarEventosService(outbox, publicador, reloj, politica);
+    }
+
+    /** RF34, pedir el enlace: un INSERT del token (con su transacción) y el correo fuera de ella. */
+    @Bean
+    public SolicitarRecuperacionService solicitarRecuperacionService(RecuperacionRepositoryPort recuperaciones,
+                                                                     GeneradorTokenPort generador,
+                                                                     NotificadorCuentaPort notificador,
+                                                                     RelojPort reloj) {
+        return new SolicitarRecuperacionService(recuperaciones, generador, notificador, reloj);
+    }
+
+    @Bean
+    public RestablecerContrasenaService restablecerContrasenaService(RecuperacionRepositoryPort recuperaciones,
+                                                                     PasswordHasherPort hasher, OutboxPort outbox,
+                                                                     RelojPort reloj) {
+        return new RestablecerContrasenaService(recuperaciones, hasher, outbox, reloj);
+    }
+
+    /** El que recibe el controlador: el token, la contraseña y el evento en una sola transacción (DEC-285). */
+    @Bean
+    @Primary
+    public RestablecerContrasenaUseCase restablecerContrasenaUseCase(RestablecerContrasenaService servicio,
+                                                                     PlatformTransactionManager transacciones) {
+        return new RestablecerContrasenaTransaccional(servicio, new TransactionTemplate(transacciones));
     }
 }

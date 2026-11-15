@@ -4,12 +4,18 @@ import co.edu.unimagdalena.samaria360.auth.application.port.in.ComandoRegistroTu
 import co.edu.unimagdalena.samaria360.auth.application.port.in.RegistrarTuristaUseCase;
 import co.edu.unimagdalena.samaria360.auth.application.port.in.RegistroRecibido;
 import co.edu.unimagdalena.samaria360.auth.application.port.out.NotificadorCuentaPort;
+import co.edu.unimagdalena.samaria360.auth.application.port.out.OutboxPort;
 import co.edu.unimagdalena.samaria360.auth.application.port.out.PasswordHasherPort;
 import co.edu.unimagdalena.samaria360.auth.application.port.out.RegistroRepositoryPort;
 import co.edu.unimagdalena.samaria360.auth.application.port.out.RelojPort;
 import co.edu.unimagdalena.samaria360.auth.application.port.out.TuristaNuevo;
+import co.edu.unimagdalena.samaria360.auth.domain.model.Destino;
+import co.edu.unimagdalena.samaria360.auth.domain.model.EstadoAdministrativo;
+import co.edu.unimagdalena.samaria360.auth.domain.model.EventoCuentaActualizada;
+import co.edu.unimagdalena.samaria360.auth.domain.model.Rol;
 import co.edu.unimagdalena.samaria360.auth.domain.model.RegistroTurista;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,9 +30,11 @@ public class RegistrarTuristaService implements RegistrarTuristaUseCase {
     private final PasswordHasherPort hasher;
     private final NotificadorCuentaPort notificador;
     private final RelojPort reloj;
+    private final OutboxPort outbox;
 
     public RegistrarTuristaService(RegistroRepositoryPort registros, PasswordHasherPort hasher,
-                                   NotificadorCuentaPort notificador, RelojPort reloj) {
+                                   NotificadorCuentaPort notificador, RelojPort reloj, OutboxPort outbox) {
+        this.outbox = Objects.requireNonNull(outbox);
         this.registros = Objects.requireNonNull(registros);
         this.hasher = Objects.requireNonNull(hasher);
         this.notificador = Objects.requireNonNull(notificador);
@@ -40,7 +48,11 @@ public class RegistrarTuristaService implements RegistrarTuristaUseCase {
                 c.aceptoPoliticas());
         String hash = hasher.codificar(datos.contrasena().valor());
         if (!RegistroComun.atenderCorreoExistente(registros, notificador, datos.correo().valor())) {
-            registros.registrarTurista(new TuristaNuevo(UUID.randomUUID(), datos, hash, RegistroComun.hoy(reloj)));
+            UUID id = UUID.randomUUID();
+            registros.registrarTurista(new TuristaNuevo(id, datos, hash, RegistroComun.hoy(reloj)));
+            // Solo para RabbitMQ: ms-analytics cuenta los turistas por país (RF14; ADR-011).
+            outbox.registrar(EventoCuentaActualizada.registro(id, Rol.Turista, EstadoAdministrativo.Activo, null,
+                    reloj.ahora()), List.of(Destino.RABBITMQ));
         }
         return RegistroRecibido.INSTANCIA;
     }

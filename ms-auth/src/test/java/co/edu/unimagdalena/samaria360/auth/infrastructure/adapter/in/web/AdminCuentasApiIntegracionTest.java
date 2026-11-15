@@ -225,10 +225,13 @@ class AdminCuentasApiIntegracionTest {
         assertThat(jdbc.queryForObject("SELECT revisado_en IS NOT NULL FROM prestador WHERE id_usuario = ?",
                 Boolean.class, id)).isTrue();
         assertThat(jdbc.queryForList("SELECT en.destino FROM outbox_entrega en JOIN outbox_evento e"
-                + " ON e.id_evento = en.id_evento WHERE e.id_usuario = ?", String.class, id))
-                .containsExactlyInAnyOrder("ms-catalog", "ms-booking");
+                + " ON e.id_evento = en.id_evento WHERE e.id_usuario = ? AND e.tipo = 'CuentaActualizada'", String.class, id))
+                .containsExactlyInAnyOrder("ms-catalog", "ms-booking", "rabbitmq");
+        // Auditoría de RF13 (ADR-011): la decisión, solo para RabbitMQ y sin la justificación.
+        assertThat(jdbc.queryForObject("SELECT carga->>'decision' FROM outbox_evento"
+                + " WHERE id_usuario = ? AND tipo = 'PrestadorValidado'", String.class, id)).isEqualTo("Aprobado");
         Map<String, Object> evento = jdbc.queryForMap("SELECT tipo, carga::text AS carga FROM outbox_evento"
-                + " WHERE id_usuario = ?", id);
+                + " WHERE id_usuario = ? AND tipo = 'CuentaActualizada'", id);
         assertThat(evento.get("tipo")).isEqualTo("CuentaActualizada");
         assertThat(JsonPath.<String>read((String) evento.get("carga"), "$.estadoCuenta")).isEqualTo("Activo");
         assertThat(JsonPath.<String>read((String) evento.get("carga"), "$.rol")).isEqualTo("Prestador");
@@ -337,8 +340,8 @@ class AdminCuentasApiIntegracionTest {
             assertThat(JsonPath.<String>read(cuerpo(perdedora), "$.estadoActual")).isIn("Activo", "Rechazado");
             // Un solo cambio y un solo evento.
             assertThat(version(id)).isEqualTo(1);
-            assertThat(jdbc.queryForObject("SELECT count(*) FROM outbox_evento WHERE id_usuario = ?", Integer.class, id))
-                    .isEqualTo(1);
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM outbox_evento WHERE id_usuario = ?"
+                    + " AND tipo = 'CuentaActualizada'", Integer.class, id)).isEqualTo(1);
         } finally {
             hilos.shutdownNow();
         }

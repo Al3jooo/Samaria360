@@ -13,7 +13,10 @@ import co.edu.unimagdalena.samaria360.auth.domain.exception.EstadoCambiadoExcept
 import co.edu.unimagdalena.samaria360.auth.domain.exception.PoliticasNoAceptadasException;
 import co.edu.unimagdalena.samaria360.auth.domain.exception.RntYaRegistradoException;
 import co.edu.unimagdalena.samaria360.auth.domain.exception.RolCambiadoException;
+import co.edu.unimagdalena.samaria360.auth.domain.exception.TokenRecuperacionInvalidoException;
+import co.edu.unimagdalena.samaria360.auth.domain.exception.CredencialesServicioInvalidasException;
 import co.edu.unimagdalena.samaria360.auth.domain.exception.UltimoAdministradorException;
+import co.edu.unimagdalena.samaria360.auth.domain.exception.SesionVencidaException;
 import co.edu.unimagdalena.samaria360.auth.domain.exception.UsuarioNoEncontradoException;
 import co.edu.unimagdalena.samaria360.auth.domain.model.MotivoInvalido;
 import org.slf4j.Logger;
@@ -89,6 +92,19 @@ public class ManejadorErrores extends ResponseEntityExceptionHandler {
         return problema;
     }
 
+    /** DEC-280: el mismo 401 para un cliente desconocido y un secreto incorrecto. */
+    @ExceptionHandler(CredencialesServicioInvalidasException.class)
+    ProblemDetail credencialesServicio(CredencialesServicioInvalidasException ex) {
+        return Problemas.crear(HttpStatus.UNAUTHORIZED, CodigoError.CREDENCIALES_SERVICIO_INVALIDAS, ex.getMessage());
+    }
+
+    /** RF34: el enlace no existe, ya se usó o venció; no se dice cuál (DEC-285). */
+    @ExceptionHandler(TokenRecuperacionInvalidoException.class)
+    ProblemDetail tokenInvalido(TokenRecuperacionInvalidoException ex) {
+        return Problemas.crear(HttpStatus.BAD_REQUEST, CodigoError.TOKEN_INVALIDO,
+                "El enlace de recuperación no es válido o venció");
+    }
+
     @ExceptionHandler(PoliticasNoAceptadasException.class)
     ProblemDetail politicasNoAceptadas(PoliticasNoAceptadasException ex) {
         return Problemas.crear(HttpStatus.BAD_REQUEST, CodigoError.POLITICAS_NO_ACEPTADAS, ex.getMessage());
@@ -139,6 +155,12 @@ public class ManejadorErrores extends ResponseEntityExceptionHandler {
     }
 
     /** Token válido de un usuario que ya no existe. */
+    /** DEC-317: la renovación no prolonga la sesión más allá de su duración máxima. */
+    @ExceptionHandler(SesionVencidaException.class)
+    ProblemDetail sesionVencida(SesionVencidaException ex) {
+        return Problemas.crear(HttpStatus.UNAUTHORIZED, CodigoError.SESION_VENCIDA, ex.getMessage());
+    }
+
     @ExceptionHandler(UsuarioNoEncontradoException.class)
     ProblemDetail usuarioNoEncontrado(UsuarioNoEncontradoException ex) {
         return Problemas.crear(HttpStatus.UNAUTHORIZED, CodigoError.NO_AUTENTICADO, "La sesión no es válida");

@@ -1,5 +1,6 @@
 package co.edu.unimagdalena.samaria360.auth.infrastructure.adapter.out.security;
 
+import co.edu.unimagdalena.samaria360.auth.application.port.out.TokenEmitido;
 import co.edu.unimagdalena.samaria360.auth.application.port.out.TokenServicioPort;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Destino;
 import co.edu.unimagdalena.samaria360.auth.infrastructure.config.JwtPropiedades;
@@ -26,6 +27,8 @@ public class JwtServicioAdapter implements TokenServicioPort {
 
     public static final String ROL_SERVICIO = "SERVICIO";
     public static final String SUJETO = "ms-auth";
+    /** {@code aud} de los tokens de los clientes internos: solo los acepta el /internal/** de ms-auth (DEC-280). */
+    public static final String AUDIENCIA_PROPIA = "ms-auth";
     static final Duration VIGENCIA = Duration.ofMinutes(5);
 
     private final JwtEncoder encoder;
@@ -40,16 +43,27 @@ public class JwtServicioAdapter implements TokenServicioPort {
 
     @Override
     public String emitir(Destino destino, Instant ahora) {
+        return firmar(SUJETO, destino.texto(), ahora).token();
+    }
+
+    /** DEC-280: el cliente interno es el sujeto; la audiencia es ms-auth (solo sirve en su /internal/**). */
+    @Override
+    public TokenEmitido emitirParaCliente(String cliente, Instant ahora) {
+        return firmar(cliente, AUDIENCIA_PROPIA, ahora);
+    }
+
+    private TokenEmitido firmar(String sujeto, String audiencia, Instant ahora) {
         Instant emitidoEn = ahora.truncatedTo(ChronoUnit.SECONDS);
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(propiedades.emisor())
-                .subject(SUJETO)
-                .audience(List.of(destino.texto()))
+                .subject(sujeto)
+                .audience(List.of(audiencia))
                 .claim(JwtTokenProviderAdapter.CLAIM_ROL, ROL_SERVICIO)
                 .issuedAt(emitidoEn)
                 .expiresAt(emitidoEn.plus(VIGENCIA))
                 .build();
         JwsHeader cabecera = JwsHeader.with(SignatureAlgorithm.RS256).keyId(kid).build();
-        return encoder.encode(JwtEncoderParameters.from(cabecera, claims)).getTokenValue();
+        String token = encoder.encode(JwtEncoderParameters.from(cabecera, claims)).getTokenValue();
+        return new TokenEmitido(token, emitidoEn.plus(VIGENCIA));
     }
 }

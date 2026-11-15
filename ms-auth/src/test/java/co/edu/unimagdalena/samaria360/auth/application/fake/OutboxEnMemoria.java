@@ -2,6 +2,8 @@ package co.edu.unimagdalena.samaria360.auth.application.fake;
 
 import co.edu.unimagdalena.samaria360.auth.application.port.out.EntregaPendiente;
 import co.edu.unimagdalena.samaria360.auth.application.port.out.OutboxPort;
+import co.edu.unimagdalena.samaria360.auth.application.port.out.PublicacionPendiente;
+import co.edu.unimagdalena.samaria360.auth.domain.model.EventoPublicable;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Destino;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EventoCuentaActualizada;
 
@@ -10,6 +12,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 /** Outbox en memoria con la semántica del adaptador JDBC: última entrega pendiente por usuario, arriendo y reintentos. */
 public class OutboxEnMemoria implements OutboxPort {
@@ -60,7 +63,13 @@ public class OutboxEnMemoria implements OutboxPort {
         }
         eventos.add(evento);
         long id = eventos.size();
-        destinos.forEach(destino -> entregas.add(new Entrega(id, destino, evento)));
+        destinos.forEach(destino -> {
+            if (destino == Destino.RABBITMQ) {
+                publicaciones.add(new Publicacion(id, "CuentaActualizada", evento.idUsuario(), evento.ocurridoEn()));
+            } else {
+                entregas.add(new Entrega(id, destino, evento));
+            }
+        });
     }
 
     @Override
@@ -99,6 +108,79 @@ public class OutboxEnMemoria implements OutboxPort {
     @Override
     public void liberar(Destino destino, List<EntregaPendiente> liberadas, Instant ahora) {
         liberadas.forEach(entrega -> buscar(destino, entrega).proximoIntento = ahora);
+    }
+
+    /** Publicación pendiente para RabbitMQ (ADR-011): los eventos con destino RABBITMQ y los de auditoría. */
+    public static final class Publicacion {
+        public final long idEvento;
+        public final UUID idPublico = UUID.randomUUID();
+        public final String tipo;
+        public final UUID clave;
+        public final Instant ocurridoEn;
+        public int intentos;
+        public Instant proximoIntento;
+        public Instant publicadaEn;
+        public String ultimoError;
+
+        Publicacion(long idEvento, String tipo, UUID clave, Instant ocurridoEn) {
+            this.idEvento = idEvento;
+            this.tipo = tipo;
+            this.clave = clave;
+            this.ocurridoEn = ocurridoEn;
+            this.proximoIntento = ocurridoEn;
+        }
+    }
+
+    private final List<Publicacion> publicaciones = new ArrayList<>();
+    private final List<EventoPublicable> publicables = new ArrayList<>();
+
+    public List<Publicacion> publicaciones() {
+        return publicaciones;
+    }
+
+    public List<EventoPublicable> publicables() {
+        return publicables;
+    }
+
+    @Override
+    public void registrarPublicacion(EventoPublicable evento) {
+        publicables.add(evento);
+        publicaciones.add(new Publicacion(1000L + publicaciones.size(), evento.tipo(), evento.idUsuario(),
+                evento.ocurridoEn()));
+    }
+
+    @Override
+    public List<PublicacionPendiente> reclamarPublicaciones(Instant ahora, Duration arriendo, int limite) {
+        List<Publicacion> elegidas = publicaciones.stream()
+                .filter(p -> p.publicadaEn == null && !p.proximoIntento.isAfter(ahora))
+                .sorted(Comparator.comparingLong(p -> p.idEvento))
+                .limit(limite)
+                .toList();
+        elegidas.forEach(p -> p.proximoIntento = ahora.plus(arriendo));
+        return elegidas.stream().map(p -> new PublicacionPendiente(p.idEvento, p.idPublico, p.tipo, p.clave,
+                p.ocurridoEn, "{}", p.intentos)).toList();
+    }
+
+    @Override
+    public void marcarPublicada(PublicacionPendiente publicacion, Instant ahora) {
+        buscar(publicacion).publicadaEn = ahora;
+    }
+
+    @Override
+    public void registrarFalloPublicacion(PublicacionPendiente publicacion, Instant proximoIntento, String error) {
+        Publicacion p = buscar(publicacion);
+        p.intentos++;
+        p.proximoIntento = proximoIntento;
+        p.ultimoError = error;
+    }
+
+    @Override
+    public void liberarPublicaciones(List<PublicacionPendiente> liberadas, Instant ahora) {
+        liberadas.forEach(publicacion -> buscar(publicacion).proximoIntento = ahora);
+    }
+
+    private Publicacion buscar(PublicacionPendiente publicacion) {
+        return publicaciones.stream().filter(p -> p.idEvento == publicacion.idEvento()).findFirst().orElseThrow();
     }
 
     /** Último límite pedido a {@link #purgarEntregados}; la regla real se prueba contra PostgreSQL. */

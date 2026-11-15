@@ -13,6 +13,7 @@ import co.edu.unimagdalena.samaria360.auth.domain.model.CambioEstadoCuenta;
 import co.edu.unimagdalena.samaria360.auth.domain.model.CuentaAdministrada;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Destino;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EventoCuentaActualizada;
+import co.edu.unimagdalena.samaria360.auth.domain.model.EventoPrestadorValidado;
 import co.edu.unimagdalena.samaria360.auth.domain.model.JustificacionRechazo;
 import co.edu.unimagdalena.samaria360.auth.domain.model.MotivoInvalido;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Rol;
@@ -66,6 +67,11 @@ public class AdministrarCuentasService implements AdministrarCuentasUseCase {
                 ? cuenta.aprobar()
                 : cuenta.rechazar(JustificacionRechazo.de(comando.justificacion()));
         aplicar(cambio, comando.idAdministrador());
+        // Auditoría de RF13 (ADR-011): la decisión, sin la justificación (texto libre).
+        if (comando.idAdministrador() != null) {
+            outbox.registrarPublicacion(new EventoPrestadorValidado(comando.idPrestador(), aprobar,
+                    comando.idAdministrador(), reloj.ahora()));
+        }
         return detallePrestador(comando.idPrestador());
     }
 

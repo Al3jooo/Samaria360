@@ -38,6 +38,7 @@ class AuthApiIntegracionTest {
 
     private static final String LOGIN = "/api/v1/auth/login";
     private static final String ME = "/api/v1/auth/me";
+    private static final String RENOVACION = "/api/v1/auth/sesion/renovacion";
     private static final String JWKS = "/api/v1/auth/.well-known/jwks.json";
     private static final String CORREO_TURISTA = "turista@samaria360.test";
     private static final String CONTRASENA_SEMILLA = "Samaria360*";
@@ -208,6 +209,50 @@ class AuthApiIntegracionTest {
         assertThat(JsonPath.<String>read(cuerpo(resultado), "$.codigo")).isEqualTo("NO_AUTENTICADO");
     }
 
+    /** DEC-317: renovar devuelve un token nuevo con el mismo inicio de sesión (ini) y la forma del login. */
+    @Test
+    void renovarLaSesionEmiteOtroTokenQueConservaElInicio() throws Exception {
+        String token = token(CORREO_TURISTA);
+        long ini = SignedJWT.parse(token).getJWTClaimsSet().getLongClaim("ini");
+
+        MvcResult resultado = renovar(token);
+
+        assertThat(resultado.getResponse().getStatus()).isEqualTo(200);
+        String nuevo = JsonPath.read(cuerpo(resultado), "$.token");
+        assertThat(JsonPath.<String>read(cuerpo(resultado), "$.tipo")).isEqualTo("Bearer");
+        assertThat(SignedJWT.parse(nuevo).getJWTClaimsSet().getLongClaim("ini")).isEqualTo(ini);
+        assertThat(me(nuevo).getResponse().getStatus()).isEqualTo(200);
+    }
+
+    @Test
+    void renovarSinTokenResponde401() throws Exception {
+        assertThat(mvc.perform(post(RENOVACION)).andReturn().getResponse().getStatus()).isEqualTo(401);
+    }
+
+    @Test
+    void unaSesionDeMasDeOchoHorasNoSeRenueva() throws Exception {
+        Usuario turista = new Usuario(ID_TURISTA, CORREO_TURISTA, "$2a$10$hash", Rol.Turista, EstadoCuenta.Activo,
+                0, null);
+        Instant ahora = Instant.now();
+        String token = tokens.emitir(turista, ahora, ahora.minusSeconds(8 * 3600 + 60)).token();
+
+        MvcResult resultado = renovar(token);
+
+        assertThat(resultado.getResponse().getStatus()).isEqualTo(401);
+        assertThat(JsonPath.<String>read(cuerpo(resultado), "$.codigo")).isEqualTo("SESION_VENCIDA");
+    }
+
+    @Test
+    void unaCuentaDesactivadaNoRenuevaLaSesion() throws Exception {
+        String token = token(CORREO_TURISTA);
+        jdbc.update("UPDATE usuario SET estado_cuenta = 'Desactivado' WHERE correo = 'turista@samaria360.test'");
+
+        MvcResult resultado = renovar(token);
+
+        assertThat(resultado.getResponse().getStatus()).isEqualTo(403);
+        assertThat(JsonPath.<String>read(cuerpo(resultado), "$.codigo")).isEqualTo("CUENTA_INACTIVA");
+    }
+
     @Test
     void elJwksPublicaLaClavePublicaConSuKid() throws Exception {
         MvcResult resultado = mvc.perform(get(JWKS)).andReturn();
@@ -251,6 +296,10 @@ class AuthApiIntegracionTest {
         MvcResult resultado = login(correo, CONTRASENA_SEMILLA);
         assertThat(resultado.getResponse().getStatus()).isEqualTo(200);
         return JsonPath.read(cuerpo(resultado), "$.token");
+    }
+
+    private MvcResult renovar(String token) throws Exception {
+        return mvc.perform(post(RENOVACION).header(HttpHeaders.AUTHORIZATION, "Bearer " + token)).andReturn();
     }
 
     private MvcResult me(String token) throws Exception {

@@ -77,6 +77,20 @@
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
 
+        <!-- ============ Adaptadores de salida: mensajería y correo ============ -->
+        <dependency>
+            <!-- Nivel 3 de ADR-003: publicación de eventos en RabbitMQ con outbox y publisher confirms (ADR-011,
+                 DEC-284). Versión gestionada por Spring Boot. -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+        <dependency>
+            <!-- Correo por SMTP directo de ms-auth (figura 20 del Entregable 2; RF34, DEC-278, DEC-282). Versión
+                 gestionada por Spring Boot. -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!-- ============ Operación y contrato ============ -->
         <dependency>
             <!-- /actuator/health para los healthchecks de docker-compose -->
@@ -115,6 +129,21 @@
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- RabbitMQ real en las pruebas del relevo de eventos (ADR-011, «Cumplimiento»). Versión del BOM de
+                 Testcontainers que gestiona Spring Boot. -->
+            <groupId>org.testcontainers</groupId>
+            <artifactId>rabbitmq</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <!-- Valida cada evento publicado contra docs/sad/api/eventos.schema.json (JSON Schema 2020-12; ADR-011,
+                 «Cumplimiento»). Solo pruebas. -->
+            <groupId>com.networknt</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>1.5.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>

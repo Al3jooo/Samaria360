@@ -16,6 +16,7 @@ import co.edu.unimagdalena.samaria360.auth.domain.model.Destino;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EstadoAdministrativo;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EstadoCuenta;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EventoCuentaActualizada;
+import co.edu.unimagdalena.samaria360.auth.domain.model.EventoRolCambiado;
 import co.edu.unimagdalena.samaria360.auth.domain.model.MotivoInvalido;
 import co.edu.unimagdalena.samaria360.auth.domain.model.MotivoNoElegible;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Rol;
@@ -67,6 +68,12 @@ class CambiarRolServiceTest {
                 new EventoCuentaActualizada(CUENTA, Rol.Gestor, EstadoAdministrativo.Activo, 3, null, T0));
         assertThat(outbox.entregas()).extracting(e -> e.destino)
                 .containsExactlyInAnyOrder(Destino.MS_CATALOG, Destino.MS_BOOKING);
+        // Auditoría de RF13 en RabbitMQ (ADR-011).
+        assertThat(outbox.publicables()).singleElement().isInstanceOfSatisfying(EventoRolCambiado.class, evento -> {
+            assertThat(evento.idUsuario()).isEqualTo(CUENTA);
+            assertThat(evento.rolAnterior()).isEqualTo(Rol.Turista);
+            assertThat(evento.rolNuevo()).isEqualTo(Rol.Gestor);
+        });
         // Turista → Gestor no quita un Administrador: no se bloquea a nadie.
         assertThat(cuentas.llamadas()).containsExactly("buscar", "aplicar", "resumen");
     }

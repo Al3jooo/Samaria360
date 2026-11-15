@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 // El relevo se prueba llamando al caso de uso: el programador no corre en las pruebas.
-@SpringBootTest(properties = "samaria360.outbox.habilitado=false")
+@SpringBootTest(properties = {"samaria360.outbox.habilitado=false", "samaria360.eventos.habilitado=false"})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(InfraestructuraTestConfig.class)

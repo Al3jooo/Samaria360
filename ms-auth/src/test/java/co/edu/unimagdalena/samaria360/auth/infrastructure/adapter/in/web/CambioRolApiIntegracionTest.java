@@ -112,8 +112,11 @@ class CambioRolApiIntegracionTest {
         assertThat(existe("gestor", id)).isFalse();
         assertThat(existe("administrador", id)).isTrue();
         assertThat(version(id)).isEqualTo(3);
-        assertThat(jdbc.queryForObject("SELECT count(*) FROM outbox_evento WHERE id_usuario = ?", Integer.class, id))
-                .isEqualTo(3);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM outbox_evento WHERE id_usuario = ?"
+                + " AND tipo = 'CuentaActualizada'", Integer.class, id)).isEqualTo(3);
+        // Un RolCambiado por cada cambio, para la auditoría de RF13 (ADR-011).
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM outbox_evento WHERE id_usuario = ?"
+                + " AND tipo = 'RolCambiado'", Integer.class, id)).isEqualTo(3);
         assertThat(evento(id, 3)).containsEntry("rol", "Administrador");
     }
 
@@ -134,8 +137,9 @@ class CambioRolApiIntegracionTest {
         assertThat(carga).containsEntry("idUsuario", id.toString()).containsEntry("rol", "Turista")
                 .containsEntry("estadoCuenta", "Activo");
         assertThat(jdbc.queryForList("SELECT en.destino FROM outbox_entrega en JOIN outbox_evento e"
-                        + " ON e.id_evento = en.id_evento WHERE e.id_usuario = ? AND (e.carga->>'version')::int = 2",
-                String.class, id)).containsExactlyInAnyOrder("ms-catalog", "ms-booking");
+                        + " ON e.id_evento = en.id_evento WHERE e.id_usuario = ? AND (e.carga->>'version')::int = 2"
+                        + " AND e.tipo = 'CuentaActualizada'",
+                String.class, id)).containsExactlyInAnyOrder("ms-catalog", "ms-booking", "rabbitmq");
         // De vuelta en el listado de turistas, con su estado.
         assertThat(JsonPath.<List<String>>read(cuerpo(admin(get(BASE + "/turistas?q=" + correo(id)))),
                 "$.elementos[*].idUsuario")).containsExactly(id.toString());
@@ -539,7 +543,7 @@ class CambioRolApiIntegracionTest {
 
     private List<String> destinos(UUID id) {
         return jdbc.queryForList("SELECT en.destino FROM outbox_entrega en JOIN outbox_evento e"
-                + " ON e.id_evento = en.id_evento WHERE e.id_usuario = ?", String.class, id);
+                + " ON e.id_evento = en.id_evento WHERE e.id_usuario = ? AND en.destino <> 'rabbitmq'", String.class, id);
     }
 
     private int administradoresActivos() {

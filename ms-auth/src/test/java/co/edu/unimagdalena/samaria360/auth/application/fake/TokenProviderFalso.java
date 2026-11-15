@@ -12,11 +12,17 @@ public class TokenProviderFalso implements TokenProviderPort {
     public static final Duration VIGENCIA = Duration.ofMinutes(15);
 
     private int llamadas;
+    private Instant ultimoInicioSesion;
 
     @Override
-    public TokenEmitido emitir(Usuario usuario, Instant ahora) {
+    public TokenEmitido emitir(Usuario usuario, Instant ahora, Instant inicioSesion) {
         llamadas++;
+        ultimoInicioSesion = inicioSesion;
         return new TokenEmitido("token-" + usuario.getId(), ahora.plus(VIGENCIA));
+    }
+
+    public Instant ultimoInicioSesion() {
+        return ultimoInicioSesion;
     }
 
     public int llamadas() {

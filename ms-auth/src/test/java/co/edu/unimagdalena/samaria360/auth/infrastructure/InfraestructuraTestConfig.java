@@ -4,7 +4,11 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.DynamicPropertyRegistrar;
+import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+import org.testcontainers.utility.MountableFile;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -28,6 +32,58 @@ public class InfraestructuraTestConfig {
     @ServiceConnection
     PostgreSQLContainer<?> postgres() {
         return new PostgreSQLContainer<>("postgres:16-alpine");
+    }
+
+    /**
+     * RabbitMQ real (misma imagen que docker-compose) con la topología de {@code infra/rabbitmq/definiciones.json}
+     * (ADR-011): el vhost, el exchange y las colas son los de producción. Se conecta con el usuario guest de la imagen,
+     * con permisos sobre el vhost.
+     */
+    @Bean
+    RabbitMQContainer rabbitmq() {
+        RabbitMQContainer rabbit = new RabbitMQContainer("rabbitmq:4.1.4-management-alpine")
+                .withCopyFileToContainer(MountableFile.forHostPath("../infra/rabbitmq/definiciones.json"),
+                        "/tmp/definiciones.json");
+        rabbit.start();
+        try {
+            rabbit.execInContainer("rabbitmqctl", "import_definitions", "/tmp/definiciones.json");
+            rabbit.execInContainer("rabbitmqctl", "set_permissions", "-p", "samaria360", "guest", ".*", ".*", ".*");
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(e);
+        }
+        return rabbit;
+    }
+
+    @Bean
+    DynamicPropertyRegistrar rabbitmqDePrueba(RabbitMQContainer rabbit) {
+        return registro -> {
+            registro.add("spring.rabbitmq.host", rabbit::getHost);
+            registro.add("spring.rabbitmq.port", rabbit::getAmqpPort);
+            registro.add("spring.rabbitmq.username", () -> "guest");
+            registro.add("spring.rabbitmq.password", () -> "guest");
+        };
+    }
+
+    /** Servidor SMTP de desarrollo (DEC-282), el mismo de Compose: la API de Mailpit deja leer los correos enviados. */
+    @Bean
+    GenericContainer<?> mailpit() {
+        GenericContainer<?> mailpit = new GenericContainer<>("axllent/mailpit:v1.27.11")
+                .withExposedPorts(1025, 8025)
+                .waitingFor(Wait.forListeningPorts(1025, 8025));
+        mailpit.start();
+        return mailpit;
+    }
+
+    @Bean
+    DynamicPropertyRegistrar mailpitDePrueba(GenericContainer<?> mailpit) {
+        return registro -> {
+            registro.add("spring.mail.host", mailpit::getHost);
+            registro.add("spring.mail.port", () -> mailpit.getMappedPort(1025));
+            registro.add("prueba.mailpit.api", () -> "http://" + mailpit.getHost() + ":" + mailpit.getMappedPort(8025));
+        };
     }
 
     @Bean
