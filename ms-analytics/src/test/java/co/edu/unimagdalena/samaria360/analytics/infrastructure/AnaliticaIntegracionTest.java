@@ -141,6 +141,8 @@ class AnaliticaIntegracionTest {
                         "Administrador", 2)))).andReturn().getResponse().getContentAsString());
         assertThat(pagina.get("totalElementos").asLong()).isEqualTo(1);
         assertThat(pagina.at("/elementos/0/detalle").asText()).contains(prestador.toString());
+        // DEC-322 (A005): los datos del detalle, para traducirlo en la interfaz; el validador v2 los acepta.
+        assertThat(pagina.at("/elementos/0/datos/idPrestador").asText()).isEqualTo(prestador.toString());
 
         assertThat(mvc.perform(get("/api/v1/analytics/admin/auditoria").header(HttpHeaders.AUTHORIZATION,
                 TokensDePrueba.bearer(TokensDePrueba.usuario(UUID.randomUUID(), "Turista", 0)))).andReturn()

@@ -73,8 +73,10 @@ public class BeanConfig {
     public CalificacionesService calificacionesService(CalificacionRepositoryPort calificaciones,
                                                        PromedioRepositoryPort promedios, ReservaProyeccionPort reservas,
                                                        CuentaProyeccionPort cuentas, AuditoriaRepositoryPort auditoria,
-                                                       OutboxEventosPort outbox, RelojPort reloj) {
-        return new CalificacionesService(calificaciones, promedios, reservas, cuentas, auditoria, outbox, reloj);
+                                                       OutboxEventosPort outbox, ConsultasProyeccionPort fichas,
+                                                       RelojPort reloj) {
+        return new CalificacionesService(calificaciones, promedios, reservas, cuentas, auditoria, outbox, fichas,
+                reloj);
     }
 
     /**

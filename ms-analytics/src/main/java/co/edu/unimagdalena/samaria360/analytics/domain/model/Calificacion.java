@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 /**
  * Calificación de un servicio o un atractivo (RF17; decisión 1 del equipo, DEC-300): de 1 a 5 estrellas y un comentario
  * de 0 a 500 caracteres; una por turista y entidad, sin edición. {@code estado}: {@code Visible} u {@code Oculta}
- * (RF29, reversible); eliminar es definitivo. {@code idPrestador} y {@code nombreEntidad}, solo en los servicios (salen
- * de la reserva Completada). {@code id} es nulo hasta que se guarda.
+ * (RF29, reversible); eliminar es definitivo. {@code idPrestador}, solo en los servicios (sale de la reserva
+ * Completada); {@code nombreEntidad}, de la reserva en un servicio y de la ficha consultada en un atractivo (DEC-323). {@code id} es nulo hasta que se guarda.
  */
 public record Calificacion(String id, TipoEntidad tipoEntidad, String idEntidad, UUID turistaId, UUID idPrestador,
                            String nombreEntidad, int estrellas, String comentario, Estado estado,

@@ -76,6 +76,39 @@ class DominioAnaliticaTest {
     }
 
     @Test
+    void laAuditoriaGuardaLosDatosDelDetalleParaTraducirlo() {
+        UUID usuario = UUID.randomUUID();
+        RegistroAuditoria rol = RegistroAuditoria.deCambioRol(evento("RolCambiado", Map.of("idUsuario",
+                usuario.toString(), "rolAnterior", "Turista", "rolNuevo", "Gestor",
+                "idAdministrador", UUID.randomUUID().toString())));
+        RegistroAuditoria moderacion = RegistroAuditoria.deModeracion(UUID.randomUUID(), usuario,
+                AccionAuditada.CALIFICACION_OCULTADA, "6a0000000000000000000001", TipoEntidad.atractivo,
+                "6a0000000000000000000002", "Lenguaje ofensivo", T0);
+
+        // DEC-322: la interfaz arma la frase con datos; el detalle en español se conserva.
+        assertThat(rol.datos()).containsExactly(Map.entry("idUsuario", usuario.toString()),
+                Map.entry("rolAnterior", "Turista"), Map.entry("rolNuevo", "Gestor"));
+        assertThat(rol.detalle()).isEqualTo("Cuenta " + usuario + ": Turista → Gestor");
+        assertThat(moderacion.datos()).containsEntry("tipoEntidad", "atractivo")
+                .containsEntry("motivo", "Lenguaje ofensivo");
+    }
+
+    @Test
+    void laAuditoriaDelServicioGuardaSuNombreSiElEventoLoTrae() {
+        String servicio = "6a0000000000000000000003";
+        Map<String, Object> base = new LinkedHashMap<>(Map.of("idServicio", servicio, "idPrestador",
+                PRESTADOR.toString(), "decision", "Publicado", "idAdministrador", UUID.randomUUID().toString()));
+        RegistroAuditoria anterior = RegistroAuditoria.deServicio(evento("ServicioDecidido", base));
+        base.put("nombreServicio", "Tour Tayrona");
+        RegistroAuditoria conNombre = RegistroAuditoria.deServicio(evento("ServicioDecidido", base));
+
+        // DEC-323: el nombre es opcional en el contrato; un evento anterior sigue siendo válido.
+        assertThat(anterior.datos()).doesNotContainKey("nombreServicio");
+        assertThat(conNombre.datos()).containsEntry("nombreServicio", "Tour Tayrona");
+        assertThat(conNombre.detalle()).contains("«Tour Tayrona»");
+    }
+
+    @Test
     void elPaisSoloSeGuardaEnUnTurista() {
         CuentaProyectada gestor = CuentaProyectada.de(evento("CuentaActualizada", Map.of("idUsuario",
                 TURISTA.toString(), "rol", "Gestor", "estadoCuenta", "Activo", "version", 1, "pais", "CO")));

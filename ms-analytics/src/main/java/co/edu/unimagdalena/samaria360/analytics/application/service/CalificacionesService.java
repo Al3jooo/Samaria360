@@ -7,6 +7,7 @@ import co.edu.unimagdalena.samaria360.analytics.application.port.in.ModerarCalif
 import co.edu.unimagdalena.samaria360.analytics.application.port.in.Pagina;
 import co.edu.unimagdalena.samaria360.analytics.application.port.out.AuditoriaRepositoryPort;
 import co.edu.unimagdalena.samaria360.analytics.application.port.out.CalificacionRepositoryPort;
+import co.edu.unimagdalena.samaria360.analytics.application.port.out.ConsultasProyeccionPort;
 import co.edu.unimagdalena.samaria360.analytics.application.port.out.CuentaProyeccionPort;
 import co.edu.unimagdalena.samaria360.analytics.application.port.out.OutboxEventosPort;
 import co.edu.unimagdalena.samaria360.analytics.application.port.out.PromedioRepositoryPort;
@@ -42,17 +43,20 @@ public class CalificacionesService implements CalificarUseCase, ConsultarCalific
     private final CuentaProyeccionPort cuentas;
     private final AuditoriaRepositoryPort auditoria;
     private final OutboxEventosPort outbox;
+    private final ConsultasProyeccionPort fichas;
     private final RelojPort reloj;
 
     public CalificacionesService(CalificacionRepositoryPort calificaciones, PromedioRepositoryPort promedios,
                                  ReservaProyeccionPort reservas, CuentaProyeccionPort cuentas,
-                                 AuditoriaRepositoryPort auditoria, OutboxEventosPort outbox, RelojPort reloj) {
+                                 AuditoriaRepositoryPort auditoria, OutboxEventosPort outbox,
+                                 ConsultasProyeccionPort fichas, RelojPort reloj) {
         this.calificaciones = Objects.requireNonNull(calificaciones);
         this.promedios = Objects.requireNonNull(promedios);
         this.reservas = Objects.requireNonNull(reservas);
         this.cuentas = Objects.requireNonNull(cuentas);
         this.auditoria = Objects.requireNonNull(auditoria);
         this.outbox = Objects.requireNonNull(outbox);
+        this.fichas = Objects.requireNonNull(fichas);
         this.reloj = Objects.requireNonNull(reloj);
     }
 
@@ -64,7 +68,8 @@ public class CalificacionesService implements CalificarUseCase, ConsultarCalific
         Optional<ReservaProyectada> reserva = verificarElegible(comando.turista(), tipo, comando.idEntidad());
         Calificacion nueva = Calificacion.nueva(tipo, comando.idEntidad(), comando.turista(),
                 reserva.map(ReservaProyectada::idPrestador).orElse(null),
-                reserva.map(ReservaProyectada::nombreServicio).orElse(null),
+                reserva.map(ReservaProyectada::nombreServicio)
+                        .orElseGet(() -> fichas.ultimoNombre(tipo, comando.idEntidad()).orElse(null)),
                 comando.estrellas(), comando.comentario(), reloj.ahora());
         Calificacion guardada = calificaciones.insertar(nueva);
         recalcular(tipo, comando.idEntidad());
@@ -148,7 +153,21 @@ public class CalificacionesService implements CalificarUseCase, ConsultarCalific
                 throw new CamposInvalidosException(Map.of("estado", "NO_PERMITIDO"));
             }
         }
-        return calificaciones.paraModerar(filtro, pagina, TAMANO);
+        Pagina<Calificacion> encontradas = calificaciones.paraModerar(filtro, pagina, TAMANO);
+        // DEC-323: las calificaciones de atractivos anteriores no guardaron el nombre; se completa con la ficha.
+        return new Pagina<>(encontradas.elementos().stream().map(this::conNombre).toList(), encontradas.pagina(),
+                encontradas.tamano(), encontradas.totalElementos());
+    }
+
+    private Calificacion conNombre(Calificacion c) {
+        if (c.nombreEntidad() != null) {
+            return c;
+        }
+        return fichas.ultimoNombre(c.tipoEntidad(), c.idEntidad())
+                .map(nombre -> new Calificacion(c.id(), c.tipoEntidad(), c.idEntidad(), c.turistaId(), c.idPrestador(),
+                        nombre, c.estrellas(), c.comentario(), c.estado(), c.motivoModeracion(), c.fecha(),
+                        c.fechaModeracion()))
+                .orElse(c);
     }
 
     @Override
@@ -202,9 +221,8 @@ public class CalificacionesService implements CalificarUseCase, ConsultarCalific
     /** RF29 pide la acción y su motivo en el log (excepción a «sin texto libre» de DEC-294, registrada en DEC-300). */
     private void auditar(UUID administrador, AccionAuditada accion, Calificacion calificacion, String motivo,
                          Instant ahora) {
-        auditoria.registrar(new RegistroAuditoria(UUID.randomUUID(), administrador, accion,
-                "Calificación " + calificacion.id() + " de " + calificacion.tipoEntidad().name() + " "
-                        + calificacion.idEntidad() + ". Motivo: " + motivo, ahora));
+        auditoria.registrar(RegistroAuditoria.deModeracion(UUID.randomUUID(), administrador, accion,
+                calificacion.id(), calificacion.tipoEntidad(), calificacion.idEntidad(), motivo, ahora));
     }
 
     private void recalcular(TipoEntidad tipo, String idEntidad) {

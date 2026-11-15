@@ -165,9 +165,10 @@ class CalificacionesServiceTest {
     private final Dobles.Cuentas cuentas = new Dobles.Cuentas();
     private final Dobles.Auditoria auditoria = new Dobles.Auditoria();
     private final Outbox outbox = new Outbox();
+    private final Dobles.Consultas fichas = new Dobles.Consultas();
     private final CalificacionesService servicio = new CalificacionesService(calificaciones,
             p -> versiones.merge(p.tipoEntidad() + ":" + p.idEntidad(), 1L, Long::sum), reservas, cuentas, auditoria,
-            outbox, () -> AHORA);
+            outbox, fichas, () -> AHORA);
 
     private void completada() {
         reservas.guardar(new ReservaProyectada(UUID.randomUUID(), TURISTA, PRESTADOR, SERVICIO, "Tour Tayrona",
@@ -212,6 +213,23 @@ class CalificacionesServiceTest {
                 .isInstanceOfSatisfying(ReglaNegocioException.class,
                         e -> assertThat(e.getCodigo()).isEqualTo(ReglaNegocioException.CALIFICACION_DUPLICADA));
         assertThat(servicio.elegibilidad(TURISTA, "atractivo", ATRACTIVO).propia().estrellas()).isEqualTo(5);
+    }
+
+    @Test
+    void laModeracionMuestraElNombreDelAtractivoQueTrajoSuFicha() {
+        Calificacion sinNombre = servicio.calificar(comando("atractivo", ATRACTIVO, 4));
+        assertThat(sinNombre.nombreEntidad()).isNull();
+
+        // DEC-323: la ficha consultada trajo el nombre (ConsultasAgregadas); la moderación lo completa al listar.
+        fichas.sumar(new co.edu.unimagdalena.samaria360.analytics.domain.model.ConsultasFicha(
+                co.edu.unimagdalena.samaria360.analytics.domain.model.TipoEntidad.atractivo, ATRACTIVO,
+                "Playa Cristal", null, java.time.LocalDate.of(2030, 3, 1), 3));
+
+        assertThat(servicio.listar(null, 0).elementos()).extracting(Calificacion::nombreEntidad)
+                .containsExactly("Playa Cristal");
+        Calificacion conNombre = servicio.calificar(new ComandoCalificar(UUID.randomUUID(), "atractivo", ATRACTIVO,
+                5, ""));
+        assertThat(conNombre.nombreEntidad()).isEqualTo("Playa Cristal");
     }
 
     @Test
