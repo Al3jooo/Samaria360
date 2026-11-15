@@ -1,0 +1,36 @@
+' WF-31 «Mis itinerarios» (RF35) y WF-32 «Base de conocimientos» (RF05); DEC-298, DEC-297.
+' Propuestos por arquitectura (plan del 100 %, iteración L). Solo estructura: regiones, elementos y flujo.
+
+@startsalt
+{+
+{ <b>Samaria360 | Búsqueda | Servicios | Asistente IA | [ES/EN] | (avatar ▼) }
+==
+<b>WF-31 · Mis itinerarios (Turista, /perfil/itinerarios)
+← Volver a Mi perfil
+2 de 20 itinerarios
+{+
+<b>Fin de semana | Actualizado el 01/03/2030
+Día 1: Tour Tayrona (Servicio)
+Día 2: Playa Cristal (Atractivo)
+[Editar] | [Eliminar]
+}
+Editar: Nombre [______] · por paso: Día [1 ▼] [Quitar] · [Guardar cambios] [Cancelar]
+Eliminar: «¿Eliminar "Fin de semana"? No se puede deshacer.» [Sí, eliminar] [Cancelar]
+Vacío: «Todavía no tienes itinerarios guardados.» [Pedir un itinerario al asistente]
+==
+<b>WF-32 · Base de conocimientos del asistente (Administrador, /admin/conocimiento)
+{+
+<b>Nueva entrada
+Categoría [__________]
+Contenido [______________________________] 0 de 2000 caracteres
+[Agregar entrada]
+}
+12 entradas
+{+
+<b>Clima | 01/03/2030
+En temporada de lluvias los senderos de la Sierra cierran por la tarde.
+[Editar] | [Eliminar]
+}
+[Anterior] Página 1 de 2 [Siguiente]
+}
+@endsalt

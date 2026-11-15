@@ -1,0 +1,40 @@
+' WF-38 «Oferta y disponibilidad» (RF19), WF-39 «Historial de modificaciones» (RF41), WF-40 «Asistentes» (RF42)
+' y la galería de WF-18 (RF48); DEC-310 a DEC-313.
+' Propuestos por arquitectura (plan del 100 %, iteración I). Solo estructura: regiones, elementos y flujo.
+
+@startsalt
+{+
+{ <b>Samaria360 | Búsqueda | Servicios | Asistente IA | [ES/EN] | (avatar ▼) }
+==
+<b>WF-38 · Oferta y disponibilidad (Prestador, /prestador/servicios/:id/oferta; desde WF-18, servicio Publicado)
+< Volver al servicio
+<b>Disponibilidad de Tour Tayrona
+{ Desde [dd/mm/aaaa] | Hasta [dd/mm/aaaa] | [Consultar] }
+{# Fecha | Salida o unidad | Cupos totales | Reservados | Disponibles | Estado | Acciones
+ 16/11/2026 | 07:00 | [ 12 ] | 3 | 9 | Abierta | [Guardar cupos] [Cerrar (deshabilitado: tiene reservas)]
+ 16/11/2026 | 13:30 | [ 12 ] | 0 | 12 | Abierta | [Guardar cupos] [Cerrar]
+ 21/11/2026 | 07:00 | [ 12 ] | 0 | 0 | Cerrada | [Abrir] }
+{+ <b>Agregar una salida (o una fecha) | Fecha [dd/mm/aaaa] | Salida [hh:mm] (o Unidad [▼]) | Cupos [  ] | [Agregar] }
+{+ <b>Días y horarios habituales | [X] Lunes [ ] Martes ... [X] Sábado | Salidas [07:00, 13:30] | [Guardar días y horarios] }
+Ver asistentes · Ver historial de modificaciones
+==
+<b>WF-39 · Historial de modificaciones (Prestador, /prestador/historial-modificaciones)
+{ Servicio [Todos ▼] | [Filtrar] }
+{# Fecha y hora | Servicio | Cambio | Fecha o unidad | Valor anterior | Valor nuevo
+ 14/11 10:00 | Tour Tayrona | Precio | — | 80000 | 95000
+ 13/11 09:30 | Tour Tayrona | Cupos | 2026-11-16 07:00 | 12 | 8 }
+{ [Anterior] | Página 1 de 1 | [Siguiente] }
+==
+<b>WF-40 · Asistentes (Prestador, /prestador/asistentes)
+{ Servicio [▼] | Fecha [dd/mm/aaaa] | Salida (opcional) [hh:mm] | [Consultar] }
+<b>Tour Tayrona · 16 de noviembre de 2026
+3 personas en total
+{ [Descargar CSV] | [Descargar PDF] }
+{# Nombre | Correo | Teléfono | Personas | Salida o unidad | Entrada | Fin
+ Ana Pérez | ana@correo | +57 300 | 2 | 07:00 | 16/11 | 16/11 }
+==
+<b>WF-18 · Detalle de un servicio Publicado: Galería (RF48)
+{+ <b>Galería | 2 de 5 imágenes. JPEG o PNG de hasta 5 MB | (miniatura) [Quitar] | (miniatura) [Quitar] | [Agregar imagen] }
+{ [Actualizar precio] | [Editar datos comerciales] | [Gestionar disponibilidad] }
+}
+@endsalt

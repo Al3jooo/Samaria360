@@ -1,6 +1,6 @@
 # Modelo de datos NoSQL (MongoDB)
 
-Validadores de `catalog_db` en su **última versión**. Parten de la transcripción fiel del **Documento Entregable 2** (sección "Diagramas de Base de Datos NoSQL", versión del 10/10/2026), con los cambios posteriores que se listan abajo.
+Validadores de `catalog_db`, `analytics_db` y `chatbot_db` en su **última versión**. Parten de la transcripción fiel del **Documento Entregable 2** (sección "Diagramas de Base de Datos NoSQL", versión del 10/10/2026), con los cambios posteriores que se listan abajo.
 
 **Dónde vive cada versión.** La versión del Entregable 2 (v1) está congelada en `infra/mongo/init/servicios.v1.schema.json` y `atractivos.v1.schema.json`, que usan los scripts de inicialización (línea base). Cada cambio posterior va en una migración de `infra/mongo/migraciones` con **su propia copia** del validador (p. ej. `esquema/M001__servicios.v2.schema.json`); las migraciones nunca leen estos archivos. Las pruebas de ms-catalog (`MigracionesMongoTest`) verifican que, después de aplicar todas las migraciones, el validador de la base sea igual al de esta carpeta.
 
@@ -14,10 +14,29 @@ Validadores de `catalog_db` en su **última versión**. Parten de la transcripci
 | `favoritos.schema.json` | `favoritos` | `catalog_db` | ms-catalog |
 | `historial_busqueda.schema.json` | `historial_busqueda` | `catalog_db` | ms-catalog |
 | `eventos.schema.json` | `eventos` | `catalog_db` | ms-catalog |
+| `outbox_eventos.schema.json` | `outbox_eventos` | `catalog_db` | ms-catalog |
+| `ocupaciones.schema.json` | `ocupaciones` | `catalog_db` | ms-catalog |
+| `historial_modificaciones.schema.json` | `historial_modificaciones` | `catalog_db` | ms-catalog |
+| `analytics_db/cuentas.schema.json` | `cuentas` | `analytics_db` | ms-analytics |
+| `analytics_db/reservas.schema.json` | `reservas` | `analytics_db` | ms-analytics |
+| `analytics_db/logs_auditoria.schema.json` | `logs_auditoria` | `analytics_db` | ms-analytics |
+| `analytics_db/notificaciones.schema.json` | `notificaciones` | `analytics_db` | ms-analytics |
+| `analytics_db/correos_pendientes.schema.json` | `correos_pendientes` | `analytics_db` | ms-analytics |
+| `analytics_db/eventos_procesados.schema.json` | `eventos_procesados` | `analytics_db` | ms-analytics |
+| `analytics_db/calificaciones.schema.json` | `calificaciones` | `analytics_db` | ms-analytics |
+| `analytics_db/promedios.schema.json` | `promedios` | `analytics_db` | ms-analytics |
+| `analytics_db/reportes.schema.json` | `reportes` | `analytics_db` | ms-analytics |
+| `analytics_db/outbox_eventos.schema.json` | `outbox_eventos` | `analytics_db` | ms-analytics |
+| `analytics_db/ocupaciones.schema.json` | `ocupaciones` | `analytics_db` | ms-analytics |
+| `analytics_db/consultas.schema.json` | `consultas` | `analytics_db` | ms-analytics |
+| `chatbot_db/cuentas.schema.json` | `cuentas` | `chatbot_db` | ms-chatbot |
+| `chatbot_db/uso_diario.schema.json` | `uso_diario` | `chatbot_db` | ms-chatbot |
+| `chatbot_db/itinerarios_sugeridos.schema.json` | `itinerarios_sugeridos` | `chatbot_db` | ms-chatbot |
+| `chatbot_db/base_conocimiento_turistico.schema.json` | `base_conocimiento_turistico` | `chatbot_db` | ms-chatbot |
 
 Cada archivo contiene exactamente el objeto que va en `validator` de `db.createCollection` o de `collMod`. `servicios.schema.json` tiene dos claves, `$jsonSchema` y `$expr`: MongoDB exige las dos (un AND implícito).
 
-Las demás colecciones del Entregable 2 (`itinerarios_sugeridos`, `base_conocimiento_turistico`, `calificaciones`, `reportes`, `logs_auditoria`, `notificaciones`) se transcribirán aquí cuando un caso de uso del prototipo las necesite.
+Con el plan del 100 % (DEC-278) ya están todas las colecciones del Entregable 2: `itinerarios_sugeridos` y `base_conocimiento_turistico` en `chatbot_db` (ms-chatbot, C001), y `calificaciones`, `reportes`, `logs_auditoria` y `notificaciones` en `analytics_db` (ms-analytics, A001 y A002). Cada base tiene sus migraciones, con su propia copia de cada validador: `infra/mongo/migraciones/` (catalog_db, M…), `infra/mongo/analytics/` (A…) e `infra/mongo/chatbot/` (C…). Las aplica `mongo-migraciones`, cada una con el usuario de su servicio (DEC-275).
 
 ## Notas para la implementación
 
@@ -77,3 +96,38 @@ Las demás colecciones del Entregable 2 (`itinerarios_sugeridos`, `base_conocimi
   - sin `version`: los eventos no se editan (DEC-241);
   - índices `eventos_agenda` (`{fechaInicio: 1, _id: 1, fechaFin: 1}`) y `eventos_registro` (`{fechaRegistro: -1, _id: -1}`).
   - Falta llevarlo al Documento Entregable 2 (punto 13 de «Pendientes para el SAD (modelo NoSQL)» en `docs/trazabilidad.md`).
+
+## Plan del 100 % (iteraciones F a K e I)
+
+### catalog_db
+
+- **Colección `outbox_eventos` (M014; iteración G; DEC-293):** los eventos de ms-catalog para RabbitMQ (ADR-011), escritos en la misma transacción que el cambio. Obligatorios: `idPublico` (UUID del evento), `tipo`, `clave` (la de enrutamiento), `datos`, `creadoEn`, `intentos` y `proximoIntento`; `publicadoEn` y `ultimoError` los escribe el relevo. Índices `outbox_pendientes` (`{publicadoEn, proximoIntento, _id}`) y `outbox_id_publico` (único). **Ampliación propia:** no está en el Entregable 2.
+- **Esquema v5 de `servicios` y v3 de `atractivos` (M015; iteración H; DEC-302):** `calificacion {promedio, cantidad, version}`, opcional, copiada del evento `PromedioActualizado` de ms-analytics. `promedio` es `double` de 1 a 5, o `null` sin calificaciones visibles; `cantidad` ≥ 0; `version` es la del promedio en ms-analytics. El UPDATE solo avanza con una versión mayor y no toca la `version` de la edición. Índice `servicios_calificacion` (`{"calificacion.promedio": -1, _id: 1}`) para `orden=Calificacion` (RF61). **Desviación del Entregable 2:** allí el promedio vivía solo en el servicio de análisis; se copia para ordenar sin consultar otro servicio (decisión 6).
+- **Esquema v4 de `atractivos` y colección `ocupaciones` (M016; iteración J; DEC-304):** `atractivos.ocupacionActual {valor, fecha}` (0 a 1 000 000) es la última lectura del Gestor (RF39) y no sube `version`. Índice `atractivos_categoria` para los alternativos (RF51). `ocupaciones` guarda cada lectura: `atractivoId`, `ocupacion`, `limite` (la capacidad de carga en ese momento), `fecha` y `gestorId`; índice `ocupaciones_atractivo` (`{atractivoId, fecha: -1}`). **Ampliación propia.**
+- **Colección `historial_modificaciones` (M017; iteración I; DEC-311):** RF41, últimos 30 días por prestador. Obligatorios: `servicioId`, `prestadorId`, `tipo`, `valorNuevo` y `fecha`; opcionales: `nombreServicio`, `detalle`, `valorAnterior` e `idEvento` (el del `OfertaModificada` de ms-booking). Índices `historial_prestador` (`{prestadorId, fecha: -1, _id: -1}`) e `historial_id_evento` (único y parcial: deduplica los eventos; los cambios de precio de RF32 no lo llevan). **Ampliación propia.**
+
+### analytics_db (ms-analytics; A001 a A004; DEC-292, DEC-300, DEC-304, DEC-308)
+
+Todas con `additionalProperties: false`. ms-analytics no lee bases ajenas: sus proyecciones salen de los eventos de RabbitMQ (decisión 6).
+
+- **A001 (iteración G):**
+  - `cuentas`: proyección de `CuentaActualizada` (`rol`, `estadoCuenta`, `version` y el `pais` del turista), para el validador de `ver` y los turistas por país de RF14;
+  - `reservas`: proyección de los eventos de reservas (`idTurista`, `idPrestador`, `idServicio`, `estado`, `actualizadaEn`, más `confirmadaEn` y los datos del servicio);
+  - `logs_auditoria` (RF13): `usuarioId`, `accion`, `fecha`, `idEvento` (único) y `detalle` sin texto libre;
+  - `notificaciones` (RF63): `usuarioId`, `tipo`, `mensaje`, `leida`, `fecha` e `idEvento`;
+  - `correos_pendientes` (RF30): el correo al Prestador, con `intentos`, `proximoIntento` y `enviadoEn`;
+  - `eventos_procesados`: idempotencia; el `_id` es el id del evento y se purga por `procesadoEn`.
+- **A002 (iteración H):**
+  - `calificaciones` (RF17): una por turista y entidad (índice único); `estrellas` de 1 a 5, `comentario` de 0 a 500 y `estado` con el motivo de la moderación (RF29);
+  - `promedios`: el promedio visible y su `version`;
+  - `reportes` (RF57): `motivo` de la lista del equipo, `descripcion` y `estado` (Pendiente o Revisado);
+  - `outbox_eventos`: `PromedioActualizado`, con la misma forma que la de catalog_db.
+- **A003 (iteración J):** `ocupaciones`, copia de `OcupacionRegistrada` con `porcentaje` y `nivel` calculados al recibirla, para RF64. Índice único por `idEvento`.
+- **A004 (iteración K):** `consultas`, por ficha y día de Bogotá (`tipoEntidad`, `idEntidad`, `dia` y `consultas`, con `nombre` e `idPrestador`), para RF14 y RF31. Índices `consultas_tipo_dia` y `consultas_prestador_dia`.
+- **Diferencias con el Entregable 2:** `calificaciones`, `reportes`, `logs_auditoria` y `notificaciones` parten del §2.4, con límites, enums e `idEvento` (idempotencia). Las demás son **ampliaciones propias** que exige la mensajería: proyecciones, outbox, correos pendientes e idempotencia.
+
+### chatbot_db (ms-chatbot; C001; DEC-297)
+
+- `base_conocimiento_turistico` (RF05: `contenido`, `categoria` y `fechaActualizacion`; hasta 500 entradas) e `itinerarios_sugeridos` (RF35: `turistaId`, `nombre`, `items`, `fechaCreacion` y `fechaActualizacion`; hasta 20 por turista) parten del §2.4, con límites y `additionalProperties: false`.
+- **Ampliaciones propias:** `uso_diario` (RF59 y decisión 5: `turistaId`, `dia` de Bogotá y `mensajes`; índice único `uso_turista_dia`; 20 por día) y `cuentas` (proyección de `CuentaActualizada` para el validador de `ver`).
+- No hay historial de conversación en el servidor, y el contexto que recibe el modelo no lleva datos personales (DEC-297).

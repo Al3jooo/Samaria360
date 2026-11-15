@@ -106,4 +106,4 @@ G --> Ge : respuesta
 ## Fuera de alcance
 
 - Cambios de estado programados o automáticos (por clima, por aforo: RF08 y RF39 están descartados).
-- Notificar a los turistas (RF13, RF30 y RF63, con ms-notificaciones).
+- Notificar a los turistas: sin RF en el SRS (RF63 cubre solo las reservas); si se agrega, ms-analytics vía RabbitMQ.

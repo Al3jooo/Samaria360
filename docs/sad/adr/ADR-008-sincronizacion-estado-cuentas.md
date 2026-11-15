@@ -5,7 +5,7 @@
 - **Fase:** Construcción (RUP)
 - **Componentes:** `ms-auth` (`auth_db`), `ms-catalog` (`catalog_db`) y `ms-booking` (`reservas_db`)
 - **Requisitos:** RF22, RF28, RF62 y, desde la enmienda B2, RF45; RNF01, RNF02, RNF06
-- **Registra las decisiones:** DEC-26 y DEC-29; la enmienda B2, DEC-106 a DEC-111; la enmienda de la iteración C, DEC-125, DEC-126, DEC-142, DEC-146 y DEC-147
+- **Registra las decisiones:** DEC-26 y DEC-29; la enmienda B2, DEC-106 a DEC-111; la enmienda de la iteración C, DEC-125, DEC-126, DEC-142, DEC-146 y DEC-147; la enmienda DEC-278 (ver al final)
 
 ## Contexto
 
@@ -35,7 +35,7 @@ Si ms-auth se escala a varias instancias, el arriendo debe ser **mayor que el ti
 
 D7 dice: «**Ninguna en esta iteración:** ms-booking no publica eventos». Recibir el estado de las cuentas por HTTP **no la contradice**: no se agrega ningún broker y ms-booking sigue sin publicar. Sí la **precisa**; la redacción nueva (en `docs/trazabilidad.md`):
 
-> **Sin broker de mensajería.** ms-booking no publica eventos (RF13, RF30 y RF63 siguen con ms-notificaciones). Desde «Administrar cuentas» (ADR-008) **recibe** el estado de las cuentas: el relevo del outbox de ms-auth lo entrega por HTTP a `PUT /internal/v1/cuentas/{id}`, autenticado con un JWT de servicio. Es una entrega punto a punto con reintentos, no un bus de eventos. Reservar sigue sin publicar nada y el inventario solo depende de `reservas_db`.
+> **Sin broker de mensajería.** ms-booking no publica eventos (RF13, RF30 y RF63 siguen con ms-notificaciones; precisado por la enmienda DEC-278). Desde «Administrar cuentas» (ADR-008) **recibe** el estado de las cuentas: el relevo del outbox de ms-auth lo entrega por HTTP a `PUT /internal/v1/cuentas/{id}`, autenticado con un JWT de servicio. Es una entrega punto a punto con reintentos, no un bus de eventos. Reservar sigue sin publicar nada y el inventario solo depende de `reservas_db`.
 
 ADR-007 dice «No hay endpoint interno, ni JWT propagado, ni privilegios por estar en la red de Docker» (consulta de ms-booking a ms-catalog). Eso no cambia: la consulta al detalle sigue siendo la pública. Los endpoints internos nuevos mantienen el principio Zero-Trust: **no se confía en la red**, solo en un JWT de servicio con la `aud` del destino.
 
@@ -169,5 +169,9 @@ Esta enmienda no crea un ADR nuevo: el RNT y la cuenta del prestador viajan por 
 ## Cuándo revisarla
 
 - Cuando exista el *refresh token*, el TTL podrá bajar más y esta ventana se reduce.
-- Cuando exista mensajería (ms-notificaciones), el relevo podría publicar el evento en ella.
+- Cuando exista mensajería (ms-notificaciones), el relevo podría publicar el evento en ella. *(Precisado por la enmienda DEC-278.)*
 - Si ms-auth se escala a varias instancias (revisar el arriendo) o si se agrega la purga del outbox.
+
+## Enmienda DEC-278 (2026-11-14): ms-notificaciones no existe
+
+El Entregable 2 no tiene ms-notificaciones: RF13, RF30 y RF63 son de ms-analytics, que los recibe por RabbitMQ (nivel 3 de [ADR-003](ADR-003-estrategia-conectividad.md)), y el correo de las cuentas (RF34) sale de ms-auth por SMTP directo. Con RabbitMQ, el **relevo HTTP de las cuentas se mantiene** hacia ms-catalog y ms-booking (`PUT /internal/v1/cuentas/{id}`); la publicación en RabbitMQ es un destino más del outbox, no lo reemplaza.

@@ -136,6 +136,6 @@ end
 
 ## Fuera de alcance
 
-- Verificar el correo y enviar el aviso de cuenta existente por correo (RF34, ms-notificaciones).
+- Verificar el correo y enviar el aviso de cuenta existente por correo (RF34, ms-auth por SMTP directo).
 - Iniciar la sesión automáticamente después del registro (ADR-006).
 - Registrar la razón social en el formulario (D2).

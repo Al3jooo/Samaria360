@@ -1,0 +1,31 @@
+' WF-33 «Calificaciones recibidas» (RF56) y WF-34 «Moderación» (RF29, RF57); DEC-303.
+' Propuestos por arquitectura (plan del 100 %, iteración H). Solo estructura: regiones, elementos y flujo.
+
+@startsalt
+{+
+{ <b>Samaria360 | Búsqueda | Servicios | Asistente IA | [ES/EN] | [Campana] | (avatar ▼) }
+==
+<b>WF-33 · Calificaciones recibidas (Prestador, /prestador/calificaciones)
+{ Servicio [Todos ▼] | Desde [dd/mm/aaaa] | Hasta [dd/mm/aaaa] | [Filtrar] }
+Promedio 4,3 ★★★★☆ · 12 calificaciones
+{+
+Tour Tayrona · 4,5 · 8 calificaciones | Cabañas El Roble · 4,0 · 4 calificaciones
+}
+{+
+<b>Tour Tayrona | ★★★★★ | 01/03/2030
+Excelente guía y muy puntuales.
+}
+[Anterior] Página 1 de 2 [Siguiente]
+==
+<b>WF-34 · Moderación (Administrador, /admin/moderacion)
+{ [Calificaciones] | Reportes }
+Estado [Todas ▼]
+{+
+(Visible) Tour Tayrona | ★☆☆☆☆ | 01/03/2030
+Comentario con lenguaje ofensivo.
+[Ocultar] | Eliminar
+Motivo para ocultarla [________________] [Ocultar calificación] [Cancelar]
+}
+Pestaña «Reportes»: Estado [Pendiente ▼] · (Pendiente) Información desactualizada · Ver el atractivo · 01/03/2030 · descripción · [Marcar revisado]
+}
+@endsalt

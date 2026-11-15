@@ -6,6 +6,7 @@
 - **Componentes:** `ms-booking` (`reservas_db`) y `ms-catalog` (`GET /api/v1/catalogo/servicios/{id}`)
 - **Requisitos:** RF10, RF11, RF18, RF20, RF32, RF37, RF44, RNF01, RNF02, RNF03
 - **Enmienda A2 (iteración C):** inventario bajo demanda; registra DEC-152 a DEC-159 (ver al final)
+- **Enmienda DEC-278 (2026-11-14):** ms-notificaciones no existe en el Entregable 2 (ver al final)
 
 ## Contexto
 
@@ -47,7 +48,7 @@ Esos datos son de ms-catalog (MongoDB). Los cupos de cada día (RF11) no existen
 
 ## Cuándo revisarla
 
-Cuando exista mensajería (ms-notificaciones) o si las pruebas de carga (RNF02, RNF03) muestran que la llamada síncrona pesa.
+Cuando exista mensajería (ms-notificaciones) o si las pruebas de carga (RNF02, RNF03) muestran que la llamada síncrona pesa. *(Precisado por la enmienda DEC-278: la mensajería es RabbitMQ.)*
 
 ## Enmienda A2 (iteración C): inventario bajo demanda
 
@@ -84,3 +85,11 @@ Desde A1, el detalle público de ms-catalog trae la **oferta** de cada Tour y Al
 ### Cuándo revisarla
 
 Además de lo anterior: si RF19 entra en alcance (habrá que reconciliar la oferta con las filas existentes) o si las pruebas de carga muestran que el 404 repetido del resumen pesa.
+
+## Enmienda DEC-278 (2026-11-14): ms-notificaciones no existe
+
+El Entregable 2 no tiene ms-notificaciones: la mensajería que esta decisión esperaba para revisarse es RabbitMQ (nivel 3 de [ADR-003](ADR-003-estrategia-conectividad.md)). La consulta síncrona al catálogo para reservar no cambia con esta enmienda.
+
+## Enmienda RF19 (iteración I, DEC-310): el Prestador modifica el inventario
+
+La enmienda A2 decía que las filas existentes de `inventario_cupo` nunca cambian. Con RF19 (decisión 3 del equipo) **cambian solo por el Prestador**, y nunca se borran: `PUT /api/v1/reservas/prestador/servicios/{id}/inventario` fija los cupos totales con un UPDATE condicional que conserva los reservados (no baja de ellos: 409 `CUPOS_RESERVADOS`) y abre una fila cerrada o crea una nueva; `DELETE` marca `cerrado` (V8) solo si no tiene reservas Confirmadas (409 `FECHA_CON_RESERVAS`). La reserva, la disponibilidad y el resumen ignoran las filas cerradas. La plantilla (`PUT …/plantilla`) no toca filas existentes: ms-booking publica `OfertaModificada` (outbox V8) y ms-catalog fija la `oferta` del servicio; la materialización siguiente la lee del detalle del catálogo, así que hay una ventana de consistencia eventual de segundos entre el 202 y la oferta nueva. Antes de cada cambio ms-booking lee el detalle público del catálogo, como al reservar (D4): la dirección de la dependencia síncrona no cambia.

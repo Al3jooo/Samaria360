@@ -79,8 +79,27 @@ El nombre del servicio, el de la unidad y los precios quedan **congelados** (RF3
 - **`desde`, `hasta` y `estado`:** las mismas reglas y errores que «Mis reservas».
 - **`servicio`** (opcional): el id de un servicio (ObjectId en texto). Otro formato → `servicio: FORMATO`. Un servicio de otro prestador no da error: no tiene reservas suyas.
 - **Orden:** el de «Mis reservas» (índice `ix_reserva_prestador_inicio`, V6).
-- **Cada elemento:** `{idReserva, estado, idServicio, nombreServicio, categoria, idUnidad, nombreUnidad, fechaEntrada, fechaSalida, horaInicio, fechaInicio, fechaFin, cantidad, personas, precioUnitario, unidadCobro, precioTotal, moneda, fechaCreacion, fechaCancelacion}`. **Sin datos del Turista** (Ley 1581; RF42 descartado) y sin `cancelableHasta`: el Prestador no cancela.
+- **Cada elemento:** `{idReserva, estado, idServicio, nombreServicio, categoria, idUnidad, nombreUnidad, fechaEntrada, fechaSalida, horaInicio, fechaInicio, fechaFin, cantidad, personas, precioUnitario, unidadCobro, precioTotal, moneda, fechaCreacion, fechaCancelacion}`. **Sin datos del Turista** (Ley 1581; los contactos solo salen en «Asistentes», RF42) y sin `cancelableHasta`: el Prestador no cancela.
 - Un Turista → **403 `ACCESO_DENEGADO`**; el Prestador en las rutas del Turista, también.
+
+## Oferta del Prestador (RF19)
+
+Rol **Prestador**, dueño del servicio (Tour o Alojamiento). CU [«Modificar oferta»](../../casos-de-uso/CU-modificar-oferta.md); reglas de la decisión 3 del equipo (DEC-310, **decisión del equipo, no del SRS**). Antes de cada operación ms-booking lee el detalle público del catálogo (como al reservar, D4) y materializa la ventana si falta: un servicio ajeno, inexistente o no visible → **409 `OFERTA_NO_DISPONIBLE`**; Gastronomía o Alquiler → 400 `campos.idServicio = CATEGORIA_NO_RESERVABLE`; catálogo caído y falta materializar → 503.
+
+- **Consultar:** `GET /api/v1/reservas/prestador/servicios/{id}/inventario?desde=&hasta=` → `{idServicio, nombre, categoria, desde, hasta, diasOperacion, salidas, filas}`. Por defecto, de mañana a 14 días; `hasta` se recorta al horizonte de 60 días; `hasta` antes de `desde` → `campos.hasta = RANGO_INVALIDO`. Cada fila: `{categoria, idUnidad, fecha, horaInicio, cuposTotales, cuposDisponibles, reservados, cerrado}` (`reservados = cuposTotales − cuposDisponibles`).
+- **Ajustar, abrir o agregar:** `PUT …/servicios/{id}/inventario` `{fecha, horaInicio, idUnidad, cuposTotales}` → **200** con la fila. `fecha` desde mañana en Santa Marta y dentro del horizonte (`FECHA_PASADA`, `MAXIMO_DIAS`); `horaInicio` `HH:mm` obligatoria en Tour; `idUnidad` de una unidad del alojamiento (`NO_PERMITIDO` si no es suya); `cuposTotales` de 1 a 10 000. Si la fila existe, fija los cupos totales y conserva los reservados (UPDATE condicional): por debajo de lo reservado → **409 `CUPOS_RESERVADOS`** con `reservados`; si estaba cerrada, la abre. Si no existe, la crea (una salida o una fecha nueva).
+- **Cerrar:** `DELETE …/servicios/{id}/inventario?fecha=&horaInicio=&idUnidad=` → **200** con la fila (`cerrado: true`). No borra la fila: la reserva, la disponibilidad y el resumen dejan de verla. Con reservas Confirmadas → **409 `FECHA_CON_RESERVAS`**; fila inexistente → `FECHA_NO_DISPONIBLE`.
+- **Plantilla:** `PUT …/servicios/{id}/plantilla` `{diasOperacion, salidas}` → **202** sin cuerpo. De 1 a 7 días (`Lunes` … `Domingo`, sin tildes) y, en Tour, de 1 a 10 salidas `HH:mm` (se ordenan y no se repiten); en Alojamiento, `salidas` se ignora. Se aplica a las fechas que todavía no están materializadas: ms-catalog fija la `oferta` del servicio cuando recibe el evento y la materialización siguiente la usa.
+- Cada cambio encola **`OfertaModificada`** ([`eventos.md`](eventos.md)) en la misma transacción (outbox V8, `clave` = id del servicio); ms-catalog guarda el historial (RF41).
+
+## Asistentes (RF42)
+
+`GET /api/v1/reservas/prestador/asistentes?servicio=&fecha=&horaInicio=` · rol **Prestador** → `{idServicio, fecha, horaInicio, asistentes, totalPersonas}`. CU [«Exportar asistentes»](../../casos-de-uso/CU-exportar-asistentes.md) (decisión 7 del equipo, DEC-312).
+
+- **Qué reservas:** las **Confirmadas** del Prestador del token para ese servicio: en Tour, las que empiezan en `fecha` (y en `horaInicio`, si viene); en Alojamiento, las estadías con `fechaEntrada ≤ fecha < fechaSalida`. Ordenadas por salida y nombre. Un servicio ajeno da una lista vacía.
+- **Cada asistente:** `{idReserva, nombre, correo, telefono, personas, horaInicio, nombreUnidad, fechaEntrada, fechaSalida}`. El contacto lo entrega ms-auth (`POST /internal/v1/tokens` con el cliente `ms-booking` y `POST /internal/v1/contactos`, lotes de 100; `AUTH_INTERNO_URI`, `SERVICIO_BOOKING_SECRETO`); no se guarda. Una cuenta sin contacto llega con `nombre`, `correo` y `telefono` nulos.
+- `servicio` y `fecha` obligatorios (`REQUERIDO`, `FORMATO`). ms-auth caído → **503 `SERVICIO_NO_DISPONIBLE`** con `servicio: ms-auth`.
+- La exportación a CSV o PDF la hace el navegador (WF-40).
 
 ## Cancelar
 
@@ -149,6 +168,8 @@ Una tarea de ms-booking pasa de `Confirmada` a `Completada` las reservas cuya `f
 | `PRECIO_CAMBIADO` | 409 | Lleva `precioTotal`, `precioUnitario` y `moneda` vigentes (RF37) |
 | `CANCELACION_FUERA_DE_PLAZO` | 409 | Faltan menos de 24 horas (RF44) |
 | `RESERVA_NO_CANCELABLE` | 409 | La reserva está Completada (también si RF52 la completó mientras se cancelaba) |
+| `CUPOS_RESERVADOS` | 409 | RF19: los cupos nuevos quedan por debajo de los reservados; lleva `reservados` (DEC-310) |
+| `FECHA_CON_RESERVAS` | 409 | RF19: la fecha o salida que se quiere cerrar tiene reservas Confirmadas (DEC-310) |
 | `IDEMPOTENCIA_CONFLICTO` | 422 | La misma clave con otro pedido |
-| `SERVICIO_NO_DISPONIBLE` | 503 | ms-catalog no responde (`servicio: ms-catalog`) al reservar o cuando la disponibilidad o el resumen deben materializar la oferta (también si el resumen agota su plazo de 2,5 s); o, desde el gateway, ms-booking caído (`servicio: ms-booking`) |
+| `SERVICIO_NO_DISPONIBLE` | 503 | ms-auth no responde al pedir los contactos de RF42 (`servicio: ms-auth`); ms-catalog no responde (`servicio: ms-catalog`) al reservar o cuando la disponibilidad o el resumen deben materializar la oferta (también si el resumen agota su plazo de 2,5 s); o, desde el gateway, ms-booking caído (`servicio: ms-booking`) |
 | `ERROR_INTERNO` | 500 | Cualquier otro error |

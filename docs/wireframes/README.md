@@ -2,7 +2,7 @@
 
 **Versión 2 — 12/10/2026.** Reemplaza a la versión del Documento Entregable 2; la versión anterior queda en el historial de Git. Cada imagen tiene aquí su descripción escrita, que es la referencia cuando un detalle de la imagen no se lea bien.
 
-**Imágenes de los wireframes propuestos por arquitectura (13/11/2026, DEC-268).** WF-01 a WF-10 los dibujó el equipo de diseño. Los nuevos (WF-12 `_004` a `_006`, WF-13 a WF-26, WF-06 para atractivos y `WF-05-06-11-cambios-turista`) tienen un `.png` con el mismo nombre que su `.puml`, dibujado por arquitectura en el mismo estilo de boceto (escala de grises, sin identidad visual) a partir del `.puml` y de la pantalla implementada. Un `.png` con varias láminas muestra la pantalla, sus estados y sus diálogos; las notas en recuadro punteado son anotaciones, no elementos de la pantalla. El equipo los validó el 2026-11-13 (DEC-269).
+**Imágenes de los wireframes propuestos por arquitectura (13/11/2026, DEC-268).** WF-01 a WF-10 los dibujó el equipo de diseño. Los nuevos (WF-12 `_004` a `_006`, WF-13 a WF-26, WF-06 para atractivos y `WF-05-06-11-cambios-turista`) tienen un `.png` con el mismo nombre que su `.puml`, dibujado por arquitectura en el mismo estilo de boceto (escala de grises, sin identidad visual) a partir del `.puml` y de la pantalla implementada. Un `.png` con varias láminas muestra la pantalla, sus estados y sus diálogos; las notas en recuadro punteado son anotaciones, no elementos de la pantalla. El equipo los validó el 2026-11-13 (DEC-269). Los de WF-27 a WF-40 (plan del 100 %) tienen también su `.png` desde el 2026-11-15, dibujado del mismo modo a partir del `.puml` y de las pantallas recorridas ese día; un `.png` reúne las pantallas de su `.puml` (por ejemplo, `WF-38-40-oferta-prestador.png` trae WF-38, WF-39, WF-40 y la galería de WF-18).
 
 **Reglas:**
 - **Trazabilidad:** toda pantalla del prototipo corresponde a un wireframe de esta carpeta. Si un elemento queda fuera del alcance de la iteración, se muestra deshabilitado («No disponible» para lectores de pantalla, sin texto visible de estado; DEC-22, DEC-270) y se lista como pendiente en `docs/trazabilidad.md`.
@@ -12,7 +12,7 @@
 ## Elementos comunes
 
 **Pantallas de la plataforma (WF-04 a WF-10):**
-- **Encabezado:** logo «Samaria360»; navegación **Búsqueda, Servicios, Asistente IA**; selector **ES / EN** (RF03, RNF08); con sesión, avatar circular con las iniciales (p. ej. «MG»). Sin sesión, el prototipo muestra además el enlace «Inicio de sesión» (los wireframes solo dibujan el estado con sesión).
+- **Encabezado:** logo «Samaria360»; navegación **Búsqueda, Asistente IA** («Servicios» se quitó por decisión del equipo, DEC-317); selector **ES / EN** (RF03, RNF08); con sesión, avatar circular con las iniciales (p. ej. «MG»). Sin sesión, el prototipo muestra además el enlace «Inicio de sesión» (los wireframes solo dibujan el estado con sesión).
 - **Banner de avisos del municipio (RF40, DEC-67):** debajo del encabezado, en todas las pantallas con el encabezado de la plataforma. Muestra todos los avisos activos, del más reciente al más antiguo, con su tipo. Se cierra y no vuelve en la sesión del navegador; sin avisos activos, no aparece. WF-04 lo dibuja solo en el inicio, pero RF40 lo pide «en la parte superior de la interfaz para todos los usuarios»: por eso es común («Mejora de diseño»). Estructura en WF-14.
 - **Pie de página:** logo; columnas **Explorar** (Alojamiento, Gastronomía, Tours, Alquiler de equipos), **Municipio** (Noticias, Agenda de eventos), **Prestadores** (Registrar servicio, Panel del gestor), **Legal y Soporte** (Términos y condiciones, Políticas de privacidad, Preguntas frecuentes — RF46, RF26). Texto inferior: «© 2026 Alcaldía de Santa Marta · Samaria360». «Términos y condiciones» lleva a WF-15, «Políticas de privacidad» a su sección 4 y «Preguntas frecuentes» a WF-13. «Agenda de eventos» (RF25) lleva a WF-26: no está en la v2 y se agregó en la iteración E, sesión B2 («Mejora de diseño», DEC-246).
 
@@ -27,11 +27,11 @@
 | WF-01-inicio-sesion.png | Inicio de sesión | Iniciar sesión | RF15, RF03, RF34, RF46 | **Sí** (sin recuperación de contraseña) |
 | WF-02-registro-turista.png | Registro de turista | Registrarse | RF01 | **Sí** (`/registro`) |
 | WF-03-registro-prestador.png | Registro de prestador | Registrarse | RF02 | **Sí** (`/registro`, sin razón social en el formulario) |
-| WF-04-inicio-busqueda.png | Inicio y búsqueda | Buscar oferta turística | RF16, RF40, RF04 | **Sí** (el banner de avisos es un elemento común, WF-14; «Destacados» con criterio provisional) |
+| WF-04-inicio-busqueda.png | Inicio y búsqueda | Buscar oferta turística | RF16, RF40, RF04 | **Sí** (el banner de avisos es un elemento común, WF-14; «Destacados»: los 3 servicios mejor calificados, DEC-317) |
 | WF-05-exploracion.png | Exploración: mapa y resultados | Buscar oferta, filtrar, ordenar, navegar el mapa | RF16, RF10, RF23, RF27, RF38, RF39, RF50, RF61 | **Sí** (núcleo del catálogo, incluye «Más filtros») |
 | WF-06-detalle.png | Detalle de lugar o servicio | Consultar detalle de oferta | RF37, RF39, RF51, RF54, RF57, RF58 | Sí (versión mínima: solo servicios y los datos que existen). La ficha de un atractivo tiene su propia variante (`WF-06-detalle-atractivo.puml`, iteración E) |
-| WF-07-asistente-ia.png | Asistente virtual IA | Interactuar con el asistente | RF04, RF35, RF36, RF59 | No |
-| WF-08-registrar-servicio.png (+ `WF-08-registrar-servicio.puml`, ampliación) | Registrar servicio comercial | Registrar servicio comercial | RF09, RF10, RF27, RF37, RF48, RF58 | Backend en la iteración C (sesión A1); **pantalla hecha en B1** (`/prestador/servicios/nuevo`), sin fotos (RF48, descartado en DEC-54), «cobra por» ni impuestos. La ampliación en Salt está **propuesta por arquitectura y validada por el equipo** |
+| WF-07-asistente-ia.png | Asistente virtual IA | Interactuar con el asistente | RF04, RF35, RF36, RF59 | **Sí** (iteración L; `/asistente`, solo el Turista; diferencias en DEC-298) |
+| WF-08-registrar-servicio.png (+ `WF-08-registrar-servicio.puml`, ampliación) | Registrar servicio comercial | Registrar servicio comercial | RF09, RF10, RF27, RF37, RF48, RF58 | Backend en la iteración C (sesión A1); **pantalla hecha en B1** (`/prestador/servicios/nuevo`), con fotos de 1 a 5 desde DEC-318, sin «cobra por» ni impuestos. La ampliación en Salt está **propuesta por arquitectura y validada por el equipo** |
 | WF-09-registrar-atractivo.png (+ `WF-09-registrar-atractivo.puml`, ampliación) | Registrar atractivo turístico | Registrar atractivo; Actualizar atractivo | RF06, RF07, RF24, RF27, RF33, RF58 | **Sí** (iteración E, sesión B1; `/gestor/atractivos/nuevo` y, en edición, `/gestor/atractivos/:id`), con la casilla de veracidad deshabilitada y sin editar las fotos de un atractivo registrado. La ampliación en Salt está **propuesta por arquitectura y validada por el equipo** |
 | WF-10-disponibilidad-reserva.png | Disponibilidad y reserva **(nuevo)** | Reservar servicio | RF11, RF20, RF37, RF44 | **Sí** (sin RNT, impuestos, pagos ni «Notificarme si se libera») |
 | — (WF-11, sin imagen) | Mis reservas **(pendiente de diseño)** | Reservar servicio | RF12, RF18, RF44, RF52 | Sí (diseño provisional) |
@@ -51,6 +51,12 @@
 | WF-25-eventos-gestor.puml (+ `.png`) | Eventos, panel del gestor, y Registrar evento **(nuevo)** | Registrar evento en agenda (con el flujo «Consultar eventos registrados») | RF25 | **Sí** (iteración E, sesión B2; `/gestor/eventos` y `/gestor/eventos/nuevo`). **Propuesto por arquitectura y validado por el equipo** |
 | WF-26-agenda-eventos.puml (+ `.png`) | Agenda de eventos **(nuevo)** | Consultar agenda de eventos | RF25 | **Sí** (iteración E, sesión B2; `/agenda`, pública). **Propuesto por arquitectura y validado por el equipo** |
 | WF-06-detalle-atractivo.puml (+ `.png`) | Ficha pública de un atractivo **(nuevo)** | Consultar detalle de atractivo | RF06, RF07, RF24, RF27, RF33, RF58 | **Sí** (iteración E, sesión B1; `/atractivos/:id`). **Propuesto por arquitectura y validado por el equipo** |
+| WF-27-28-recuperar-contrasena.puml (+ `.png`) | Recuperar y restablecer contraseña **(nuevo)** | Recuperar contraseña | RF34 | **Sí** (iteración F; `/recuperar` y `/restablecer`). **Propuesto por arquitectura** |
+| WF-29-30-notificaciones-auditoria.puml (+ `.png`) | Campana de notificaciones y Auditoría **(nuevo)** | Notificar cambios de reserva; Consultar log de auditoría | RF63, RF30, RF13 | **Sí** (iteración G; campana en el encabezado y `/admin/auditoria`). **Propuesto por arquitectura** |
+| WF-31-32-itinerarios-conocimiento.puml (+ `.png`) | Mis itinerarios y Base de conocimientos **(nuevo)** | Guardar itinerario; Gestionar base de conocimientos | RF35, RF05 | **Sí** (iteración L; `/perfil/itinerarios` y `/admin/conocimiento`). **Propuesto por arquitectura** |
+| WF-33-34-calificaciones-moderacion.puml (+ `.png`) | Calificaciones recibidas y Moderación **(nuevo)** | Consultar calificaciones recibidas; Moderar calificaciones; Reportar información falsa | RF56, RF29, RF57 | **Sí** (iteración H; `/prestador/calificaciones` y `/admin/moderacion`). **Propuesto por arquitectura** |
+| WF-35-37-tableros.puml (+ `.png`) | Tableros, Mi panel y Reporte de afluencia **(nuevo)** | Consultar tableros; Consultar panel del prestador; Consultar reporte de afluencia | RF14, RF31, RF64 | **Sí** (iteración K; `/tableros`, `/prestador/panel` y `/gestor/afluencia`). **Propuesto por arquitectura** |
+| WF-38-40-oferta-prestador.puml (+ `.png`) | Oferta y disponibilidad, Historial de modificaciones, Asistentes y galería de WF-18 **(nuevo)** | Modificar oferta; Consultar historial de modificaciones; Exportar asistentes; Editar galería del servicio | RF19, RF41, RF42, RF48 | **Sí** (iteración I; `/prestador/servicios/:id/oferta`, `/prestador/historial-modificaciones`, `/prestador/asistentes` y el detalle de WF-18). **Propuesto por arquitectura** |
 | WF-05-06-11-cambios-turista.puml (+ `.png`) | Cambios en WF-05, WF-06 y WF-11 **(nuevo)** | Consultar historial de búsquedas, Guardar favoritos, Compartir reserva completada | RF60, RF54, RF49 | **Sí** (sesión B de B1). **Propuesto por arquitectura y validado por el equipo** |
 
 ## WF-01 — Inicio de sesión
@@ -109,6 +115,8 @@ Nombre; tipo, ubicación y calificación con reseñas; indicador de accesibilida
 
 Encabezado «Asistente Virtual IA» y estado «En línea»; aviso de versión beta; conversación; panel «Itinerario sugerido» por día y hora con **Compartir** y **Descargar PDF**; «Prestadores mencionados»; **Guardar itinerario en perfil** (RF35) y **Ver en el mapa**; chips rápidos (Aforo en vivo, Rutas alternas, Tours mañana, Alquiler de equipos); campo de texto y enviar; sección «El asistente también puede ayudarte con» (Aforos en vivo, Rutas y clima, Prestadores verificados).
 
+**Diferencias de la pantalla de la iteración L con WF-07** (DEC-298): el itinerario va por día, **sin hora** (el contrato no la tiene); «Descargar PDF» imprime solo el itinerario y el navegador ofrece «Guardar como PDF»; «Compartir» usa la hoja del sistema o el portapapeles, como RF49; «Ver en el mapa» lleva a la exploración (WF-05); los chips envían su texto como mensaje; «Prestadores mencionados» muestra la justificación (RF36) en lugar de la calificación hasta la iteración H; se agrega «Te quedan n de 20 mensajes hoy» (mejora de diseño).
+
 ## WF-08 — Registrar servicio comercial
 
 Migas: Panel del Prestador › Mis Servicios › Registrar Nuevo Servicio. Aviso de verificación (hasta 2 días hábiles). Secciones: **Datos del servicio** (nombre, categoría, RNT, descripción); **Datos de contacto** (teléfono/WhatsApp, correo, dirección, horario de atención); **Precio** («desde» en COP, «cobra por», casilla «el precio incluye impuestos»); **Campos según la categoría** (con Alojamiento: número de habitaciones, capacidad máxima, servicios incluidos WiFi / Desayuno / Piscina / Parqueadero); **Fotos** (1 a 5, la primera es la portada — RF48); **Condiciones de accesibilidad**; casilla de veracidad; **Publicar servicio**.
@@ -127,7 +135,7 @@ Migas: Panel del Prestador › Mis Servicios › Registrar Nuevo Servicio. Aviso
 - **Después del 201** la pantalla lleva al **detalle propio** del servicio (`/prestador/servicios/{id}`, WF-18) con «Enviado a aprobación» y «Pendiente de aprobación», no a la lista que indica el `.puml` (línea 100) (DEC-168): el Prestador ve lo que guardó el servidor, con el precio derivado y el RNT.
 - El **RNT** aparece como «Se toma de tu registro de prestador», **sin el valor**: ningún endpoint se lo da al Prestador antes del registro (`/me` no lo trae). El valor se ve en el detalle propio y en WF-06 (DEC-167; pendiente de contrato). **Actualización de la iteración D (sesión B, O16, DEC-203):** el valor se muestra con el de `GET /api/v1/auth/prestador/perfil`; mientras carga, si falla o si no hay RNT, queda el texto anterior y el formulario sigue usable.
 - La **casilla de veracidad** aparece deshabilitada (DEC-22): la «visita de verificación del municipio» del PNG no está en el SRS y exigirla sería una regla nueva (DEC-167).
-- Se omiten la alerta del PNG (RUT, certificado de sanidad, cámara de comercio, «2 días hábiles») y la nota «Recibirás la respuesta en el correo registrado»: no están en el SRS y el aviso por correo es de RF34 o ms-notificaciones. Queda el aviso del `.puml` («Pendiente de aprobación»). «Un gestor del municipio verifica» pasa a «el Administrador» (RF21).
+- Se omiten la alerta del PNG (RUT, certificado de sanidad, cámara de comercio, «2 días hábiles») y la nota «Recibirás la respuesta en el correo registrado»: no están en el SRS y el aviso por correo es de RF34 (ms-auth, por SMTP directo; DEC-278). Queda el aviso del `.puml` («Pendiente de aprobación»). «Un gestor del municipio verifica» pasa a «el Administrador» (RF21).
 - Las migas empiezan en «Mis servicios»: no hay un «Panel del Prestador» aparte.
 - **Mejoras de diseño:** «Latitud» y «Longitud» editables y «Usar el centro de Santa Marta» como alternativa al pin sin ratón (DEC-165), y «Todos los días» en la oferta (DEC-164).
 
@@ -212,6 +220,53 @@ Migas: Inicio y búsqueda › Panel del gestor › Registrar atractivo. Seccione
 - **Tarjetas** en el orden del servidor (los vigentes según «hoy» en Bogotá, por fecha de inicio): bloque con el día y el mes de inicio, nombre, fechas, lugar y descripción con sus saltos de línea. Sin insignias de «Hoy» ni «En curso».
 - **Estados:** agenda vacía con «Explorar la oferta turística»; página fuera de rango, a la última; error con «Reintentar». Páginas de 10.
 - **Sin filtros** ni ficha propia de un evento: el CU los deja fuera de alcance.
+
+## WF-27 y WF-28 — Recuperar y restablecer la contraseña (nuevos)
+
+**Estado: propuestos por arquitectura** (plan del 100 %, iteración F, DEC-288). Wireframe en Salt (`WF-27-28-recuperar-contrasena.puml`), solo de estructura. CU «Recuperar contraseña» (RF34). Pantallas públicas con el encabezado y el pie reducidos de WF-01, sin imagen; se llega desde «¿Olvidaste tu contraseña?» de WF-01, que deja de estar deshabilitado.
+- **WF-27** (`/recuperar`): tarjeta «Recuperar contraseña» con el correo, «Enviar enlace» y «Volver a iniciar sesión». Al enviar, el mismo mensaje exista o no la cuenta (ADR-006), con la vigencia de 30 minutos y el uso único.
+- **WF-28** (`/restablecer#token=…`): tarjeta «Elige una contraseña nueva» con la contraseña y su confirmación (mínimo 8 caracteres). El token llega en el fragmento y se quita de la URL al leerlo. Éxito: el cambio y que las sesiones abiertas se cerraron, con «Iniciar sesión». Enlace usado, vencido o sin token: alerta con «Pedir otro enlace».
+
+## WF-29 y WF-30 — Campana de notificaciones y Auditoría (nuevos)
+
+**Estado: propuestos por arquitectura** (plan del 100 %, iteración G, DEC-294). Wireframe en Salt (`WF-29-30-notificaciones-auditoria.puml`), solo de estructura.
+- **WF-29, campana** (encabezado común, entre ES/EN y el avatar; solo el Turista y el Prestador; RF63): botón con el contador de no leídas (9+ como máximo). El panel tiene el título, «Marcar todas como leídas» y la lista de las 20 más recientes, con el texto en el idioma activo y la fecha; las no leídas se distinguen. Cada una lleva a «Mis reservas» (Turista) o al historial de reservas (Prestador). Estados: vacía y «no responden en este momento».
+- **WF-30, Auditoría** (`/admin/auditoria`, menú del avatar del Administrador; RF13): filtros de acción y rango de fechas con «Filtrar» (en la URL); tabla con fecha y hora, usuario (los 12 últimos caracteres del id, precedidos de «…»; el id completo en el título), acción y detalle; por debajo de 40 rem, tarjetas. 20 por página.
+
+## Cambios de la iteración J en WF-05, WF-06 y WF-24 (afluencia)
+
+**Propuestos por arquitectura** (DEC-306): en WF-06 para atractivos, «Alerta de afluencia» muestra el nivel (Bajo, Medio o Alto), el porcentaje de la capacidad, la ocupación y la hora de la lectura, y, al llegar al límite, una alerta que lleva a «Destinos alternativos con menor afluencia» (hasta 3 tarjetas de la misma categoría); en WF-05, la tarjeta del atractivo muestra su nivel, los marcadores toman el color de la leyenda y la leyenda deja de decir «Sin datos» cuando hay niveles; en WF-24, la columna «Afluencia» trae «Registrar ocupación» por atractivo. En WF-06 del servicio, la alerta y los alternativos siguen deshabilitados (la afluencia es de los atractivos en el SRS), y el orden «Afluencia» de WF-05 también (RF61 no lo pide).
+
+## WF-38 a WF-40 — Oferta y disponibilidad, Historial de modificaciones y Asistentes (nuevos)
+
+**Estado: propuestos por arquitectura** (plan del 100 %, iteración I, DEC-310 a DEC-313). Wireframe en Salt (`WF-38-40-oferta-prestador.puml`), solo de estructura.
+- **WF-38, Oferta y disponibilidad** (`/prestador/servicios/:id/oferta`, con «Gestionar disponibilidad» del detalle de un servicio Publicado con oferta en WF-18; RF19): rango de fechas en la URL; tabla con fecha, salida o unidad, cupos totales (editables), reservados, disponibles, estado y «Guardar cupos», «Cerrar» o «Abrir»; «Agregar una salida» (Tour) o «Agregar una fecha» (Alojamiento); «Días y horarios habituales» (plantilla de las fechas sin inventario). Los 409 se explican junto a la tabla.
+- **WF-39, Historial de modificaciones** (`/prestador/historial-modificaciones`, menú del avatar del Prestador; RF41): filtro de servicio y página en la URL; tabla con fecha y hora, servicio, tipo de cambio, fecha o unidad, valor anterior y valor nuevo, 20 por página.
+- **WF-40, Asistentes** (`/prestador/asistentes`, menú del avatar del Prestador; RF42): servicio (solo Tour y Alojamiento), fecha y salida opcional en la URL; total de personas, «Descargar CSV», «Descargar PDF» (impresión de una hoja con el listado) y la tabla con nombre, correo, teléfono, personas, salida o unidad y fechas.
+
+**Cambios de la iteración I en WF-18** (DEC-313): el detalle de un servicio Publicado suma la sección «Galería» (miniaturas con «Quitar», deshabilitado con una sola imagen, y «Agregar imagen», deshabilitado con cinco) y la acción «Gestionar disponibilidad» (Tour y Alojamiento). En WF-08, «Fotos del servicio» pide de 1 a 5 imágenes desde DEC-318; después de la aprobación se editan con la galería.
+
+## WF-35 a WF-37 — Tableros, Mi panel y Reporte de afluencia (nuevos)
+
+**Estado: propuestos por arquitectura** (plan del 100 %, iteración K, DEC-309). Wireframe en Salt (`WF-35-37-tableros.puml`), solo de estructura.
+- **WF-35, Tableros** (`/tableros`, menú del avatar del Administrador y del Gestor; RF14): rango de fechas con «Aplicar» (en la URL), total de reservas del periodo, reservas por día, top 3 de atractivos más consultados y turistas registrados por país.
+- **WF-36, Mi panel** (`/prestador/panel`, menú del avatar del Prestador; RF31): «Últimos 7 días» o «Últimos 30 días» (en la URL), tabla por servicio con consultas y reservas, y una barra por servicio para cada medida.
+- **WF-37, Reporte de afluencia** (`/gestor/afluencia`, menú del avatar del Gestor; RF64): rango de fechas y atractivo con «Aplicar» (en la URL), tabla por atractivo (lecturas, promedio, máximo y último nivel) y ocupación promedio por día.
+- Gráficos de una sola serie con un solo tono y sin leyenda; cada uno con su tabla de datos.
+
+## WF-33 y WF-34 — Calificaciones recibidas y Moderación (nuevos)
+
+**Estado: propuestos por arquitectura** (plan del 100 %, iteración H, DEC-303). Wireframe en Salt (`WF-33-34-calificaciones-moderacion.puml`), solo de estructura.
+- **WF-33, Calificaciones recibidas** (`/prestador/calificaciones`, menú del avatar del Prestador; RF56): filtros de servicio y rango de fechas con «Filtrar» (en la URL), promedio general, resumen por servicio y la lista (servicio, estrellas, fecha y comentario), 20 por página. Sin datos del turista.
+- **WF-34, Moderación** (`/admin/moderacion`, menú del avatar del Administrador; RF29 y RF57): pestañas «Calificaciones» (filtro de estado; «Ocultar» o «Volver a mostrar» y «Eliminar», cada una con su motivo) y «Reportes» (filtro de estado; motivo, enlace a la ficha, fecha, descripción y «Marcar revisado»). La pestaña y el estado van en la URL.
+
+**Cambios de la iteración H en WF-05, WF-06 y WF-11** (DEC-303): la calificación con reseñas de WF-06 (promedio en el subtítulo y la sección «Calificaciones y reseñas» con el formulario de estrellas) y «Reportar información falsa o desactualizada» quedan habilitados, también en la ficha del atractivo (mejora de diseño); la tarjeta de WF-05 muestra la calificación y el orden «Calificación» funciona; WF-11 suma «Calificar» en las reservas Completadas.
+
+## WF-31 y WF-32 — Mis itinerarios y Base de conocimientos (nuevos)
+
+**Estado: propuestos por arquitectura** (plan del 100 %, iteración L, DEC-297 y DEC-298). Wireframe en Salt (`WF-31-32-itinerarios-conocimiento.puml`), solo de estructura.
+- **WF-31, Mis itinerarios** (`/perfil/itinerarios`, menú del avatar del Turista; RF35): «Volver a Mi perfil», contador «n de 20», una tarjeta por itinerario con el nombre, la fecha y los pasos por día (enlazados a su ficha), «Editar» (nombre, día de cada paso y «Quitar») y «Eliminar» con confirmación. Vacío: enlace al asistente.
+- **WF-32, Base de conocimientos** (`/admin/conocimiento`, menú del avatar del Administrador; RF05): formulario con categoría y contenido (contador de caracteres), lista de entradas de 10 en 10 con «Editar» y «Eliminar» (con confirmación).
 
 ## WF-06 para atractivos — Ficha pública de un atractivo (nuevo)
 

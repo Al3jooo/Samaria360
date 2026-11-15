@@ -43,7 +43,7 @@ rectangle "Gestionar Reservas" {
 Turista --> CR
 CR ..> VA : <<include>>
 CR ..> NC : <<include>>
-note right of NC : Pendiente: llega con\nms-notificaciones
+note right of NC : Pendiente: llega con\nms-analytics (RabbitMQ)
 @enduml
 ```
 
@@ -142,6 +142,6 @@ end
 
 ## Fuera de alcance
 
-- «Notificar cambios de reserva» (RF13, RF30, RF63): llega con ms-notificaciones.
+- «Notificar cambios de reserva» (RF13, RF30, RF63): llega con ms-analytics, vía RabbitMQ.
 - RF12 del lado del prestador y RF19 (el prestador modifica fechas y cupos).
 - Reembolsos y pagos: el prototipo no cobra.

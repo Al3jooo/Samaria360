@@ -1,0 +1,29 @@
+' WF-35 «Tableros» (RF14), WF-36 «Mi panel» (RF31) y WF-37 «Reporte de afluencia» (RF64); DEC-309.
+' Propuestos por arquitectura (plan del 100 %, iteración K). Solo estructura: regiones, elementos y flujo.
+
+@startsalt
+{+
+{ <b>Samaria360 | Búsqueda | Servicios | Asistente IA | [ES/EN] | (avatar ▼) }
+==
+<b>WF-35 · Tableros (Administrador y Gestor, /tableros)
+{ Desde [dd/mm/aaaa] | Hasta [dd/mm/aaaa] | [Aplicar] }
+Del 2030-02-10 al 2030-03-11
+{+ <b>128 | Reservas en el periodo }
+{+ <b>Reservas por día | (columnas de una serie, valor al pasar el puntero) | > Ver los datos en una tabla }
+{+ <b>Top 3 de atractivos más consultados | Playa Cristal ████████ 420 consultas | Pozo Azul █████ 260 | Museo del Oro ███ 150 }
+{+ <b>Turistas registrados por país | Colombia ████████ 80 | Perú ██ 12 | Sin país █ 3 }
+==
+<b>WF-36 · Mi panel (Prestador, /prestador/panel)
+{ [Últimos 7 días] | Últimos 30 días }
+{# Servicio | Consultas | Reservas
+ Tour Tayrona | 120 | 9
+ Cabañas El Roble | 45 | 2 }
+{ Consultas por servicio (barras) | Reservas por servicio (barras) }
+==
+<b>WF-37 · Reporte de afluencia (Gestor, /gestor/afluencia)
+{ Desde [dd/mm/aaaa] | Hasta [dd/mm/aaaa] | Atractivo [Todos ▼] | [Aplicar] }
+{# Atractivo | Lecturas | Promedio | Máximo | Último nivel
+ Playa Cristal | 14 | 62,5 % | 100 % | Afluencia alta · 11/03 15:00 }
+{+ <b>Ocupación promedio por día | (columnas de una serie) | > Ver los datos en una tabla }
+}
+@endsalt

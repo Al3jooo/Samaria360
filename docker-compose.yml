@@ -3,7 +3,8 @@
 #
 # Entrada: el navegador habla solo con frontend (nginx), que pasa /api/ a api-gateway (ADR-005). En el host se
 # publican el frontend y el gateway; ms-auth, ms-catalog y ms-booking solo se alcanzan dentro de la red de Docker;
-# PostgreSQL y MongoDB solo en 127.0.0.1 (DBeaver, Compass). El asistente (chatbot) está fuera del alcance del prototipo.
+# PostgreSQL, MongoDB y la consola de RabbitMQ solo en 127.0.0.1 (DBeaver, Compass). RabbitMQ es el nivel 3 de ADR-003
+# (ADR-011); Mailpit, el servidor SMTP de desarrollo, solo con el perfil dev (COMPOSE_PROFILES=dev en .env, DEC-282).
 #
 # Requisitos: .env (copia de .env.example) y las llaves del JWT en infra/keys/ (ver README.md, «Arranque en un comando»).
 
@@ -84,7 +85,15 @@ services:
     <<: *reinicio
     # Sin límite, la caché de WiredTiger toma ~50 % de (RAM de la máquina virtual de Docker − 1 GB). Con 0,25 GB de
     # caché y 512 MB de límite, todo el sistema cabe en ~4 GB (README, «Memoria»).
-    command: ["--wiredTigerCacheSizeGB", "0.25"]
+    # Réplica rs0 de un solo nodo (DEC-281) para las transacciones del outbox (ADR-011); la inicia mongo-migraciones.
+    # Con control de acceso, la réplica exige un keyFile: se genera la primera vez en su propio volumen (nunca en Git).
+    command:
+      - sh
+      - -c
+      - >-
+        if [ ! -s /data/llave/mongo.key ]; then openssl rand -base64 756 > /data/llave/mongo.key; fi &&
+        chmod 400 /data/llave/mongo.key && chown 999:999 /data/llave/mongo.key &&
+        exec docker-entrypoint.sh mongod --wiredTigerCacheSizeGB 0.25 --replSet rs0 --keyFile /data/llave/mongo.key
     mem_limit: 512m
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:?Falta MONGO_USER en .env}
@@ -94,6 +103,7 @@ services:
       - "127.0.0.1:${MONGO_PORT:-27017}:27017"
     volumes:
       - mongo-data:/data/db
+      - mongo-llave:/data/llave
       # Línea base congelada (formato v1): validadores, índices (2dsphere) y semilla. Solo con el volumen vacío.
       - ./infra/mongo/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
@@ -116,12 +126,67 @@ services:
       # Usuario propio de ms-catalog (DEC-275): readWrite solo en catalog_db; lo crea o actualiza este servicio.
       CATALOG_DB_USER: ${CATALOG_DB_USER:-catalog_app}
       CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD:?Falta CATALOG_DB_PASSWORD en .env}
+      # Usuario propio de ms-analytics: readWrite solo en analytics_db (como DEC-275).
+      ANALYTICS_DB_USER: ${ANALYTICS_DB_USER:-analytics_app}
+      ANALYTICS_DB_PASSWORD: ${ANALYTICS_DB_PASSWORD:?Falta ANALYTICS_DB_PASSWORD en .env}
+      # Usuario propio de ms-chatbot: readWrite solo en chatbot_db (como DEC-275).
+      CHATBOT_DB_USER: ${CHATBOT_DB_USER:-chatbot_app}
+      CHATBOT_DB_PASSWORD: ${CHATBOT_DB_PASSWORD:?Falta CHATBOT_DB_PASSWORD en .env}
     volumes:
       - ./infra/mongo/migraciones:/migraciones:ro
+      - ./infra/mongo/analytics:/analytics:ro
+      - ./infra/mongo/chatbot:/chatbot:ro
     entrypoint: ["sh", "/migraciones/aplicar.sh"]
     depends_on:
       mongo:
         condition: service_healthy
+
+  # Nivel 3 de ADR-003 (ADR-011, DEC-284): topología en infra/rabbitmq/definiciones.json y un usuario por servicio con
+  # permisos mínimos, creados en cada arranque por iniciar.sh con las contraseñas de .env.
+  rabbitmq:
+    image: rabbitmq:4.1.4-management-alpine
+    container_name: samaria360-rabbitmq
+    <<: *reinicio
+    mem_limit: 384m
+    hostname: rabbitmq
+    entrypoint: ["sh", "/etc/rabbitmq/iniciar.sh"]
+    environment:
+      RABBITMQ_USER: ${RABBITMQ_USER:?Falta RABBITMQ_USER en .env}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:?Falta RABBITMQ_PASSWORD en .env}
+      RABBITMQ_AUTH_PASSWORD: ${RABBITMQ_AUTH_PASSWORD:?Falta RABBITMQ_AUTH_PASSWORD en .env}
+      RABBITMQ_BOOKING_PASSWORD: ${RABBITMQ_BOOKING_PASSWORD:?Falta RABBITMQ_BOOKING_PASSWORD en .env}
+      RABBITMQ_CATALOG_PASSWORD: ${RABBITMQ_CATALOG_PASSWORD:?Falta RABBITMQ_CATALOG_PASSWORD en .env}
+      RABBITMQ_ANALYTICS_PASSWORD: ${RABBITMQ_ANALYTICS_PASSWORD:?Falta RABBITMQ_ANALYTICS_PASSWORD en .env}
+      RABBITMQ_CHATBOT_PASSWORD: ${RABBITMQ_CHATBOT_PASSWORD:?Falta RABBITMQ_CHATBOT_PASSWORD en .env}
+    ports:
+      # Consola de administración, solo en 127.0.0.1 (ADR-011, punto 9); AMQP (5672) solo en la red interna y en
+      # 127.0.0.1 para el arranque local con ./mvnw.
+      - "127.0.0.1:${RABBITMQ_CONSOLA_PORT:-15672}:15672"
+      - "127.0.0.1:${RABBITMQ_PORT:-5672}:5672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - ./infra/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./infra/rabbitmq/definiciones.json:/etc/rabbitmq/definiciones.json:ro
+      - ./infra/rabbitmq/iniciar.sh:/etc/rabbitmq/iniciar.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/rabbitmq-listo && rabbitmq-diagnostics -q check_port_connectivity"]
+      interval: 10s
+      timeout: 10s
+      retries: 12
+      start_period: 30s
+
+  # Servidor SMTP de desarrollo y CI (DEC-282): reemplaza al «Servidor SMTP» externo del diagrama de despliegue; no es
+  # un contenedor de la arquitectura. Bandeja web en http://localhost:8025. En la demo, SMTP de Gmail (SMTP_* en .env).
+  mailpit:
+    image: axllent/mailpit:v1.27.11
+    container_name: samaria360-mailpit
+    profiles: ["dev"]
+    <<: *reinicio
+    mem_limit: 64m
+    ports:
+      - "127.0.0.1:${MAILPIT_PORT:-8025}:8025"
+    expose:
+      - "1025"
 
   ms-auth:
     build: ./ms-auth
@@ -140,6 +205,21 @@ services:
       # Relevo de cuentas hacia los endpoints internos de ms-catalog y ms-booking (ADR-008): URI, no secretos.
       CATALOG_INTERNO_URI: http://ms-catalog:8082
       BOOKING_INTERNO_URI: http://ms-booking:8083
+      # Publicación de eventos en RabbitMQ con el usuario propio de ms-auth (ADR-011).
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_AUTH_PASSWORD: ${RABBITMQ_AUTH_PASSWORD:?Falta RABBITMQ_AUTH_PASSWORD en .env}
+      # Correo de la recuperación de contraseña (RF34, DEC-282): Mailpit con el perfil dev; SMTP de Gmail en la demo.
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PUERTO: ${SMTP_PUERTO:-1025}
+      SMTP_USUARIO: ${SMTP_USUARIO:-}
+      SMTP_CLAVE: ${SMTP_CLAVE:-}
+      SMTP_TLS: ${SMTP_TLS:-false}
+      CORREO_REMITENTE: ${CORREO_REMITENTE:-no-responder@samaria360.local}
+      # Secretos de los clientes internos (DEC-280): ms-analytics lee contactos de prestadores (RF30).
+      SERVICIO_ANALYTICS_SECRETO: ${SERVICIO_ANALYTICS_SECRETO:?Falta SERVICIO_ANALYTICS_SECRETO en .env}
+      SERVICIO_BOOKING_SECRETO: ${SERVICIO_BOOKING_SECRETO:-}
+      # Origen del enlace del correo de RF34 (la SPA): en la demo, https://samaria360.duckdns.org.
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8000}
       JWT_LLAVE_PRIVADA: /run/secrets/jwt_llave_privada
       JWT_LLAVE_PUBLICA: /run/secrets/jwt_llave_publica
     # Llaves montadas como archivos de solo lectura en /run/secrets/; nunca se copian a la imagen.
@@ -148,9 +228,12 @@ services:
       - jwt_llave_publica
     expose:
       - "8081" # sin ports: solo se alcanza por la red interna, a través del gateway (ADR-005)
+    # RabbitMQ solo para el orden de arranque: si no está, los eventos esperan en el outbox (ADR-011).
     depends_on:
       postgres-bases:
         condition: service_completed_successfully
+      rabbitmq:
+        condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8081/actuator/health"]
       <<: *salud-java
@@ -165,10 +248,15 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       MONGO_HOST: mongo
       MONGO_PORT: "27017"
+      # Réplica rs0 (DEC-281); con ./mvnw el valor por defecto es directConnection=true.
+      MONGO_OPCIONES: "&replicaSet=rs0"
       # Usuario propio con readWrite solo en catalog_db (DEC-275); root no llega a este contenedor.
       CATALOG_DB_USER: ${CATALOG_DB_USER:-catalog_app}
       CATALOG_DB_PASSWORD: ${CATALOG_DB_PASSWORD:?Falta CATALOG_DB_PASSWORD en .env}
       AUTH_JWKS_URI: http://ms-auth:8081/api/v1/auth/.well-known/jwks.json
+      # Eventos del catálogo en RabbitMQ con el usuario propio de ms-catalog (ADR-011, DEC-293).
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_CATALOG_PASSWORD: ${RABBITMQ_CATALOG_PASSWORD:?Falta RABBITMQ_CATALOG_PASSWORD en .env}
     expose:
       - "8082"
     depends_on:
@@ -197,6 +285,12 @@ services:
       # Llamada directa al endpoint público de detalle antes de reservar y para materializar la oferta del catálogo
       # en el inventario bajo demanda (ADR-007 y su enmienda A2; DEC-135)
       MS_CATALOG_URL: http://ms-catalog:8082
+      # Eventos de reservas en RabbitMQ con el usuario propio de ms-booking (ADR-011, DEC-291).
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_BOOKING_PASSWORD: ${RABBITMQ_BOOKING_PASSWORD:?Falta RABBITMQ_BOOKING_PASSWORD en .env}
+      # Contactos de los turistas para el listado de asistentes de RF42 (DEC-280, DEC-312), con su secreto de cliente.
+      AUTH_INTERNO_URI: http://ms-auth:8081
+      SERVICIO_BOOKING_SECRETO: ${SERVICIO_BOOKING_SECRETO:-}
     expose:
       - "8083"
     # Con el contenedor de ms-catalog detenido, su nombre no resuelve y el DNS de Docker tarda varios segundos en
@@ -216,6 +310,77 @@ services:
       test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8083/actuator/health"]
       <<: *salud-java
 
+  # Análisis y notificaciones (Entregable 2, figura 20; ADR-011, DEC-292): consume los eventos de RabbitMQ, guarda en
+  # analytics_db y envía el correo de RF30 por SMTP.
+  ms-analytics:
+    build: ./ms-analytics
+    image: samaria360/ms-analytics:0.1.0
+    container_name: samaria360-ms-analytics
+    <<: [*reinicio, *memoria-java]
+    mem_limit: 512m
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      MONGO_HOST: mongo
+      MONGO_PORT: "27017"
+      MONGO_OPCIONES: "&replicaSet=rs0"
+      ANALYTICS_DB_USER: ${ANALYTICS_DB_USER:-analytics_app}
+      ANALYTICS_DB_PASSWORD: ${ANALYTICS_DB_PASSWORD:?Falta ANALYTICS_DB_PASSWORD en .env}
+      AUTH_JWKS_URI: http://ms-auth:8081/api/v1/auth/.well-known/jwks.json
+      # Contacto del Prestador para RF30 (endpoint interno de ms-auth con JWT de servicio, DEC-280).
+      AUTH_INTERNO_URI: http://ms-auth:8081
+      SERVICIO_ANALYTICS_SECRETO: ${SERVICIO_ANALYTICS_SECRETO:?Falta SERVICIO_ANALYTICS_SECRETO en .env}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_ANALYTICS_PASSWORD: ${RABBITMQ_ANALYTICS_PASSWORD:?Falta RABBITMQ_ANALYTICS_PASSWORD en .env}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PUERTO: ${SMTP_PUERTO:-1025}
+      SMTP_USUARIO: ${SMTP_USUARIO:-}
+      SMTP_CLAVE: ${SMTP_CLAVE:-}
+      SMTP_TLS: ${SMTP_TLS:-false}
+      CORREO_REMITENTE: ${CORREO_REMITENTE:-no-responder@samaria360.local}
+    expose:
+      - "8084"
+    depends_on:
+      mongo-migraciones:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8084/actuator/health"]
+      <<: *salud-java
+
+  # Asistente virtual (Entregable 2, figura 20; DEC-279, DEC-297): chatbot_db, la búsqueda pública del catálogo
+  # (DEC-280) y el proveedor LLM externo (Gemini, solo con GEMINI_API_KEY; por defecto, reglas).
+  ms-chatbot:
+    build: ./ms-chatbot
+    image: samaria360/ms-chatbot:0.1.0
+    container_name: samaria360-ms-chatbot
+    <<: [*reinicio, *memoria-java]
+    mem_limit: 512m
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      MONGO_HOST: mongo
+      MONGO_PORT: "27017"
+      MONGO_OPCIONES: "&replicaSet=rs0"
+      CHATBOT_DB_USER: ${CHATBOT_DB_USER:-chatbot_app}
+      CHATBOT_DB_PASSWORD: ${CHATBOT_DB_PASSWORD:?Falta CHATBOT_DB_PASSWORD en .env}
+      AUTH_JWKS_URI: http://ms-auth:8081/api/v1/auth/.well-known/jwks.json
+      CATALOG_INTERNO_URI: http://ms-catalog:8082
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_CHATBOT_PASSWORD: ${RABBITMQ_CHATBOT_PASSWORD:?Falta RABBITMQ_CHATBOT_PASSWORD en .env}
+      LLM_PROVEEDOR: ${LLM_PROVEEDOR:-reglas}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODELO: ${GEMINI_MODELO:-gemini-3.5-flash-lite}
+    expose:
+      - "8085"
+    depends_on:
+      mongo-migraciones:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8085/actuator/health"]
+      <<: *salud-java
+
   api-gateway:
     build: ./api-gateway
     image: samaria360/api-gateway:0.1.0
@@ -226,6 +391,8 @@ services:
       AUTH_URI: http://ms-auth:8081
       CATALOG_URI: http://ms-catalog:8082
       BOOKING_URI: http://ms-booking:8083
+      ANALYTICS_URI: http://ms-analytics:8084
+      CHATBOT_URI: http://ms-chatbot:8085
       # Con nginx el navegador usa un solo origen; CORS queda para el frontend en desarrollo (Vite).
       CORS_ORIGENES: http://localhost:${FRONTEND_PORT:-8000},http://localhost:5173
     # Solo en 127.0.0.1, como las bases: el navegador entra por el frontend (nginx); el 8080 queda para depurar y
@@ -240,6 +407,10 @@ services:
       ms-catalog:
         condition: service_started
       ms-booking:
+        condition: service_started
+      ms-analytics:
+        condition: service_started
+      ms-chatbot:
         condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8080/actuator/health"]
@@ -276,3 +447,5 @@ secrets:
 volumes:
   postgres-data:
   mongo-data:
+  mongo-llave:
+  rabbitmq-data:

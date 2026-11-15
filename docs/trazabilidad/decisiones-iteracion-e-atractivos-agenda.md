@@ -168,7 +168,7 @@ Avance: sigue en **39 de 64**; RF25 lleva a 40 al cerrar B2.
 
 **Recorrido visual:** no aplica en A2 (solo backend). El de B2 requiere el `docker compose up` que aplica M012 y M013 (O36).
 
-**Fuera de alcance de la sesión A2:** las pantallas de la agenda (B2); editar, borrar o despublicar eventos (DEC-215); vincular un evento a un atractivo (el §2.4 guarda la ubicación como texto); notificaciones de eventos (ms-notificaciones).
+**Fuera de alcance de la sesión A2:** las pantallas de la agenda (B2); editar, borrar o despublicar eventos (DEC-215); vincular un evento a un atractivo (el §2.4 guarda la ubicación como texto); notificaciones de eventos (ms-notificaciones). *Enmienda DEC-278 (2026-11-14): ms-notificaciones no existe en el Entregable 2; las notificaciones de eventos no tienen RF en el SRS y, si se agregan, irían en ms-analytics vía RabbitMQ.*
 
 ## Aplicación de O36 y corrección O38 y O39 (iteración E; WF-09, WF-23)
 
@@ -255,4 +255,4 @@ Avance: de **39 a 40 de 64**. La iteración E está cerrada.
 
 **Datos de prueba en el volumen local (C3):** evento `6aecd33cb4962254d1133241` («Prueba recorrido B2»), `fechaInicio = fechaFin = 2026-11-05` (hoy en Bogotá), creado por el Gestor de la semilla (`00000000-0000-4000-8000-000000000003`) el 2026-11-05T19:04:28.948Z. No hay borrado de eventos (DEC-215): queda en el volumen y sale de la agenda a las 00:00 de Bogotá del 2026-11-06.
 
-**Fuera de alcance de la sesión B2:** editar, borrar o despublicar eventos (DEC-215); filtros de la agenda y ficha propia de un evento (CU); un bloque «Próximos eventos» en el inicio (pendiente opcional de DEC-246); notificaciones de eventos (ms-notificaciones).
+**Fuera de alcance de la sesión B2:** editar, borrar o despublicar eventos (DEC-215); filtros de la agenda y ficha propia de un evento (CU); un bloque «Próximos eventos» en el inicio (pendiente opcional de DEC-246); notificaciones de eventos (ms-notificaciones). *Enmienda DEC-278 (2026-11-14): ms-notificaciones no existe en el Entregable 2; las notificaciones de eventos no tienen RF en el SRS y, si se agregan, irían en ms-analytics vía RabbitMQ.*

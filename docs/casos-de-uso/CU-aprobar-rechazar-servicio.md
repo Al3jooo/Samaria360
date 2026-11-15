@@ -212,5 +212,5 @@ end
 ## Fuera de alcance
 
 - Reenviar o editar un servicio rechazado (iteración D).
-- Notificar al prestador la decisión (ms-notificaciones; RF13 y RF30 siguen fuera de alcance) y el log de auditoría de la aprobación (RF13): `revisadoPor` y `fechaRevision` lo preparan.
+- Notificar al prestador la decisión (sin RF en el SRS: RF30 cubre las reservas; si se agrega, ms-analytics vía RabbitMQ) y el log de auditoría de la aprobación (RF13, ms-analytics vía RabbitMQ): `revisadoPor` y `fechaRevision` lo preparan.
 - Despublicar un servicio ya publicado: el SRS no lo define.

@@ -10,7 +10,7 @@ Backend y documentos (DEC-33, un solo PR por decisión del usuario, DEC-190). CU
 
 | # | Tema | Decisión | Dónde |
 |---|---|---|---|
-| DEC-183 | Oferta inmutable (R-D1) | La `oferta` (días de operación y salidas) es **inmutable después de la aprobación**. RF32 cambia solo el precio; modificar fechas, horarios y cupos es RF19, fuera de alcance (DEC-34). **Justificación:** las filas materializadas en ms-booking no cambian si cambia la oferta (la marca solo avanza); invalidarlas exigiría tocar el inventario y enmendar otra vez ADR-007 | `CU-actualizar-tarifas.md`; `ActualizacionPrecio` |
+| DEC-183 | Oferta inmutable (R-D1) | La `oferta` (días de operación y salidas) es **inmutable después de la aprobación**. RF32 cambia solo el precio; modificar fechas, horarios y cupos es RF19, fuera de alcance (DEC-34). **Enmendada por DEC-310 (iteración I):** RF19 cambia la oferta por ms-booking (cupos, cierres y plantilla); RF32 sigue sin cambiarla. **Justificación:** las filas materializadas en ms-booking no cambian si cambia la oferta (la marca solo avanza); invalidarlas exigiría tocar el inventario y enmendar otra vez ADR-007 | `CU-actualizar-tarifas.md`; `ActualizacionPrecio` |
 
 **Decisiones de la sesión A (DEC-184 a DEC-195; propuestas por arquitectura y aprobadas con el plan, con las condiciones del usuario):**
 

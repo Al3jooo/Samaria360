@@ -77,3 +77,7 @@ El correo viaja por el **estado del router**, no por la URL, para que no quede e
     - dos registros simultáneos con el mismo correo: dos 202 y una sola cuenta;
     - que el log no contiene el correo.
 - **Con el sistema desplegado:** `diff` de encabezados y cuerpo, sin `Date`, de `curl -i` contra el gateway (ver `docs/trazabilidad.md`).
+
+## Enmienda DEC-285 (2026-11-14): recuperación de contraseña y aviso por correo
+
+RF34 aplica la misma regla: `POST /api/v1/auth/recuperacion` responde **202 `RECIBIDO`** exista o no la cuenta, y el correo sale en otro hilo, así que la duración de la respuesta no depende de si la cuenta existe. El aviso al dueño de un correo ya registrado deja de ser solo un log: ms-auth le envía un correo por SMTP directo (DEC-287). El límite de tasa del gateway (DEC-271) cubre también los dos pasos de RF34. Contrato en `sad/api/ms-auth.md` y CU «Recuperar contraseña».
