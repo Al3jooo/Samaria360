@@ -74,6 +74,17 @@ class RedactoresTest {
     }
 
     @Test
+    void aGeminiNoLeLlegaLaJustificacionQueDelataLosIntereses() {
+        Sugerencia porIntereses = new Sugerencia(PLAYA.item(), Sugerencia.Criterio.PREFERENCIAS,
+                "Coincide con tus intereses declarados (Naturaleza).");
+
+        String prompt = RedactorGeminiAdapter.prompt(contexto(Idioma.es, List.of(porIntereses), List.of()));
+
+        assertThat(prompt).contains("Playa Cristal").doesNotContain("intereses").doesNotContain("PREFERENCIAS")
+                .doesNotContain("Justificación");
+    }
+
+    @Test
     void siGeminiFallaRedactaConLasReglas() throws IOException {
         AtomicInteger llamadas = new AtomicInteger();
         String url = simular(500, "{}", new AtomicReference<>(), new AtomicReference<>(), new AtomicReference<>(),
