@@ -41,13 +41,14 @@ Solo el **Administrador**.
 {
   "elementos": [
     { "usuarioId": "00000000-0000-4000-8000-000000000004", "accion": "PRESTADOR_APROBADO",
-      "detalle": "Prestador 00000000-0000-4000-8000-000000000002", "fecha": "2030-03-01T15:00:00Z" }
+      "detalle": "Prestador 00000000-0000-4000-8000-000000000002",
+      "datos": { "idPrestador": "00000000-0000-4000-8000-000000000002" }, "fecha": "2030-03-01T15:00:00Z" }
   ],
   "pagina": 0, "tamano": 20, "totalElementos": 1
 }
 ```
 
-- `usuarioId`: quien hizo la acción. `accion`: `PRESTADOR_APROBADO`, `PRESTADOR_RECHAZADO`, `SERVICIO_APROBADO`, `SERVICIO_RECHAZADO`, `ROL_CAMBIADO`, `RESERVA_CANCELADA` y, desde la iteración H, las de moderación de calificaciones. `detalle`: los identificadores afectados, sin texto libre ni datos personales.
+- `usuarioId`: quien hizo la acción. `accion`: `PRESTADOR_APROBADO`, `PRESTADOR_RECHAZADO`, `SERVICIO_APROBADO`, `SERVICIO_RECHAZADO`, `ROL_CAMBIADO`, `RESERVA_CANCELADA` y, desde la iteración H, las de moderación de calificaciones. `detalle`: los identificadores afectados, sin texto libre ni datos personales (en español). `datos` (DEC-322, A005): los mismos valores por separado, para que la interfaz arme el detalle en el idioma activo (RF03, RNF08): `idPrestador` (validación de prestadores); `idServicio`, `idPrestador` y, desde DEC-323, `nombreServicio` (servicios); `idUsuario`, `rolAnterior` y `rolNuevo` (cambio de rol); `idReserva` y `nombreServicio` (cancelación); `idCalificacion`, `tipoEntidad`, `idEntidad` y `motivo` (moderación, RF29). Es `{}` en las entradas anteriores a A005, que solo traen `detalle`. En la moderación, `nombreEntidad` de una calificación de atractivo sale del último nombre que trajo `ConsultasAgregadas` para esa ficha (DEC-323); es `null` si nunca se consultó.
 - Filtros opcionales: `accion`, `usuario` (UUID), `desde` y `hasta` (`yyyy-MM-dd`, `hasta` incluido). **400** `DATOS_INVALIDOS` con `campos` (`NO_PERMITIDO`, `FORMATO`) si uno no tiene forma o `hasta` es anterior a `desde`. Páginas de 20, de la más reciente a la más antigua.
 
 ## Calificaciones (RF17, RF29, RF56)

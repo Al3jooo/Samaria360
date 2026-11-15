@@ -51,7 +51,7 @@
     "instante": { "type": "string", "format": "date-time", "pattern": "Z$" },
     "rol": { "enum": ["Turista", "Prestador", "Gestor", "Administrador"] },
     "tipoEntidad": { "enum": ["servicio", "atractivo"] },
-    "nombreServicio": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "nombreServicio": { "type": "string", "minLength": 1, "maxLength": 150 },
     "personas": { "type": "integer", "minimum": 1 },
 
     "CuentaActualizada": {
@@ -141,6 +141,7 @@
       "additionalProperties": false,
       "properties": {
         "idServicio": { "$ref": "#/$defs/objectId" },
+        "nombreServicio": { "$ref": "#/$defs/nombreServicio" },
         "idPrestador": { "$ref": "#/$defs/uuid" },
         "decision": { "enum": ["Publicado", "Rechazado"] },
         "idAdministrador": { "$ref": "#/$defs/uuid" }

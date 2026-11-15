@@ -101,6 +101,7 @@ Reserva creada y confirmada automáticamente (RF20). Lo que RF30 pide mostrar: l
 ```
 
 - `categoria`: `Tour` o `Alojamiento`. `idUnidad`: el ObjectId de la unidad en Alojamiento; `null` en Tour. `cantidad`: cupos descontados (`cantidad_solicitada`).
+- `nombreServicio`, en todos los eventos que lo llevan: de 1 a 150 caracteres, el largo del nombre comercial (DEC-323; antes decía 120).
 
 ### ReservaCancelada
 
@@ -123,10 +124,10 @@ Paso automático de Confirmada a Completada (RF52). Con él, ms-analytics habili
 Aprobación o rechazo de un servicio (RF21). La justificación **no viaja**.
 
 ```json
-{ "idServicio": "…", "idPrestador": "…", "decision": "Publicado", "idAdministrador": "…" }
+{ "idServicio": "…", "nombreServicio": "Tour a Playa Cristal", "idPrestador": "…", "decision": "Publicado", "idAdministrador": "…" }
 ```
 
-`decision`: `Publicado` o `Rechazado`.
+`decision`: `Publicado` o `Rechazado`. `nombreServicio` (opcional, agregado en DEC-323): el nombre comercial, para que la auditoría lo muestre; no es un dato personal.
 
 ### ConsultasAgregadas
 
