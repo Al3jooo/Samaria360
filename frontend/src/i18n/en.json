@@ -1661,7 +1661,7 @@
     "titulo": "AI Virtual Assistant",
     "enLinea": "Online",
     "subtitulo": "answers in seconds with Samaria360 data: attractions, published services and official information from the city.",
-    "beta": "Beta assistant: recommendations use only the Samaria360 catalog and the city's knowledge base. Check capacity and trail status before you go.",
+    "beta": "Beta assistant: recommendations use only the Samaria360 catalog and the city's knowledge base. Check crowd levels and trail status before you go.",
     "cerrarBeta": "Close the notice",
     "conversacion": "Conversation with the assistant",
     "autorAsistente": "AI Assistant",
@@ -1675,7 +1675,7 @@
     "verItinerarios": "View my itineraries",
     "sugerenciasRapidas": "Quick questions",
     "chips": {
-      "aforo": "Live capacity",
+      "aforo": "Live crowd level",
       "rutas": "Alternative routes",
       "toursManana": "Tours tomorrow",
       "alquiler": "Equipment rental"
@@ -1711,7 +1711,7 @@
     "sinPrestadores": "Services suggested by the assistant will show up here.",
     "ayuda": {
       "titulo": "The assistant can also help you with",
-      "aforosTitulo": "Live capacity",
+      "aforosTitulo": "Live crowd levels",
       "aforos": "Which attractions are open and which are worth visiting given their status.",
       "rutasTitulo": "Routes and weather",
       "rutas": "City tips and rules from the knowledge base, such as weather or closures.",
