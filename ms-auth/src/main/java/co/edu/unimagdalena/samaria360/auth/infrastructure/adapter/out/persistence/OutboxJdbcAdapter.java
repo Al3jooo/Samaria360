@@ -2,13 +2,16 @@ package co.edu.unimagdalena.samaria360.auth.infrastructure.adapter.out.persisten
 
 import co.edu.unimagdalena.samaria360.auth.application.port.out.EntregaPendiente;
 import co.edu.unimagdalena.samaria360.auth.application.port.out.OutboxPort;
+import co.edu.unimagdalena.samaria360.auth.application.port.out.PublicacionPendiente;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Destino;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EstadoAdministrativo;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EventoCuentaActualizada;
+import co.edu.unimagdalena.samaria360.auth.domain.model.EventoPublicable;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Rol;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -51,6 +54,12 @@ public class OutboxJdbcAdapter implements OutboxPort {
         if (evento.rnt() != null) {
             carga.put("rnt", evento.rnt());
         }
+        // País de origen del turista, solo para RabbitMQ (decisión 6 del equipo: «visitantes por zona», RF14). El relevo
+        // HTTP no lo envía: su cuerpo se arma con los campos de EntregaPendiente.
+        if (evento.rol() == Rol.Turista) {
+            jdbc.query("SELECT pais_origen FROM turista WHERE id_usuario = ?",
+                    rs -> { carga.put("pais", rs.getString(1)); }, evento.idUsuario());
+        }
         Long id = jdbc.queryForObject("""
                 INSERT INTO outbox_evento (tipo, id_usuario, carga, creado_en)
                 VALUES (?, ?, ?::jsonb, ?) RETURNING id_evento
@@ -59,6 +68,18 @@ public class OutboxJdbcAdapter implements OutboxPort {
             jdbc.update("INSERT INTO outbox_entrega (id_evento, destino, proximo_intento) VALUES (?, ?, ?)",
                     id, destino.texto(), Timestamp.from(evento.ocurridoEn()));
         }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void registrarPublicacion(EventoPublicable evento) {
+        Long id = jdbc.queryForObject("""
+                INSERT INTO outbox_evento (tipo, id_usuario, carga, creado_en)
+                VALUES (?, ?, ?::jsonb, ?) RETURNING id_evento
+                """, Long.class, evento.tipo(), evento.idUsuario(), escribir(evento.datos()),
+                Timestamp.from(evento.ocurridoEn()));
+        jdbc.update("INSERT INTO outbox_entrega (id_evento, destino, proximo_intento) VALUES (?, ?, ?)",
+                id, Destino.RABBITMQ.texto(), Timestamp.from(evento.ocurridoEn()));
     }
 
     /**
@@ -126,6 +147,63 @@ public class OutboxJdbcAdapter implements OutboxPort {
         for (EntregaPendiente entrega : entregas) {
             jdbc.update("UPDATE outbox_entrega SET proximo_intento = ? WHERE id_evento = ? AND destino = ?"
                     + " AND entregado_en IS NULL", Timestamp.from(ahora), entrega.idEvento(), destino.texto());
+        }
+    }
+
+    /**
+     * Todas las publicaciones pendientes y vencidas para RabbitMQ, en orden de id, bloqueadas con SKIP LOCKED y con el
+     * arriendo concedido en la misma transacción (ADR-011). El RNT del prestador no se publica: solo lo usa ms-catalog,
+     * que lo recibe por HTTP.
+     */
+    @Override
+    @Transactional
+    public List<PublicacionPendiente> reclamarPublicaciones(Instant ahora, Duration arriendo, int limite) {
+        List<PublicacionPendiente> reclamadas = jdbc.query("""
+                SELECT en.id_evento, en.intentos, e.id_publico, e.tipo, e.id_usuario, e.creado_en, e.carga::text AS carga
+                FROM outbox_entrega en
+                JOIN outbox_evento e ON e.id_evento = en.id_evento
+                WHERE en.destino = ? AND en.entregado_en IS NULL AND en.proximo_intento <= ?
+                ORDER BY en.id_evento
+                LIMIT ?
+                FOR UPDATE OF en SKIP LOCKED
+                """, (rs, n) -> {
+            ObjectNode datos = (ObjectNode) leer(rs.getString("carga"));
+            datos.remove("rnt");
+            return new PublicacionPendiente(rs.getLong("id_evento"), rs.getObject("id_publico", UUID.class),
+                    rs.getString("tipo"), rs.getObject("id_usuario", UUID.class),
+                    rs.getTimestamp("creado_en").toInstant(), datos.toString(), rs.getInt("intentos"));
+        }, Destino.RABBITMQ.texto(), Timestamp.from(ahora), limite);
+        Timestamp vence = Timestamp.from(ahora.plus(arriendo));
+        for (PublicacionPendiente publicacion : reclamadas) {
+            jdbc.update("UPDATE outbox_entrega SET proximo_intento = ? WHERE id_evento = ? AND destino = ?",
+                    vence, publicacion.idEvento(), Destino.RABBITMQ.texto());
+        }
+        return reclamadas;
+    }
+
+    @Override
+    @Transactional
+    public void marcarPublicada(PublicacionPendiente publicacion, Instant ahora) {
+        jdbc.update("UPDATE outbox_entrega SET entregado_en = ? WHERE id_evento = ? AND destino = ?",
+                Timestamp.from(ahora), publicacion.idEvento(), Destino.RABBITMQ.texto());
+    }
+
+    @Override
+    @Transactional
+    public void registrarFalloPublicacion(PublicacionPendiente publicacion, Instant proximoIntento, String error) {
+        jdbc.update("""
+                UPDATE outbox_entrega
+                SET intentos = intentos + 1, proximo_intento = ?, ultimo_error = ?
+                WHERE id_evento = ? AND destino = ?
+                """, Timestamp.from(proximoIntento), error, publicacion.idEvento(), Destino.RABBITMQ.texto());
+    }
+
+    @Override
+    @Transactional
+    public void liberarPublicaciones(List<PublicacionPendiente> publicaciones, Instant ahora) {
+        for (PublicacionPendiente publicacion : publicaciones) {
+            jdbc.update("UPDATE outbox_entrega SET proximo_intento = ? WHERE id_evento = ? AND destino = ?"
+                    + " AND entregado_en IS NULL", Timestamp.from(ahora), publicacion.idEvento(), Destino.RABBITMQ.texto());
         }
     }
 

@@ -11,6 +11,7 @@ import co.edu.unimagdalena.samaria360.auth.domain.exception.DatosRegistroInvalid
 import co.edu.unimagdalena.samaria360.auth.domain.model.CambioRol;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Destino;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EventoCuentaActualizada;
+import co.edu.unimagdalena.samaria360.auth.domain.model.EventoRolCambiado;
 import co.edu.unimagdalena.samaria360.auth.domain.model.MotivoInvalido;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Rol;
 import co.edu.unimagdalena.samaria360.auth.domain.service.PoliticaAdministradores;
@@ -65,6 +66,8 @@ public class CambiarRolService implements CambiarRolUseCase {
         }
         cuentas.aplicar(cambio);
         outbox.registrar(EventoCuentaActualizada.de(cambio, reloj.ahora()), List.of(Destino.values()));
+        // Auditoría de RF13 (ADR-011).
+        outbox.registrarPublicacion(EventoRolCambiado.de(cambio, comando.idAdministrador(), reloj.ahora()));
         return cuentas.resumen(comando.idCuenta())
                 .orElseThrow(() -> new CuentaNoEncontradaException(comando.idCuenta()));
     }

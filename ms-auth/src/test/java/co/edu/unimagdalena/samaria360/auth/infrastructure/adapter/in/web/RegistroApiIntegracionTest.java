@@ -148,9 +148,12 @@ class RegistroApiIntegracionTest {
         assertThat(repetido.getContentAsString()).isEqualTo(nuevo.getContentAsString());
         assertThat(jdbc.queryForObject("SELECT count(*) FROM usuario WHERE correo = ?", Integer.class, correo))
                 .isEqualTo(1);
-        // Se avisa al dueño con su id, nunca con la dirección de correo (dato personal).
+        // Se avisa al dueño por correo (DEC-278, RF34); el log lleva su id, nunca la dirección (dato personal). El envío
+        // es asíncrono: se espera a que termine.
         UUID id = jdbc.queryForObject("SELECT id_usuario FROM usuario WHERE correo = ?", UUID.class, correo);
-        assertThat(salida.getOut()).contains("idUsuario=" + id).doesNotContain(correo);
+        org.awaitility.Awaitility.await().atMost(java.time.Duration.ofSeconds(10))
+                .untilAsserted(() -> assertThat(salida.getOut()).contains("idUsuario=" + id));
+        assertThat(salida.getOut()).doesNotContain(correo);
     }
 
     @Test

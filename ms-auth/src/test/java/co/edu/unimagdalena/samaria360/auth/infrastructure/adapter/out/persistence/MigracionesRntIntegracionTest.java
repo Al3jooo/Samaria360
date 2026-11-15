@@ -35,7 +35,7 @@ class MigracionesRntIntegracionTest {
             Map<UUID, Long> otrasAntes = versionesDeOtrosRoles(jdbc);
             int eventosAntes = jdbc.queryForObject("SELECT count(*) FROM outbox_evento", Integer.class);
 
-            assertThat(flyway(postgres, null, true).migrate().success).isTrue();
+            assertThat(flyway(postgres, "17", true).migrate().success).isTrue();
 
             // prestador@ (Activo), prestador2@ (Inactivo), prestador3@ y prestador4@ (Pendientes) de la semilla.
             assertThat(versionesAntes).hasSize(4);
@@ -71,7 +71,7 @@ class MigracionesRntIntegracionTest {
     void v17_elEstadoDeCadaEventoEsElDeEstadoAdministrativoDePrestador() {
         try (PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(IMAGEN)) {
             postgres.start();
-            assertThat(flyway(postgres, null, true).migrate().success).isTrue();
+            assertThat(flyway(postgres, "17", true).migrate().success).isTrue();
             JdbcTemplate jdbc = jdbc(postgres);
 
             List<Map<String, Object>> eventos = eventosDePrestadores(jdbc);
@@ -91,7 +91,7 @@ class MigracionesRntIntegracionTest {
     void v17_sinSemillaYSinPrestadoresNoEncolaNada() {
         try (PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(IMAGEN)) {
             postgres.start();
-            assertThat(flyway(postgres, null, false).migrate().success).isTrue();
+            assertThat(flyway(postgres, "17", false).migrate().success).isTrue();
 
             assertThat(jdbc(postgres).queryForObject("SELECT count(*) FROM outbox_evento", Integer.class)).isZero();
         }
@@ -110,7 +110,7 @@ class MigracionesRntIntegracionTest {
             UUID rechazado = crearPrestador(jdbc, "rechazado@hotel.test", "RNT-RECH", "Rechazado", "Activo", 5);
             UUID inactivo = crearPrestador(jdbc, "inactivo@hotel.test", "RNT-INAC", "Activo", "Inactivo", 2);
 
-            assertThat(flyway(postgres, null, true).migrate().success).isTrue();
+            assertThat(flyway(postgres, "17", true).migrate().success).isTrue();
 
             for (Object[] esperado : new Object[][]{{rechazado, "RNT-RECH", "Rechazado", 6}, {inactivo, "RNT-INAC",
                     "Inactivo", 3}}) {

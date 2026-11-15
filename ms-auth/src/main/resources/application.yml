@@ -18,9 +18,36 @@ spring:
     password: ${AUTH_DB_PASSWORD:${POSTGRES_PASSWORD}}
   task:
     scheduling:
-      # Uno por destino del relevo (un destino caído no retrasa al otro) y uno para la purga del outbox (DEC-272).
+      # Uno por destino del relevo HTTP (un destino caído no retrasa al otro), uno para RabbitMQ (ADR-011) y uno para la
+      # purga del outbox (DEC-272).
       pool:
-        size: 3
+        size: 4
+  # Publicación de eventos (ADR-011, DEC-284): usuario propio de ms-auth, que solo escribe en el exchange. Publisher
+  # confirms correlacionados y mandatory: el relevo marca una entrega solo con el ack del bróker.
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ms-auth
+    password: ${RABBITMQ_AUTH_PASSWORD:}
+    virtual-host: samaria360
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    connection-timeout: 2s
+  # Correo por SMTP directo (RF34, DEC-282): Mailpit en desarrollo y CI; Gmail con contraseña de aplicación en la demo.
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PUERTO:1025}
+    username: ${SMTP_USUARIO:}
+    password: ${SMTP_CLAVE:}
+    properties:
+      mail.smtp.auth: ${SMTP_TLS:false}
+      mail.smtp.starttls.enable: ${SMTP_TLS:false}
+      mail.smtp.starttls.required: ${SMTP_TLS:false}
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 10000
+      mail.smtp.writetimeout: 10000
   jpa:
     open-in-view: false
     hibernate:
@@ -48,13 +75,36 @@ samaria360:
     destinos:
       ms-catalog: ${CATALOG_INTERNO_URI:http://localhost:8082}
       ms-booking: ${BOOKING_INTERNO_URI:http://localhost:8083}
+  # Relevo del outbox hacia RabbitMQ (ADR-011). Si RabbitMQ no está, los eventos esperan en el outbox.
+  eventos:
+    habilitado: true
+    cada: PT1S
+  # Clientes internos (DEC-280): piden un JWT de servicio con su secreto y leen solo los contactos de su rol. Sin
+  # secreto, el cliente queda deshabilitado.
+  clientes-servicio:
+    ms-analytics:
+      secreto: ${SERVICIO_ANALYTICS_SECRETO:}
+      contactos: Prestador
+    ms-booking:
+      secreto: ${SERVICIO_BOOKING_SECRETO:}
+      contactos: Turista
+  # Correos de RF34 (DEC-282): el enlace lleva el origen de la SPA.
+  correo:
+    remitente: ${CORREO_REMITENTE:no-responder@samaria360.local}
+    frontend-url: ${FRONTEND_URL:http://localhost:8000}
 
-# Solo /actuator/health (healthcheck de Docker Compose), igual que ms-booking y api-gateway.
+# Solo /actuator/health (healthcheck de Docker Compose), igual que ms-booking y api-gateway. RabbitMQ y el SMTP no
+# cuentan para la salud: si faltan, los eventos esperan en el outbox y el correo queda en el log (ADR-011, DEC-282).
 management:
   endpoints:
     web:
       exposure:
         include: health
+  health:
+    rabbit:
+      enabled: false
+    mail:
+      enabled: false
 
 # Swagger solo en dev (ver documento de perfil dev más abajo)
 springdoc:

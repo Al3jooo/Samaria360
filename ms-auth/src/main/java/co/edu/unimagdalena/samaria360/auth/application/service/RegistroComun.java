@@ -29,7 +29,7 @@ final class RegistroComun {
     static boolean atenderCorreoExistente(RegistroRepositoryPort registros, NotificadorCuentaPort notificador,
                                           String correo) {
         Optional<UUID> existente = registros.buscarIdPorCorreo(correo);
-        existente.ifPresent(notificador::avisarRegistroConCorreoExistente);
+        existente.ifPresent(id -> notificador.avisarRegistroConCorreoExistente(id, correo));
         return existente.isPresent();
     }
 }

@@ -15,6 +15,7 @@ import co.edu.unimagdalena.samaria360.auth.domain.model.EstadoAdministrativo;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EstadoCuenta;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EstadoValidacion;
 import co.edu.unimagdalena.samaria360.auth.domain.model.EventoCuentaActualizada;
+import co.edu.unimagdalena.samaria360.auth.domain.model.EventoPrestadorValidado;
 import co.edu.unimagdalena.samaria360.auth.domain.model.MotivoInvalido;
 import co.edu.unimagdalena.samaria360.auth.domain.model.Rol;
 import org.junit.jupiter.api.Test;
@@ -64,6 +65,23 @@ class AdministrarCuentasServiceTest {
                 EstadoAdministrativo.Activo, 1, RNT, T0));
         assertThat(outbox.entregas()).extracting(e -> e.destino)
                 .containsExactlyInAnyOrder(Destino.MS_CATALOG, Destino.MS_BOOKING);
+        // RabbitMQ (ADR-011): el estado de la cuenta y la decisión para la auditoría de RF13.
+        assertThat(outbox.publicables()).containsExactly(new EventoPrestadorValidado(PRESTADOR, true, ADMIN, T0));
+        assertThat(outbox.publicaciones()).extracting(p -> p.tipo)
+                .containsExactly("CuentaActualizada", "PrestadorValidado");
+    }
+
+    /** ADR-011, punto 7: la justificación (texto libre) no viaja en el evento de auditoría. */
+    @Test
+    void rechazarPublicaLaDecisionSinLaJustificacion() {
+        prestador(EstadoValidacion.Pendiente, EstadoCuenta.Activo, 0);
+
+        servicio.validar(new ComandoValidacion(PRESTADOR, "Rechazar", "RNT no vigente", ADMIN));
+
+        assertThat(outbox.publicables()).singleElement().satisfies(evento -> {
+            assertThat(evento.datos()).containsEntry("decision", "Rechazado").doesNotContainKey("justificacion");
+            assertThat(evento.datos().values()).doesNotContain("RNT no vigente");
+        });
     }
 
     @Test

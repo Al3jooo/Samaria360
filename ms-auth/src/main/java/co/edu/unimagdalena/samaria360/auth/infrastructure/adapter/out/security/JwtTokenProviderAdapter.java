@@ -15,13 +15,15 @@ import org.springframework.stereotype.Component;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-/** JWT RS256 con claims iss, sub (id_usuario), rol, ver, iat y exp; el kid coincide con el del JWKS. */
+/** JWT RS256 con claims iss, sub (id_usuario), rol, ver, ini, iat y exp; el kid coincide con el del JWKS. */
 @Component
 public class JwtTokenProviderAdapter implements TokenProviderPort {
 
     public static final String CLAIM_ROL = "rol";
     /** Versión de la cuenta al iniciar sesión (DEC-29): los servicios rechazan el token si ya hubo un cambio. */
     public static final String CLAIM_VERSION = "ver";
+    /** Inicio de la sesión, en segundos desde la época (DEC-317): se conserva al renovar el token. */
+    public static final String CLAIM_INICIO_SESION = "ini";
 
     private final JwtEncoder encoder;
     private final JwtPropiedades propiedades;
@@ -34,7 +36,7 @@ public class JwtTokenProviderAdapter implements TokenProviderPort {
     }
 
     @Override
-    public TokenEmitido emitir(Usuario usuario, Instant ahora) {
+    public TokenEmitido emitir(Usuario usuario, Instant ahora, Instant inicioSesion) {
         // iat y exp del JWT son segundos enteros (NumericDate, RFC 7519): se trunca para que
         // expiraEn de la respuesta coincida exactamente con el exp del token.
         Instant emitidoEn = ahora.truncatedTo(ChronoUnit.SECONDS);
@@ -44,6 +46,7 @@ public class JwtTokenProviderAdapter implements TokenProviderPort {
                 .subject(usuario.getId().toString())
                 .claim(CLAIM_ROL, usuario.getRol().name())
                 .claim(CLAIM_VERSION, usuario.getVersionCuenta())
+                .claim(CLAIM_INICIO_SESION, inicioSesion.getEpochSecond())
                 .issuedAt(emitidoEn)
                 .expiresAt(expiraEn)
                 .build();

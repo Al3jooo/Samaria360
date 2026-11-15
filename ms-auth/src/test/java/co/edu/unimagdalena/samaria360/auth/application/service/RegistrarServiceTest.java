@@ -1,6 +1,11 @@
 package co.edu.unimagdalena.samaria360.auth.application.service;
 
 import co.edu.unimagdalena.samaria360.auth.application.fake.NotificadorCuentaFalso;
+import co.edu.unimagdalena.samaria360.auth.application.fake.OutboxEnMemoria;
+import co.edu.unimagdalena.samaria360.auth.domain.model.Destino;
+import co.edu.unimagdalena.samaria360.auth.domain.model.EstadoAdministrativo;
+import co.edu.unimagdalena.samaria360.auth.domain.model.EventoCuentaActualizada;
+import co.edu.unimagdalena.samaria360.auth.domain.model.Rol;
 import co.edu.unimagdalena.samaria360.auth.application.fake.PasswordHasherFalso;
 import co.edu.unimagdalena.samaria360.auth.application.fake.RegistroRepositoryEnMemoria;
 import co.edu.unimagdalena.samaria360.auth.application.fake.RelojFijo;
@@ -36,10 +41,11 @@ class RegistrarServiceTest {
     private final RegistroRepositoryEnMemoria registros = new RegistroRepositoryEnMemoria();
     private final PasswordHasherFalso hasher = new PasswordHasherFalso();
     private final NotificadorCuentaFalso notificador = new NotificadorCuentaFalso();
+    private final OutboxEnMemoria outbox = new OutboxEnMemoria();
     private final RegistrarTuristaService turistas =
-            new RegistrarTuristaService(registros, hasher, notificador, new RelojFijo(AHORA));
+            new RegistrarTuristaService(registros, hasher, notificador, new RelojFijo(AHORA), outbox);
     private final RegistrarPrestadorService prestadores =
-            new RegistrarPrestadorService(registros, hasher, notificador, new RelojFijo(AHORA));
+            new RegistrarPrestadorService(registros, hasher, notificador, new RelojFijo(AHORA), outbox);
 
     // ------------------------------------------------------------------ turista
 
@@ -54,6 +60,31 @@ class RegistrarServiceTest {
         assertThat(guardado.fechaRegistro()).isEqualTo(LocalDate.of(2026, 10, 11));
         assertThat(guardado.datos().categoriasInteres()).containsExactly(CategoriaInteres.Cultura);
         assertThat(notificador.avisados()).isEmpty();
+    }
+
+    /** ADR-011: la cuenta nueva se publica en RabbitMQ (versión 0) para ms-analytics; los destinos HTTP no la reciben. */
+    @Test
+    void unRegistroNuevoEncolaCuentaActualizadaSoloParaRabbitMq() {
+        turistas.registrar(turista("ana@x.com", true));
+
+        EventoCuentaActualizada evento = outbox.eventos().get(0);
+        assertThat(evento.idUsuario()).isEqualTo(registros.turistas().get(0).idUsuario());
+        assertThat(evento.rol()).isEqualTo(Rol.Turista);
+        assertThat(evento.estadoCuenta()).isEqualTo(EstadoAdministrativo.Activo);
+        assertThat(evento.version()).isZero();
+        assertThat(outbox.entregas()).isEmpty();
+        assertThat(outbox.publicaciones()).singleElement()
+                .satisfies(p -> assertThat(p.clave).isEqualTo(evento.idUsuario()));
+    }
+
+    @Test
+    void unCorreoExistenteNoEncolaNingunEvento() {
+        registros.conCorreo("ana@x.com", ID_EXISTENTE);
+
+        turistas.registrar(turista("ana@x.com", true));
+
+        assertThat(outbox.eventos()).isEmpty();
+        assertThat(notificador.correosAvisados()).containsExactly("ana@x.com");
     }
 
     @Test

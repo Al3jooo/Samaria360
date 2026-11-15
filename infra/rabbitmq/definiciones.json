@@ -1,0 +1,179 @@
+{
+  "vhosts": [
+    {
+      "name": "samaria360"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "samaria360.eventos.v1",
+      "vhost": "samaria360",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "samaria360.eventos.v1.dlx",
+      "vhost": "samaria360",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "queues": [
+    {
+      "name": "ms-analytics.eventos.v1",
+      "vhost": "samaria360",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic",
+        "x-dead-letter-exchange": "samaria360.eventos.v1.dlx",
+        "x-dead-letter-routing-key": "ms-analytics.eventos.v1"
+      }
+    },
+    {
+      "name": "ms-analytics.eventos.v1.dlq",
+      "vhost": "samaria360",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "ms-catalog.eventos.v1",
+      "vhost": "samaria360",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic",
+        "x-dead-letter-exchange": "samaria360.eventos.v1.dlx",
+        "x-dead-letter-routing-key": "ms-catalog.eventos.v1"
+      }
+    },
+    {
+      "name": "ms-catalog.eventos.v1.dlq",
+      "vhost": "samaria360",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    },
+    {
+      "name": "ms-chatbot.eventos.v1",
+      "vhost": "samaria360",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic",
+        "x-dead-letter-exchange": "samaria360.eventos.v1.dlx",
+        "x-dead-letter-routing-key": "ms-chatbot.eventos.v1"
+      }
+    },
+    {
+      "name": "ms-chatbot.eventos.v1.dlq",
+      "vhost": "samaria360",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-queue-type": "classic"
+      }
+    }
+  ],
+  "bindings": [
+    {
+      "source": "samaria360.eventos.v1",
+      "vhost": "samaria360",
+      "destination": "ms-analytics.eventos.v1",
+      "destination_type": "queue",
+      "routing_key": "auth.#",
+      "arguments": {}
+    },
+    {
+      "source": "samaria360.eventos.v1",
+      "vhost": "samaria360",
+      "destination": "ms-analytics.eventos.v1",
+      "destination_type": "queue",
+      "routing_key": "booking.reserva.*",
+      "arguments": {}
+    },
+    {
+      "source": "samaria360.eventos.v1",
+      "vhost": "samaria360",
+      "destination": "ms-analytics.eventos.v1",
+      "destination_type": "queue",
+      "routing_key": "catalog.servicio.decidido",
+      "arguments": {}
+    },
+    {
+      "source": "samaria360.eventos.v1",
+      "vhost": "samaria360",
+      "destination": "ms-analytics.eventos.v1",
+      "destination_type": "queue",
+      "routing_key": "catalog.ficha.*",
+      "arguments": {}
+    },
+    {
+      "source": "samaria360.eventos.v1",
+      "vhost": "samaria360",
+      "destination": "ms-analytics.eventos.v1",
+      "destination_type": "queue",
+      "routing_key": "catalog.atractivo.*",
+      "arguments": {}
+    },
+    {
+      "source": "samaria360.eventos.v1.dlx",
+      "vhost": "samaria360",
+      "destination": "ms-analytics.eventos.v1.dlq",
+      "destination_type": "queue",
+      "routing_key": "ms-analytics.eventos.v1",
+      "arguments": {}
+    },
+    {
+      "source": "samaria360.eventos.v1",
+      "vhost": "samaria360",
+      "destination": "ms-catalog.eventos.v1",
+      "destination_type": "queue",
+      "routing_key": "analytics.calificacion.*",
+      "arguments": {}
+    },
+    {
+      "source": "samaria360.eventos.v1",
+      "vhost": "samaria360",
+      "destination": "ms-catalog.eventos.v1",
+      "destination_type": "queue",
+      "routing_key": "booking.oferta.*",
+      "arguments": {}
+    },
+    {
+      "source": "samaria360.eventos.v1.dlx",
+      "vhost": "samaria360",
+      "destination": "ms-catalog.eventos.v1.dlq",
+      "destination_type": "queue",
+      "routing_key": "ms-catalog.eventos.v1",
+      "arguments": {}
+    },
+    {
+      "source": "samaria360.eventos.v1",
+      "vhost": "samaria360",
+      "destination": "ms-chatbot.eventos.v1",
+      "destination_type": "queue",
+      "routing_key": "auth.cuenta.actualizada",
+      "arguments": {}
+    },
+    {
+      "source": "samaria360.eventos.v1.dlx",
+      "vhost": "samaria360",
+      "destination": "ms-chatbot.eventos.v1.dlq",
+      "destination_type": "queue",
+      "routing_key": "ms-chatbot.eventos.v1",
+      "arguments": {}
+    }
+  ]
+}

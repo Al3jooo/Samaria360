@@ -21,6 +21,7 @@ public record RelevoPropiedades(boolean habilitado, Duration cada, Destinos dest
             return switch (destino) {
                 case MS_CATALOG -> msCatalog;
                 case MS_BOOKING -> msBooking;
+                case RABBITMQ -> throw new IllegalArgumentException("RabbitMQ no es un destino HTTP (ADR-011)");
             };
         }
     }
