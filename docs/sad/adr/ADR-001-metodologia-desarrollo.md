@@ -2,7 +2,8 @@
 
 - **Estado:** Aceptado
 - **Origen:** SAD del proyecto (documento fuera del repositorio); transcrito al repositorio el 2026-11-13
-- **Componentes:** todos (`ms-auth`, `ms-catalog`, `ms-booking`, `api-gateway`, `frontend`)
+- **Componentes:** todos (`ms-auth`, `ms-catalog`, `ms-booking`, `ms-analytics`, `ms-chatbot`, `api-gateway`,
+  `frontend`; ms-analytics y ms-chatbot desde el plan del 100 %, DEC-278 y DEC-324)
 
 ## Contexto
 

@@ -2,7 +2,8 @@
 
 - **Estado:** Aceptado
 - **Origen:** SAD del proyecto (documento fuera del repositorio); transcrito al repositorio el 2026-11-13
-- **Componentes:** `ms-auth`, `ms-booking` (PostgreSQL), `ms-catalog` (MongoDB)
+- **Componentes:** `ms-auth`, `ms-booking` (PostgreSQL), `ms-catalog`, `ms-analytics` y `ms-chatbot` (MongoDB;
+  los dos últimos desde el plan del 100 %, DEC-324)
 
 ## Contexto
 
@@ -30,4 +31,8 @@ datos.
   [`modelo-nosql/`](../modelo-nosql/).
 - La sobreventa se evita con un UPDATE condicional y un CHECK sobre `inventario_cupo`, un día por sentencia, dentro de
   una transacción ([ADR-007](ADR-007-reservas-y-catalogo.md)).
-- `ms-chatbot` está fuera del alcance del prototipo (DEC-253): no existe su contenedor.
+- ~~`ms-chatbot` está fuera del alcance del prototipo (DEC-253): no existe su contenedor.~~ **Enmienda DEC-324:**
+  con el plan del 100 % (DEC-278) existen `ms-chatbot` (`chatbot_db`, DEC-279) y `ms-analytics` (`analytics_db`,
+  DEC-292), los dos en MongoDB con validadores `$jsonSchema` (`infra/mongo/chatbot/` e `infra/mongo/analytics/`), como
+  fija la tabla 1 del Entregable 2. MongoDB corre como réplica `rs0` de un nodo para las transacciones del *outbox*
+  (DEC-281).

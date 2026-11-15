@@ -635,7 +635,7 @@ Las decisiones (DEC), hallazgos y verificaciones de cada sesión están en `docs
 | API Gateway: caché DNS — decisión (DEC-260) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Revisión de documentación y código — decisiones (DEC-262 a DEC-275) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Pruebas de los RNF — decisiones (DEC-276 y DEC-277) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
-| Revisión previa al redespliegue de la demo — decisiones (DEC-319 a DEC-323) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
+| Revisión previa al redespliegue de la demo — decisiones (DEC-319 a DEC-324) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Plan del 100 % — decisiones (DEC-278 a DEC-284) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Plan del 100 %, iteración F «Mensajería y correo» — decisiones (DEC-285 a DEC-290; RF34) | [`trazabilidad/decisiones-plan-100-iteracion-f.md`](trazabilidad/decisiones-plan-100-iteracion-f.md) |
 | Plan del 100 %, iteración G «Análisis y notificaciones» — decisiones (DEC-291 a DEC-296; RF13, RF30, RF63) | [`trazabilidad/decisiones-plan-100-iteracion-g.md`](trazabilidad/decisiones-plan-100-iteracion-g.md) |
