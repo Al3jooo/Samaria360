@@ -99,12 +99,13 @@ public class ReservaRepositoryEnMemoria implements ReservaRepositoryPort {
     }
 
     @Override
-    public int completarTerminadas(Instant ahora) {
-        int cambiadas = 0;
+    public List<Reserva> completarTerminadas(Instant ahora) {
+        List<Reserva> cambiadas = new java.util.ArrayList<>();
         for (Reserva r : List.copyOf(reservas.values())) {
             if (r.estado() == EstadoReserva.Confirmada && !r.fechaFin().isAfter(ahora)) {
-                reservas.put(r.idReserva(), completada(r));
-                cambiadas++;
+                Reserva completada = completada(r);
+                reservas.put(r.idReserva(), completada);
+                cambiadas.add(completada);
             }
         }
         return cambiadas;

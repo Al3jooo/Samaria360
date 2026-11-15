@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest(properties = "samaria360.completar-reservas.habilitado=false")
+@SpringBootTest(properties = {"samaria360.completar-reservas.habilitado=false", "samaria360.eventos.habilitado=false"})
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(InfraestructuraTestConfig.class)

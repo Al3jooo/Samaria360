@@ -42,7 +42,7 @@ public class InventarioJdbcAdapter implements InventarioPort {
             jdbc.query("""
                             SELECT id_inventario FROM inventario_cupo
                             WHERE id_servicio_mongo = :servicio AND id_unidad IS NOT DISTINCT FROM :unidad
-                              AND fecha = :fecha AND hora_inicio IS NOT DISTINCT FROM :hora""",
+                              AND fecha = :fecha AND hora_inicio IS NOT DISTINCT FROM :hora AND NOT cerrado""",
                     clave(dia), fila -> {
                         filas.add(new FilaInventario(fila.getLong("id_inventario"), dia));
                     });
@@ -54,7 +54,7 @@ public class InventarioJdbcAdapter implements InventarioPort {
     public boolean descontar(long idInventario, int cantidad) {
         return jdbc.update("""
                         UPDATE inventario_cupo SET cupos_disponibles = cupos_disponibles - :cantidad
-                        WHERE id_inventario = :id AND cupos_disponibles >= :cantidad""",
+                        WHERE id_inventario = :id AND cupos_disponibles >= :cantidad AND NOT cerrado""",
                 new MapSqlParameterSource("id", idInventario).addValue("cantidad", cantidad)) == 1;
     }
 
@@ -97,7 +97,7 @@ public class InventarioJdbcAdapter implements InventarioPort {
                         FROM inventario_cupo
                         WHERE id_servicio_mongo = :servicio
                           AND (CAST(:unidad AS varchar) IS NULL OR id_unidad = :unidad)
-                          AND fecha BETWEEN :desde AND :hasta
+                          AND fecha BETWEEN :desde AND :hasta AND NOT cerrado
                         ORDER BY id_unidad NULLS FIRST, fecha, hora_inicio NULLS FIRST""",
                 parametros, (fila, n) -> {
                     Time hora = fila.getTime("hora_inicio");
@@ -114,7 +114,7 @@ public class InventarioJdbcAdapter implements InventarioPort {
         jdbc.query("""
                         SELECT id_servicio_mongo, bool_or(cupos_disponibles > 0) AS con_cupos
                         FROM inventario_cupo
-                        WHERE id_servicio_mongo IN (:servicios) AND fecha BETWEEN :desde AND :hasta
+                        WHERE id_servicio_mongo IN (:servicios) AND fecha BETWEEN :desde AND :hasta AND NOT cerrado
                         GROUP BY id_servicio_mongo""",
                 new MapSqlParameterSource("servicios", idsServicios)
                         .addValue("desde", rango.desde(), Types.DATE)

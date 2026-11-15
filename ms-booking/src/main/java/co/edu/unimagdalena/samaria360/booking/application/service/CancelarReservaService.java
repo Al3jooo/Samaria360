@@ -2,6 +2,8 @@ package co.edu.unimagdalena.samaria360.booking.application.service;
 
 import co.edu.unimagdalena.samaria360.booking.application.port.in.CancelarReservaUseCase;
 import co.edu.unimagdalena.samaria360.booking.application.port.out.InventarioPort;
+import co.edu.unimagdalena.samaria360.booking.application.port.out.OutboxEventosPort;
+import co.edu.unimagdalena.samaria360.booking.domain.model.EventoReserva;
 import co.edu.unimagdalena.samaria360.booking.application.port.out.RelojPort;
 import co.edu.unimagdalena.samaria360.booking.application.port.out.ReservaRepositoryPort;
 import co.edu.unimagdalena.samaria360.booking.domain.exception.ReservaNoCancelableException;
@@ -30,7 +32,11 @@ public class CancelarReservaService implements CancelarReservaUseCase {
     private final InventarioPort inventario;
     private final RelojPort reloj;
 
-    public CancelarReservaService(ReservaRepositoryPort reservas, InventarioPort inventario, RelojPort reloj) {
+    private final OutboxEventosPort outbox;
+
+    public CancelarReservaService(ReservaRepositoryPort reservas, InventarioPort inventario, RelojPort reloj,
+                                  OutboxEventosPort outbox) {
+        this.outbox = Objects.requireNonNull(outbox);
         this.reservas = Objects.requireNonNull(reservas);
         this.inventario = Objects.requireNonNull(inventario);
         this.reloj = Objects.requireNonNull(reloj);
@@ -55,7 +61,11 @@ public class CancelarReservaService implements CancelarReservaUseCase {
         for (CupoDescontado descuento : reservas.descuentosDe(idReserva)) {
             inventario.liberar(descuento.idInventario(), descuento.cantidad());
         }
-        return reserva.cancelada(ahora);
+        Reserva cancelada = reserva.cancelada(ahora);
+        // ADR-011 (DEC-291): auditoría de RF13 y aviso al Turista (RF63) en ms-analytics. Solo la cancelación que
+        // cambió el estado: la repetida no publica nada.
+        outbox.registrar(EventoReserva.cancelada(cancelada, idTurista, ahora));
+        return cancelada;
     }
 
     private Reserva buscar(UUID idReserva, UUID idTurista) {

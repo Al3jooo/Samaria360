@@ -1,5 +1,6 @@
 package co.edu.unimagdalena.samaria360.booking.application.service;
 
+import co.edu.unimagdalena.samaria360.booking.application.fake.OutboxEventosEnMemoria;
 import co.edu.unimagdalena.samaria360.booking.application.fake.CatalogoFalso;
 import co.edu.unimagdalena.samaria360.booking.application.fake.Eventos;
 import co.edu.unimagdalena.samaria360.booking.application.fake.InventarioEnMemoria;
@@ -36,10 +37,11 @@ class CompletarReservasServiceTest {
     private final ReservaRepositoryEnMemoria reservas = new ReservaRepositoryEnMemoria(eventos);
     private final RelojFijo reloj = new RelojFijo(Ofertas.AHORA);
     private final CatalogoFalso catalogo = new CatalogoFalso(eventos).con(Ofertas.tour());
+    private final OutboxEventosEnMemoria outbox = new OutboxEventosEnMemoria();
     private final ReservarServicioService reservar = new ReservarServicioService(reservas, inventario, catalogo,
             new MaterializarInventarioService(catalogo, inventario, new OfertaMaterializadaEnMemoria(eventos), reloj),
-            reloj, new PoliticaReserva(HorarioReservas.POR_DEFECTO));
-    private final CompletarReservasService completar = new CompletarReservasService(reservas, reloj);
+            reloj, new PoliticaReserva(HorarioReservas.POR_DEFECTO), outbox);
+    private final CompletarReservasService completar = new CompletarReservasService(reservas, reloj, outbox);
 
     @Test
     void soloCompletaLasConfirmadasCuyaActividadYaTermino() {

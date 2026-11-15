@@ -1,5 +1,6 @@
 package co.edu.unimagdalena.samaria360.booking.application.service;
 
+import co.edu.unimagdalena.samaria360.booking.application.fake.OutboxEventosEnMemoria;
 import co.edu.unimagdalena.samaria360.booking.application.fake.CatalogoFalso;
 import co.edu.unimagdalena.samaria360.booking.application.fake.Eventos;
 import co.edu.unimagdalena.samaria360.booking.application.fake.InventarioEnMemoria;
@@ -13,6 +14,7 @@ import co.edu.unimagdalena.samaria360.booking.domain.exception.ReservaNoEncontra
 import co.edu.unimagdalena.samaria360.booking.domain.model.CategoriaReservable;
 import co.edu.unimagdalena.samaria360.booking.domain.model.DiaInventario;
 import co.edu.unimagdalena.samaria360.booking.domain.model.EstadoReserva;
+import co.edu.unimagdalena.samaria360.booking.domain.model.EventoReserva;
 import co.edu.unimagdalena.samaria360.booking.domain.model.HorarioReservas;
 import co.edu.unimagdalena.samaria360.booking.domain.model.Ofertas;
 import co.edu.unimagdalena.samaria360.booking.domain.model.Reserva;
@@ -40,7 +42,8 @@ class CancelarReservaServiceTest {
             .con(OCHO, CategoriaReservable.Tour, 12, 12);
     private final ReservaRepositoryEnMemoria reservas = new ReservaRepositoryEnMemoria(eventos);
     private final RelojFijo reloj = new RelojFijo(Ofertas.AHORA);
-    private final CancelarReservaService cancelar = new CancelarReservaService(reservas, inventario, reloj);
+    private final OutboxEventosEnMemoria outbox = new OutboxEventosEnMemoria();
+    private final CancelarReservaService cancelar = new CancelarReservaService(reservas, inventario, reloj, outbox);
     private Reserva reserva;
 
     @BeforeEach
@@ -48,7 +51,7 @@ class CancelarReservaServiceTest {
         CatalogoFalso catalogo = new CatalogoFalso(eventos).con(Ofertas.tour());
         ReservarServicioService reservar = new ReservarServicioService(reservas, inventario, catalogo,
                 new MaterializarInventarioService(catalogo, inventario, new OfertaMaterializadaEnMemoria(eventos), reloj),
-                reloj, new PoliticaReserva(HorarioReservas.POR_DEFECTO));
+                reloj, new PoliticaReserva(HorarioReservas.POR_DEFECTO), outbox);
         reserva = reservar.reservar(new ComandoReserva(TURISTA, UUID.randomUUID(), Ofertas.TOUR, null,
                 DIA.toString(), null, "08:00", null, 3, new BigDecimal("240000"))).reserva();
         assertThat(inventario.disponibles(OCHO)).isEqualTo(9);
@@ -60,6 +63,27 @@ class CancelarReservaServiceTest {
 
         assertThat(cancelada.estado()).isEqualTo(EstadoReserva.Cancelada);
         assertThat(inventario.disponibles(OCHO)).isEqualTo(12);
+    }
+
+    /** ADR-011 (DEC-291): la reserva publica su confirmación y su cancelación, con quién canceló (RF13). */
+    @Test
+    void reservarYCancelarEncolanSusEventos() {
+        cancelar.cancelar(reserva.idReserva(), TURISTA);
+
+        assertThat(outbox.eventos()).extracting(e -> e.tipo())
+                .containsExactly(EventoReserva.Tipo.ReservaConfirmada, EventoReserva.Tipo.ReservaCancelada);
+        EventoReserva cancelacion = outbox.eventos().get(1);
+        assertThat(cancelacion.datos()).containsEntry("canceladaPor", TURISTA.toString())
+                .containsEntry("idReserva", reserva.idReserva().toString()).containsEntry("personas", 3);
+    }
+
+    /** La cancelación repetida responde lo mismo y no publica otro evento. */
+    @Test
+    void cancelarDosVecesPublicaUnaSolaCancelacion() {
+        cancelar.cancelar(reserva.idReserva(), TURISTA);
+        cancelar.cancelar(reserva.idReserva(), TURISTA);
+
+        assertThat(outbox.eventos()).filteredOn(e -> e.tipo() == EventoReserva.Tipo.ReservaCancelada).hasSize(1);
     }
 
     @Test

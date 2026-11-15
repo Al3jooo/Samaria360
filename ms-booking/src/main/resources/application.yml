@@ -22,6 +22,23 @@ spring:
       ddl-auto: validate
   flyway:
     locations: classpath:db/migration
+  # Publicación de los eventos de reservas (ADR-011, DEC-291): usuario propio, que solo escribe en el exchange.
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ms-booking
+    password: ${RABBITMQ_BOOKING_PASSWORD:}
+    virtual-host: samaria360
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    connection-timeout: 2s
+  task:
+    scheduling:
+      # RF52, el relevo a RabbitMQ y su purga: RabbitMQ caído no retrasa RF52.
+      pool:
+        size: 3
   cloud:
     circuitbreaker:
       resilience4j:
@@ -34,6 +51,10 @@ spring:
           enabled: false
 
 samaria360:
+  # ms-auth interno (DEC-280, DEC-312): contactos de los turistas para el listado de asistentes de RF42.
+  auth:
+    url: ${AUTH_INTERNO_URI:http://localhost:8081}
+    secreto: ${SERVICIO_BOOKING_SECRETO:}
   seguridad:
     # JWKS de ms-auth para validar los JWT (ADR-005).
     jwk-set-uri: ${AUTH_JWKS_URI:http://localhost:8081/api/v1/auth/.well-known/jwks.json}
@@ -53,6 +74,10 @@ samaria360:
     # Si se agota, 503 SERVICIO_NO_DISPONIBLE. La oferta se materializa bajo demanda (DEC-135); el generador D5 ya no
     # existe (DEC-156).
     plazo-materializacion-resumen: 2500ms
+  # Relevo del outbox hacia RabbitMQ (ADR-011). Si RabbitMQ no está, los eventos esperan en el outbox.
+  eventos:
+    habilitado: true
+    cada: PT1S
   completar-reservas:
     # RF52: Confirmada → Completada cuando fecha_fin ya pasó. Corre al arrancar y después cada 15 minutos.
     habilitado: true
@@ -63,6 +88,10 @@ management:
     web:
       exposure:
         include: health
+  # RabbitMQ no cuenta para la salud: si falta, los eventos esperan en el outbox (ADR-011).
+  health:
+    rabbit:
+      enabled: false
 
 # Swagger solo en dev (ver documento de perfil dev más abajo)
 springdoc:
