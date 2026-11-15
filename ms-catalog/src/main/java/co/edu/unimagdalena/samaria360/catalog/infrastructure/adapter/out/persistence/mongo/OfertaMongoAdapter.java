@@ -1,6 +1,7 @@
 package co.edu.unimagdalena.samaria360.catalog.infrastructure.adapter.out.persistence.mongo;
 
 import co.edu.unimagdalena.samaria360.catalog.application.port.out.OfertaRepositoryPort;
+import co.edu.unimagdalena.samaria360.catalog.domain.model.Afluencia;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.Coordenada;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.CriteriosBusqueda;
 import co.edu.unimagdalena.samaria360.catalog.domain.model.EstadoOperativo;
@@ -214,7 +215,11 @@ public class OfertaMongoAdapter implements OfertaRepositoryPort {
 
     private static Document proyeccionAtractivo() {
         return proyeccionComun("Atractivo", "$nombre")
-                .append("estadoOperativo", 1);
+                .append("estadoOperativo", 1)
+                // DEC-304: la última ocupación y el límite; el nivel vigente lo calcula el caso de uso (RF39).
+                .append("ocupacion", "$ocupacionActual.valor")
+                .append("fechaOcupacion", "$ocupacionActual.fecha")
+                .append("limite", "$limiteCapacidadCarga");
     }
 
     /** Solo los campos del resultado: el $sort y el $facet trabajan sobre documentos pequeños (límite de 100 MB). */
@@ -226,7 +231,10 @@ public class OfertaMongoAdapter implements OfertaRepositoryPort {
                 .append("imagen", new Document("$first", "$imagenes"))
                 .append("coordenadas", "$coordenadas.coordinates")
                 .append("distanciaMetros", 1)
-                .append("condicionesAccesibilidad", 1);
+                .append("condicionesAccesibilidad", 1)
+                // DEC-302: el promedio visible que llega de ms-analytics; sin calificaciones, el campo no está.
+                .append("calificacion", "$calificacion.promedio")
+                .append("cantidadCalificaciones", "$calificacion.cantidad");
     }
 
     private static Document orden(OrdenBusqueda orden) {
@@ -235,6 +243,8 @@ public class OfertaMongoAdapter implements OfertaRepositoryPort {
             case PrecioAscendente -> new Document("sinPrecio", 1).append("precio", 1).append("_id", 1);
             case PrecioDescendente -> new Document("sinPrecio", 1).append("precio", -1).append("_id", 1);
             case Nombre -> new Document("nombre", 1).append("_id", 1);
+            // Descendente: lo que no tiene calificación (campo ausente o nulo) queda al final.
+            case Calificacion -> new Document("calificacion", -1).append("_id", 1);
         };
     }
 
@@ -252,6 +262,10 @@ public class OfertaMongoAdapter implements OfertaRepositoryPort {
                 documento.descripcion(), tipo == TipoOferta.Servicio ? documento.precio() : null, documento.imagen(),
                 coordenada, distanciaKm, ServicioDocumentoMapper.accesibilidad(documento.condicionesAccesibilidad()),
                 tipo == TipoOferta.Atractivo && documento.estadoOperativo() != null
-                        ? EstadoOperativo.valueOf(documento.estadoOperativo()) : null);
+                        ? EstadoOperativo.valueOf(documento.estadoOperativo()) : null,
+                documento.calificacion(), documento.cantidadCalificaciones(),
+                tipo == TipoOferta.Atractivo && documento.ocupacion() != null && documento.fechaOcupacion() != null
+                        ? new Afluencia.Lectura(documento.ocupacion(), documento.fechaOcupacion(), documento.limite())
+                        : null, null);
     }
 }

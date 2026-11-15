@@ -1,5 +1,6 @@
 package co.edu.unimagdalena.samaria360.catalog.application.service;
 
+import co.edu.unimagdalena.samaria360.catalog.application.fake.OutboxEventosEnMemoria;
 import co.edu.unimagdalena.samaria360.catalog.application.fake.CuentaRepositoryEnMemoria;
 import co.edu.unimagdalena.samaria360.catalog.application.fake.GestionServiciosEnMemoria;
 import co.edu.unimagdalena.samaria360.catalog.application.fake.RelojFijo;
@@ -37,7 +38,7 @@ class ActualizarServicioServiceTest {
     private final GestionServiciosEnMemoria servicios = new GestionServiciosEnMemoria();
     private final ActualizarServicioService actualizar = new ActualizarServicioService(servicios);
     private final AdministrarServiciosService administrar = new AdministrarServiciosService(servicios,
-            new CuentaRepositoryEnMemoria(), new RelojFijo(Instant.parse("2026-10-25T10:00:00Z")));
+            new CuentaRepositoryEnMemoria(), new RelojFijo(Instant.parse("2026-10-25T10:00:00Z")), new OutboxEventosEnMemoria());
 
     private String tour() {
         ServicioComercial servicio = RegistroServicio.registrar(Borradores.tour(), Unidades.nuevoId(),

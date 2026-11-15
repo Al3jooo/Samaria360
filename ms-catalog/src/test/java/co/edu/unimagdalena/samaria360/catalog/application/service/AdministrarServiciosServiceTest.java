@@ -1,5 +1,6 @@
 package co.edu.unimagdalena.samaria360.catalog.application.service;
 
+import co.edu.unimagdalena.samaria360.catalog.application.fake.OutboxEventosEnMemoria;
 import co.edu.unimagdalena.samaria360.catalog.application.fake.CuentaRepositoryEnMemoria;
 import co.edu.unimagdalena.samaria360.catalog.application.fake.GestionServiciosEnMemoria;
 import co.edu.unimagdalena.samaria360.catalog.application.fake.RelojFijo;
@@ -41,7 +42,9 @@ class AdministrarServiciosServiceTest {
     private final GestionServiciosEnMemoria servicios = new GestionServiciosEnMemoria();
     private final CuentaRepositoryEnMemoria cuentas = new CuentaRepositoryEnMemoria();
     private final RelojFijo reloj = new RelojFijo(Instant.parse("2026-10-24T15:00:00.987654Z"));
-    private final AdministrarServiciosService administrar = new AdministrarServiciosService(servicios, cuentas, reloj);
+    private final OutboxEventosEnMemoria outbox = new OutboxEventosEnMemoria();
+    private final AdministrarServiciosService administrar =
+            new AdministrarServiciosService(servicios, cuentas, reloj, outbox);
 
     private String pendiente(Instant fecha) {
         ServicioComercial servicio = RegistroServicio.registrar(Borradores.tour(), Unidades.nuevoId(),
@@ -108,6 +111,26 @@ class AdministrarServiciosServiceTest {
         assertThat(aprobado.getRevision()).contains(new Revision(ADMIN, Instant.parse("2026-10-24T15:00:00.987Z"),
                 null));
         assertThat(aprobado.esVisibleEnBusquedaPublica()).isTrue();
+        // Auditoría de RF13 (ADR-011, DEC-293): la decisión, sin texto libre.
+        assertThat(outbox.eventos()).singleElement().satisfies(evento -> {
+            assertThat(evento.tipo()).isEqualTo("ServicioDecidido");
+            assertThat(evento.clave()).isEqualTo(id);
+            assertThat(evento.datos()).containsEntry("decision", "Publicado")
+                    .containsEntry("idAdministrador", ADMIN.toString())
+                    .containsEntry("idPrestador", aprobado.getPrestadorId().toString());
+        });
+    }
+
+    @Test
+    void rechazarPublicaLaDecisionSinLaJustificacion() {
+        String id = pendiente(T0);
+
+        administrar.decidir(id, "Rechazar", "Faltan fotos", ADMIN);
+
+        assertThat(outbox.eventos()).singleElement().satisfies(evento -> {
+            assertThat(evento.datos()).containsEntry("decision", "Rechazado");
+            assertThat(evento.datos().values()).doesNotContain("Faltan fotos");
+        });
     }
 
     @Test

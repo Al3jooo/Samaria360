@@ -3,6 +3,8 @@ package co.edu.unimagdalena.samaria360.catalog.application.service;
 import co.edu.unimagdalena.samaria360.catalog.application.port.in.AdministrarServiciosUseCase;
 import co.edu.unimagdalena.samaria360.catalog.application.port.out.CuentaRepositoryPort;
 import co.edu.unimagdalena.samaria360.catalog.application.port.out.GestionServiciosPort;
+import co.edu.unimagdalena.samaria360.catalog.application.port.out.OutboxEventosPort;
+import co.edu.unimagdalena.samaria360.catalog.domain.model.EventoCatalogo;
 import co.edu.unimagdalena.samaria360.catalog.application.port.out.RelojPort;
 import co.edu.unimagdalena.samaria360.catalog.domain.exception.ContenidoInvalidoException;
 import co.edu.unimagdalena.samaria360.catalog.domain.exception.EstadoServicioCambiadoException;
@@ -35,8 +37,11 @@ public class AdministrarServiciosService implements AdministrarServiciosUseCase 
     private final CuentaRepositoryPort cuentas;
     private final RelojPort reloj;
 
+    private final OutboxEventosPort outbox;
+
     public AdministrarServiciosService(GestionServiciosPort servicios, CuentaRepositoryPort cuentas,
-                                       RelojPort reloj) {
+                                       RelojPort reloj, OutboxEventosPort outbox) {
+        this.outbox = Objects.requireNonNull(outbox);
         this.servicios = Objects.requireNonNull(servicios);
         this.cuentas = Objects.requireNonNull(cuentas);
         this.reloj = Objects.requireNonNull(reloj);
@@ -91,7 +96,11 @@ public class AdministrarServiciosService implements AdministrarServiciosUseCase 
             ServicioComercial actual = servicios.buscar(id).orElseThrow(() -> new ServicioNoEncontradoException(id));
             throw new EstadoServicioCambiadoException(actual.getEstadoPublicacion());
         }
-        return detalle(id);
+        ServicioEnRevision decidido = detalle(id);
+        // Auditoría de RF13 en ms-analytics (ADR-011, DEC-293): en la misma transacción de MongoDB que la decisión.
+        outbox.registrar(EventoCatalogo.servicioDecidido(id, decidido.servicio().getPrestadorId(),
+                valor.estadoDestino(), administrador, revision.fechaRevision()));
+        return decidido;
     }
 
     private ServicioEnRevision enRevision(ServicioComercial servicio) {

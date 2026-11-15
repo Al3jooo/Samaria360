@@ -97,7 +97,7 @@ public class SecurityConfig {
                             "/api/v1/catalogo/avisos").permitAll();
                     // Detalle de atractivo (DEC-217) e imágenes de GridFS (DEC-209): públicos, como la ficha.
                     acceso.requestMatchers(HttpMethod.GET, "/api/v1/catalogo/atractivos/*",
-                            "/api/v1/catalogo/imagenes/*").permitAll();
+                            "/api/v1/catalogo/atractivos/*/afluencia", "/api/v1/catalogo/imagenes/*").permitAll();
                     // Agenda de eventos (RF25; DEC-239): pública, como los avisos.
                     acceso.requestMatchers(HttpMethod.GET, "/api/v1/catalogo/eventos").permitAll();
                     // Preguntas frecuentes y avisos (RF26, RF40; DEC-65): con ver vigente, por la misma cadena.

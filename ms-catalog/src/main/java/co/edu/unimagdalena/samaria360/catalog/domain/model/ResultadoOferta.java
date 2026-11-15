@@ -12,10 +12,41 @@ import java.util.Set;
  * @param precio          nulo en los atractivos
  * @param distanciaKm     solo si la búsqueda tiene ubicación (RF38)
  * @param estadoOperativo solo en los atractivos (RF33)
+ * @param calificacion    promedio visible de RF17 (de 1 a 5) que llega de ms-analytics (DEC-302); nulo sin calificaciones
+ * @param cantidadCalificaciones cuántas calificaciones visibles tiene; nulo si no se conoce
+ * @param lecturaOcupacion la última ocupación registrada y el límite (solo atractivos; DEC-304)
+ * @param afluencia       el nivel vigente (RF39), calculado con la hora actual por el caso de uso; nulo sin lectura del día
  */
 public record ResultadoOferta(TipoOferta tipo, String id, String nombre, String categoria, String descripcionCorta,
                               BigDecimal precio, String imagenPrincipal, Coordenada coordenada, Double distanciaKm,
-                              Set<CondicionAccesibilidad> accesibilidad, EstadoOperativo estadoOperativo) {
+                              Set<CondicionAccesibilidad> accesibilidad, EstadoOperativo estadoOperativo,
+                              Double calificacion, Long cantidadCalificaciones, Afluencia.Lectura lecturaOcupacion,
+                              Afluencia afluencia) {
+
+    /** Con la calificación y sin ocupación (los resultados anteriores a la iteración J). */
+    public ResultadoOferta(TipoOferta tipo, String id, String nombre, String categoria, String descripcionCorta,
+                           BigDecimal precio, String imagenPrincipal, Coordenada coordenada, Double distanciaKm,
+                           Set<CondicionAccesibilidad> accesibilidad, EstadoOperativo estadoOperativo,
+                           Double calificacion, Long cantidadCalificaciones) {
+        this(tipo, id, nombre, categoria, descripcionCorta, precio, imagenPrincipal, coordenada, distanciaKm,
+                accesibilidad, estadoOperativo, calificacion, cantidadCalificaciones, null, null);
+    }
+
+    /** El mismo resultado con el nivel de afluencia vigente (RF39). */
+    public ResultadoOferta conAfluencia(java.time.Instant ahora) {
+        Afluencia vigente = Afluencia.calcular(lecturaOcupacion, ahora).orElse(null);
+        return new ResultadoOferta(tipo, id, nombre, categoria, descripcionCorta, precio, imagenPrincipal, coordenada,
+                distanciaKm, accesibilidad, estadoOperativo, calificacion, cantidadCalificaciones, lecturaOcupacion,
+                vigente);
+    }
+
+    /** Sin calificación (los resultados armados en memoria y los anteriores a la iteración H). */
+    public ResultadoOferta(TipoOferta tipo, String id, String nombre, String categoria, String descripcionCorta,
+                           BigDecimal precio, String imagenPrincipal, Coordenada coordenada, Double distanciaKm,
+                           Set<CondicionAccesibilidad> accesibilidad, EstadoOperativo estadoOperativo) {
+        this(tipo, id, nombre, categoria, descripcionCorta, precio, imagenPrincipal, coordenada, distanciaKm,
+                accesibilidad, estadoOperativo, null, null, null, null);
+    }
 
     public static final int LONGITUD_DESCRIPCION_CORTA = 140;
 

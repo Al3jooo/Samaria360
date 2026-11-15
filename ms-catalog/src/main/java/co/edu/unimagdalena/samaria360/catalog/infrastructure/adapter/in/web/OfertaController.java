@@ -32,7 +32,7 @@ public class OfertaController {
     /**
      * @param lat           latitud de la ubicación del turista (RF38); va junto con {@code lng}
      * @param accesibilidad repetible: MovilidadReducida, Visual, Auditiva (RF50)
-     * @param orden         Distancia, PrecioAscendente, PrecioDescendente o Nombre (RF61); por defecto, distancia si
+     * @param orden         Distancia, PrecioAscendente, PrecioDescendente, Nombre o Calificacion (RF61, DEC-302); por defecto, distancia si
      *                      hay ubicación y nombre si no
      * @param serviciosIncluidos repetible: WiFi, Desayuno, Piscina, Parqueadero. Este y los siguientes son
      *                      «Más filtros» (RF10): cada uno exige su categoría (serviciosIncluidos, huespedes y

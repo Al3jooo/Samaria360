@@ -1,5 +1,8 @@
 package co.edu.unimagdalena.samaria360.catalog.application.service;
 
+import co.edu.unimagdalena.samaria360.catalog.application.port.out.HistorialModificacionesPort;
+import co.edu.unimagdalena.samaria360.catalog.application.port.out.RelojPort;
+import co.edu.unimagdalena.samaria360.catalog.domain.model.ModificacionServicio;
 import co.edu.unimagdalena.samaria360.catalog.application.port.in.ActualizarServicioUseCase;
 import co.edu.unimagdalena.samaria360.catalog.application.port.out.GestionServiciosPort;
 import co.edu.unimagdalena.samaria360.catalog.domain.exception.EstadoServicioCambiadoException;
@@ -29,17 +32,33 @@ import java.util.function.Predicate;
 public class ActualizarServicioService implements ActualizarServicioUseCase {
 
     private final GestionServiciosPort servicios;
+    private final HistorialModificacionesPort historial;
+    private final RelojPort reloj;
 
+    /** Sin historial de precios (los dobles de las pruebas anteriores a RF41). */
     public ActualizarServicioService(GestionServiciosPort servicios) {
+        this(servicios, null, null);
+    }
+
+    /** @param historial RF41 (DEC-311): cada cambio de precio queda con el valor anterior y el nuevo */
+    public ActualizarServicioService(GestionServiciosPort servicios, HistorialModificacionesPort historial,
+                                     RelojPort reloj) {
         this.servicios = Objects.requireNonNull(servicios);
+        this.historial = historial;
+        this.reloj = reloj;
     }
 
     @Override
     public ServicioComercial actualizarPrecio(UUID prestadorId, String id, BigDecimal precioBase,
                                               List<PrecioUnidad> unidades, Integer version) {
-        return editar(prestadorId, id,
+        ServicioComercial antes = historial == null ? null : delPrestador(prestadorId, id);
+        ServicioComercial despues = editar(prestadorId, id,
                 servicio -> ActualizacionPrecio.aplicar(servicio, precioBase, unidades, version),
                 servicios::actualizarPrecio);
+        if (historial != null) {
+            ModificacionServicio.dePrecio(antes, despues, reloj.ahora()).forEach(historial::registrar);
+        }
+        return despues;
     }
 
     @Override

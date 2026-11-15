@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 /** Prueba de integración contra MongoDB (Testcontainers) con la semilla de demostración, en el perfil test. */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest
+@SpringBootTest(properties = "samaria360.eventos.habilitado=false")
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(InfraestructuraTestConfig.class)
