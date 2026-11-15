@@ -1,0 +1,64 @@
+' WF-27 «Recuperar contraseña» y WF-28 «Restablecer contraseña» (CU «Recuperar contraseña»; RF34; DEC-285, DEC-288).
+' Propuestos por arquitectura (plan del 100 %, iteración F). Solo estructura: regiones, elementos y flujo.
+' Diagramas: (1) WF-27, pedir el enlace; (2) WF-27, enlace pedido; (3) WF-28, contraseña nueva; (4) WF-28, enlace
+' inválido. Públicas, con el encabezado y el pie reducidos de WF-01 (DisenoAcceso), sin imagen.
+
+@startsalt
+{+
+{ <b>Samaria360 (logo) | [ES/EN] }
+==
+Escribe el correo de tu cuenta y te enviaremos un enlace para elegir una contraseña nueva.
+{+
+<b>Recuperar contraseña
+Correo electrónico
+"nombre@correo.com        "
+Error por campo: «Este campo es obligatorio.» / «Escribe un correo válido.»
+Región de alerta (aria-live): 429 «Hiciste demasiados intentos…» · red · error general
+[Enviar enlace]
+Volver a iniciar sesión (enlace a /login)
+}
+}
+@endsalt
+
+@startsalt
+{+
+{ <b>Samaria360 (logo) | [ES/EN] }
+==
+{+
+<b>Recuperar contraseña
+Región de estado: «Si el correo tiene una cuenta en Samaria360, te enviamos un enlace para restablecer la
+contraseña. Vence en 30 minutos y sirve una sola vez.» (el mismo mensaje exista o no la cuenta, ADR-006)
+[Volver a iniciar sesión]
+}
+}
+@endsalt
+
+@startsalt
+{+
+{ <b>Samaria360 (logo) | [ES/EN] }
+==
+{+
+<b>Elige una contraseña nueva
+Contraseña nueva
+"********                 "
+Confirma la contraseña
+"********                 "
+Error por campo: mínimo 8 caracteres · las dos no coinciden
+[Guardar contraseña]
+}
+Al llegar desde el correo (/restablecer#token=…) el token se quita de la URL.
+Éxito: «Listo: tu contraseña cambió y las sesiones abiertas se cerraron.» [Iniciar sesión]
+}
+@endsalt
+
+@startsalt
+{+
+{ <b>Samaria360 (logo) | [ES/EN] }
+==
+{+
+<b>Elige una contraseña nueva
+Alerta: «El enlace no es válido, ya se usó o venció.»
+[Pedir otro enlace] (a /recuperar)
+}
+}
+@endsalt

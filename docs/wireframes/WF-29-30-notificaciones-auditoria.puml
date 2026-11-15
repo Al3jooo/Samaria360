@@ -1,0 +1,35 @@
+' WF-29 «Campana de notificaciones» (RF63) y WF-30 «Auditoría» (RF13); DEC-294.
+' Propuestos por arquitectura (plan del 100 %, iteración G). Solo estructura: regiones, elementos y flujo.
+
+@startsalt
+{+
+{ <b>Samaria360 | Búsqueda | Servicios | Asistente IA | [ES/EN] | [Campana (3)] | (avatar ▼) }
+==
+{+
+<b>Notificaciones | Marcar todas como leídas
+--
+(nueva) Nueva reserva de «Tour a Playa Cristal» para el 10/03/2030: 4 personas. · 01/03/2030
+Tu reserva de «Suite Casa Tayrona» para el 12/03/2030 quedó confirmada. · 28/02/2030
+Tu reserva de «Tour al Tayrona» quedó completada. Ya puedes calificar el servicio. · 20/02/2030
+--
+Vacía: «No tienes notificaciones.» · Error: «Las notificaciones no responden en este momento.»
+}
+Cada notificación lleva a «Mis reservas» (Turista) o al historial de reservas (Prestador).
+}
+@endsalt
+
+@startsalt
+{+
+{ <b>Samaria360 | Búsqueda | Servicios | Asistente IA | [ES/EN] | (avatar ▼) }
+==
+<b>Auditoría
+Acciones críticas: aprobaciones, cancelaciones y cambios de rol, con el usuario y la fecha.
+{ Acción ^Todas^ | Desde "dd/mm/aaaa" | Hasta "dd/mm/aaaa" | [Filtrar] }
+{#
+Fecha | Usuario | Acción | Detalle
+01/03/2030 10:00 | 00000000 | Prestador aprobado | Prestador 0000…0002
+28/02/2030 18:20 | 7d3c1f0a | Reserva cancelada | Reserva 9f2a… de «Tour a Playa Cristal»
+}
+{ [<] Página 1 de 3 [>] }
+}
+@endsalt
