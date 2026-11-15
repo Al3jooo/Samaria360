@@ -1655,6 +1655,24 @@
       "CALIFICACION_OCULTADA": "Rating hidden",
       "CALIFICACION_MOSTRADA": "Rating shown again",
       "CALIFICACION_ELIMINADA": "Rating deleted"
+    },
+    "detalles": {
+      "prestador": "Provider {{idPrestador}}",
+      "servicio": "Service {{idServicio}} from provider {{idPrestador}}",
+      "servicioConNombre": "Service “{{nombreServicio}}” ({{idServicio}}) from provider {{idPrestador}}",
+      "rol": "Account {{idUsuario}}: {{rolAnterior}} → {{rolNuevo}}",
+      "reserva": "Booking {{idReserva}} of “{{nombreServicio}}”",
+      "calificacion": "Rating {{idCalificacion}} of {{tipoEntidad}} {{idEntidad}}. Reason: {{motivo}}"
+    },
+    "roles": {
+      "Turista": "Tourist",
+      "Prestador": "Provider",
+      "Gestor": "Destination manager",
+      "Administrador": "Administrator"
+    },
+    "entidades": {
+      "servicio": "service",
+      "atractivo": "attraction"
     }
   },
   "asistente": {

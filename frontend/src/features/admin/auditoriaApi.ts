@@ -18,7 +18,10 @@ export type AccionAuditada = (typeof ACCIONES_AUDITADAS)[number]
 export interface RegistroAuditoria {
   usuarioId: string
   accion: AccionAuditada
+  /** Texto en español; las entradas anteriores a A005 solo traen esto. */
   detalle: string
+  /** Valores del detalle por separado (DEC-322), para armarlo en el idioma activo; vacío en las entradas anteriores. */
+  datos?: Record<string, string>
   fecha: string
 }
 

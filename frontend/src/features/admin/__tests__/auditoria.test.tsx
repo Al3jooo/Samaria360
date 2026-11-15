@@ -38,6 +38,32 @@ describe('Auditoría (RF13, WF-30)', () => {
     expect(ultima?.url).toContain('pagina=0')
   }, 15_000)
 
+  it('con datos (DEC-322) el detalle se arma en el idioma activo, con el rol traducido', async () => {
+    sessionStorage.setItem('samaria360.token', 'token-admin')
+    const cambio = {
+      usuarioId: REGISTRO.usuarioId,
+      accion: 'ROL_CAMBIADO',
+      detalle: 'Cuenta 00000000-0000-4000-8000-000000000009: Turista → Gestor',
+      datos: { idUsuario: '00000000-0000-4000-8000-000000000009', rolAnterior: 'Turista', rolNuevo: 'Gestor' },
+      fecha: REGISTRO.fecha,
+    }
+    simularFetch({
+      [ME]: () => respuestaJson(200, USUARIO_ADMIN),
+      [AUDITORIA]: () => respuestaJson(200, { elementos: [cambio, REGISTRO], pagina: 0, tamano: 20, totalElementos: 2 }),
+    })
+    const { usuario } = renderApp('/admin/auditoria')
+
+    const tabla = await screen.findByRole('table')
+    expect(within(tabla).getByText(cambio.detalle)).toBeInTheDocument()
+    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+
+    expect(
+      await within(tabla).findByText('Account 00000000-0000-4000-8000-000000000009: Tourist → Destination manager'),
+    ).toBeInTheDocument()
+    // Una entrada anterior a A005, sin datos, sigue con el texto guardado.
+    expect(within(tabla).getByText(REGISTRO.detalle)).toBeInTheDocument()
+  }, 15_000)
+
   it('un Turista ve «Sin permiso» y no se llama a la auditoría', async () => {
     sessionStorage.setItem('samaria360.token', 'token-turista')
     const { solicitudes } = simularFetch({ [ME]: () => respuestaJson(200, USUARIO_TURISTA) })

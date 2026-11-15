@@ -1655,6 +1655,24 @@
       "CALIFICACION_OCULTADA": "Calificación ocultada",
       "CALIFICACION_MOSTRADA": "Calificación mostrada de nuevo",
       "CALIFICACION_ELIMINADA": "Calificación eliminada"
+    },
+    "detalles": {
+      "prestador": "Prestador {{idPrestador}}",
+      "servicio": "Servicio {{idServicio}} del prestador {{idPrestador}}",
+      "servicioConNombre": "Servicio «{{nombreServicio}}» ({{idServicio}}) del prestador {{idPrestador}}",
+      "rol": "Cuenta {{idUsuario}}: {{rolAnterior}} → {{rolNuevo}}",
+      "reserva": "Reserva {{idReserva}} de «{{nombreServicio}}»",
+      "calificacion": "Calificación {{idCalificacion}} de {{tipoEntidad}} {{idEntidad}}. Motivo: {{motivo}}"
+    },
+    "roles": {
+      "Turista": "Turista",
+      "Prestador": "Prestador",
+      "Gestor": "Gestor",
+      "Administrador": "Administrador"
+    },
+    "entidades": {
+      "servicio": "servicio",
+      "atractivo": "atractivo"
     }
   },
   "asistente": {
