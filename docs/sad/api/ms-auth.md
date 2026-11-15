@@ -20,6 +20,7 @@ Contrato de ms-auth para el frontend y para las pruebas. Todas las rutas van por
 | `rol` | `Turista`, `Prestador`, `Gestor` o `Administrador` |
 | `ver` | `usuario.version_cuenta` al iniciar sesión (DEC-29) |
 | `iat`, `exp` | `exp - iat` = **15 minutos** (antes, 60) |
+| `ini` | Inicio de la sesión, en segundos desde la época (DEC-317): igual a `iat` al iniciar sesión y se conserva al renovar |
 
 `version_cuenta` sube en 1 con cada cambio de estado o de rol de la cuenta (RF45), y V15 la subió una vez para los Gestores y Administradores existentes (DEC-108). Cada servicio rechaza con **401 `SESION_INVALIDADA`** un token con `ver` menor que la versión conocida; un token sin `ver` cuenta como 0. ms-catalog y ms-booking rechazan también un token de Gestor o Administrador sin fila en su proyección (DEC-110). ms-auth compara contra su propia tabla en **todos** sus endpoints autenticados (`/me`, `/perfil`, `/prestador/perfil` y `/admin/**`). La respuesta de `/login` no cambia (`expiraEn` es ahora 15 minutos después).
 
@@ -41,6 +42,15 @@ CU [«Iniciar sesión»](../../casos-de-uso/CU-iniciar-sesion.md). Público.
   4. Token emitido: el conteo vuelve a 0 y se registra el acceso.
 - **400 `DATOS_INVALIDOS`** con `campos` si falta el correo (o no tiene forma de correo) o la contraseña.
 
+## Renovar la sesión (DEC-317)
+
+`POST /api/v1/auth/sesion/renovacion` · cualquier rol, con el token vigente (firma, `exp` y `ver`) y sin cuerpo.
+
+- **200** con la misma forma que el login (`{token, tipo, expiraEn, idUsuario, rol}`): un token nuevo de 15 minutos, con la `version_cuenta` actual y el mismo `ini`. Un token anterior a DEC-317 no tiene `ini` y se toma su `iat`.
+- **401 `SESION_VENCIDA`** si pasaron más de **8 horas** desde `ini`: hay que iniciar sesión de nuevo.
+- **403 `CUENTA_INACTIVA`** si la cuenta dejó de estar Activa; **401 `SESION_INVALIDADA`** con `ver` viejo; **401 `NO_AUTENTICADO`** sin token o vencido.
+- No guarda nada en la base: no hay tokens de refresco que revocar. El cliente la llama en el último minuto del token y solo si el usuario interactuó desde que se emitió.
+
 ## Usuario autenticado
 
 `GET /api/v1/auth/me` · cualquier rol → **200** `{idUsuario, correo, rol, estadoCuenta, nombreVisible}`. `nombreVisible` alimenta el avatar: el primer nombre y el primer apellido si la cuenta tiene fila en `turista` (también un Gestor o un Administrador con rol base Turista, RF45), el representante legal si es un prestador y, si no tiene ninguna de las dos (el personal de la semilla), la parte del correo antes de la `@`.
@@ -48,7 +58,7 @@ CU [«Iniciar sesión»](../../casos-de-uso/CU-iniciar-sesion.md). Público.
 
 ## Registro (RF01, RF02)
 
-CU [«Registrarse»](../../casos-de-uso/CU-registrarse.md); [ADR-006](../adr/ADR-006-registro-sin-enumeracion.md). Públicos. **Respuesta uniforme:** **202 `{"estado": "RECIBIDO"}`** exista o no el correo, con BCrypt siempre y sin inicio de sesión automático. Si el correo ya existe no se crea nada y `NotificadorCuentaLogAdapter` deja un log con el id (el aviso por correo llega con RF34).
+CU [«Registrarse»](../../casos-de-uso/CU-registrarse.md); [ADR-006](../adr/ADR-006-registro-sin-enumeracion.md). Públicos. **Respuesta uniforme:** **202 `{"estado": "RECIBIDO"}`** exista o no el correo, con BCrypt siempre y sin inicio de sesión automático. Si el correo ya existe no se crea nada y ms-auth envía al dueño un correo («ya tienes una cuenta», con el enlace a `/recuperar`) por SMTP directo, en otro hilo: la respuesta no espera al servidor SMTP (DEC-287). El log lleva el id, nunca la dirección. Una cuenta nueva encola `CuentaActualizada` con versión 0 solo para RabbitMQ (ADR-011; el turista, con su país).
 
 `POST /api/v1/auth/registro/turista`
 
@@ -75,6 +85,30 @@ CU [«Registrarse»](../../casos-de-uso/CU-registrarse.md); [ADR-006](../adr/ADR
 - **409 `RNT_YA_REGISTRADO`** si el RNT ya existe.
 
 **Errores comunes:** **400 `DATOS_INVALIDOS`** con un código por campo (`REQUERIDO`, `FORMATO`, `LONGITUD_MINIMA`, `LONGITUD_MAXIMA`, `NO_PERMITIDO`, `DUPLICADO`), todos a la vez; con los datos válidos y `aceptoPoliticas` distinto de `true`, **400 `POLITICAS_NO_ACEPTADAS`** (D6).
+
+## Recuperación de contraseña (RF34)
+
+CU [«Recuperar contraseña»](../../casos-de-uso/CU-recuperar-contrasena.md); DEC-285. Públicos, con límite de tasa en el gateway (5 cada 10 minutos por conexión, los dos pasos juntos).
+
+`POST /api/v1/auth/recuperacion`
+
+```json
+{ "correo": "ana@correo.com", "idioma": "es" }
+```
+
+- **202 `{"estado": "RECIBIDO"}`** exista o no la cuenta (ADR-006). `idioma` es opcional (`es` por defecto; `en…` para inglés) y elige el del correo.
+- Si la cuenta existe: guarda el **SHA-256** de un token de 32 bytes aleatorios que vence a los **30 minutos** (RF34) y anula los anteriores sin usar; envía por SMTP el enlace `{FRONTEND_URL}/restablecer#token=<token>`. El token va en el fragmento: el navegador no lo envía al servidor ni en el `Referer` (DEC-288).
+- **400 `DATOS_INVALIDOS`** con `campos.correo` (`REQUERIDO`, `FORMATO`, `LONGITUD_MAXIMA`).
+
+`POST /api/v1/auth/recuperacion/restablecimiento`
+
+```json
+{ "token": "<43 caracteres Base64 URL>", "contrasena": "…" }
+```
+
+- **204** si el token existe, no se usó y no venció. En una transacción: lo marca usado (UPDATE condicional), cambia la contraseña (BCrypt), pone `intentos_fallidos = 0` y `bloqueado_hasta = NULL` (RF15), sube `version_cuenta` y encola `CuentaActualizada` para ms-catalog, ms-booking y RabbitMQ: las sesiones abiertas reciben 401 `SESION_INVALIDADA` (ADR-008). Aplica a cualquier cuenta: el login decide después los 403.
+- **400 `DATOS_INVALIDOS`** con `campos.contrasena` (las reglas del registro). Se valida **antes** de consumir el token: una contraseña inválida no lo gasta.
+- **400 `TOKEN_INVALIDO`**: no existe, ya se usó o venció (un solo código para los tres).
 
 ## Países y clave pública
 
@@ -287,11 +321,13 @@ CU [«Actualizar datos comerciales»](../../casos-de-uso/CU-actualizar-datos-com
 | `POLITICAS_NO_ACEPTADAS` | 400 | Registro con datos válidos sin aceptar las políticas (D6) |
 | `CREDENCIALES_INVALIDAS` | 401 | Login con un correo inexistente o una contraseña incorrecta (el mismo mensaje) |
 | `NO_AUTENTICADO` | 401 | Sin token, vencido, inválido o de servicio (`rol = SERVICIO`) |
+| `SESION_VENCIDA` | 401 | Renovación de una sesión de más de 8 horas (DEC-317) |
 | `CUENTA_INACTIVA` | 403 | Login con la contraseña correcta o `/me`, con la cuenta no Activa (RF22, RF62) |
 | `CUENTA_PENDIENTE_VALIDACION`, `CUENTA_RECHAZADA` | 403 | Login de un prestador sin validar o rechazado, con la contraseña correcta (D3); `CUENTA_RECHAZADA` lleva `motivo`, la justificación del Administrador (DEC-273) |
 | `RNT_YA_REGISTRADO` | 409 | Registro de un prestador con un RNT que ya existe |
 | `CUENTA_BLOQUEADA` | 423 | Login de una cuenta bloqueada por intentos; lleva `bloqueadoHasta` (RF15) |
-| `DEMASIADAS_SOLICITUDES` | 429 | Lo responde el **api-gateway**, no ms-auth: más de 10 logins por minuto o 5 registros cada 10 minutos desde la misma conexión; lleva `Retry-After` (DEC-271) |
+| `TOKEN_INVALIDO` | 400 | Restablecer con un token inexistente, usado o vencido (RF34, DEC-285) |
+| `DEMASIADAS_SOLICITUDES` | 429 | Lo responde el **api-gateway**, no ms-auth: más de 10 logins por minuto, 5 registros o 5 pedidos de recuperación (RF34) cada 10 minutos desde la misma conexión; lleva `Retry-After` (DEC-271, DEC-285) |
 | `SESION_INVALIDADA` | 401 | `ver` menor que `version_cuenta`: la cuenta cambió después de iniciar sesión |
 | `ACCESO_DENEGADO` | 403 | El rol no es Administrador (`/admin/**`), no es Turista (`/perfil`) o no es Prestador (`/prestador/perfil`) |
 | `CUENTA_NO_ENCONTRADA` | 404 | No existe, o es de otro rol (en el cambio de rol: no existe) |

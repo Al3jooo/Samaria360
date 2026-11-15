@@ -1,0 +1,105 @@
+@startuml despliegue
+' Diagrama de despliegue de Samaria360: figura 20 del Entregable 2 más las conexiones
+' internas que agrega el plan del 100 % (DEC-280), marcadas con «DEC-280».
+' Fuente de verdad de los contenedores: no se agrega ninguno fuera de la figura 20.
+title Diagrama de despliegue — Samaria360 (Entregable 2, figura 20; enmienda DEC-280)
+skinparam shadowing false
+skinparam defaultTextAlignment center
+
+node "Dispositivo del usuario" <<device>> {
+  node "Navegador web" <<executionEnvironment>> {
+    component "SPA Samaria360\n(React)" as spa
+  }
+}
+
+node "Servidor de aplicación" <<device>> {
+  node "Docker Engine" <<executionEnvironment>> {
+    node "frontend :80" <<container>> {
+      component "Servidor Nginx" as nginx
+    }
+    node "api-gateway :8080" <<container>> {
+      component "Spring Cloud Gateway" as gw
+    }
+    node "ms-auth" <<container>> {
+      component "Auth Service" as auth
+    }
+    node "ms-catalog" <<container>> {
+      component "Catalog Service" as catalog
+    }
+    node "ms-booking" <<container>> {
+      component "Booking Service" as booking
+    }
+    node "ms-analytics" <<container>> {
+      component "Analytics Service" as analytics
+    }
+    node "ms-chatbot" <<container>> {
+      component "Chatbot Service" as chatbot
+    }
+    node "RabbitMQ" <<container>> {
+      component "Bróker de mensajes" as broker
+    }
+    node "PostgreSQL :5432" <<container>> {
+      database "auth_db" as authdb
+      database "reservas_db" as resdb
+    }
+    node "MongoDB :27017\n(réplica rs0 de un nodo, DEC-281)" <<container>> {
+      database "catalog_db" as catdb
+      database "analytics_db" as anadb
+      database "chatbot_db" as chatdb
+    }
+  }
+}
+
+cloud "Servicios externos" {
+  node "Proveedor LLM" <<device>> as llm
+  node "Servidor SMTP" <<device>> as smtp
+  node "Servidor OSM" <<device>> as osm
+}
+
+spa --> nginx : HTTPS
+spa --> osm : HTTPS (Mapas)
+nginx --> gw : HTTP (Proxy /api/)
+
+gw --> auth : HTTP
+gw --> catalog : HTTP
+gw --> booking : HTTP
+gw --> analytics : HTTP
+gw --> chatbot : HTTP
+
+catalog ..> auth : HTTP (JWKS)
+booking ..> auth : HTTP (JWKS)
+booking ..> catalog : HTTP (Tarifas)
+
+auth ..> broker : AMQP
+booking ..> broker : AMQP
+broker ..> catalog : AMQP
+broker ..> analytics : AMQP
+
+auth --> authdb : JDBC
+booking --> resdb : JDBC
+catalog --> catdb : Mongo Wire
+analytics --> anadb : Mongo Wire
+chatbot --> chatdb : Mongo Wire
+
+auth ..> smtp : SMTP
+analytics ..> smtp : SMTP
+chatbot ..> llm : HTTPS
+
+' --- Implementada antes del plan y no dibujada en la figura 20 (ADR-008) ---
+auth ..> catalog #gray : HTTP (relevo de cuentas,\n/internal, ADR-008)
+auth ..> booking #gray : HTTP (relevo de cuentas,\n/internal, ADR-008)
+
+' --- Conexiones agregadas por el plan del 100 % (nivel 2 de ADR-003, DEC-280) ---
+chatbot ..> catalog #blue : HTTP «DEC-280»\n(búsqueda y detalle públicos)
+analytics ..> auth #blue : HTTP «DEC-280»\n(JWKS; contacto del Prestador, RF30)
+booking ..> auth #blue : HTTP «DEC-280»\n(contactos de asistentes, RF42)
+broker ..> chatbot #blue : AMQP «DEC-280»\n(CuentaActualizada)
+chatbot ..> auth #blue : HTTP «DEC-280»\n(JWKS)
+
+note bottom of broker
+  ms-catalog y ms-analytics también publican
+  (ConsultasAgregadas, PromedioActualizado; ADR-011).
+  El relevo HTTP de cuentas de ms-auth hacia
+  ms-catalog y ms-booking se mantiene (ADR-008).
+end note
+@enduml

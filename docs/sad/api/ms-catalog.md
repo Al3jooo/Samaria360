@@ -46,10 +46,10 @@ Pública, sin token ([ADR-004](../adr/ADR-004-busqueda-combinada.md)). Decisione
   - `precioMax`: no negativo; deja fuera los atractivos, que no tienen precio (decisión 3).
   - `lat` y `lng` juntos (la ubicación del turista, RF38; nunca se guarda) y `distanciaKm` mayor que 0, que exige la ubicación.
   - `accesibilidad`: una o varias de `MovilidadReducida`, `Visual` y `Auditiva`; el resultado debe declararlas todas (RF50, decisión 6).
-  - `orden`: `Distancia` (exige la ubicación), `PrecioAscendente`, `PrecioDescendente` o `Nombre`. Por defecto, `Distancia` con ubicación y `Nombre` sin ella. Los resultados sin precio van al final al ordenar por precio (decisión 4). El orden por calificación de RF61 no existe (RF17 no está implementado).
+  - `orden`: `Distancia` (exige la ubicación), `PrecioAscendente`, `PrecioDescendente`, `Nombre` o `Calificacion` (DEC-302: el promedio visible, de mayor a menor; lo que no tiene calificaciones va al final). Por defecto, `Distancia` con ubicación y `Nombre` sin ella. Los resultados sin precio van al final al ordenar por precio (decisión 4).
   - `pagina` desde 0 y `tamano` de 1 a 10 (RF16; por defecto 10).
   - **«Más filtros»**, cada uno con su categoría: `serviciosIncluidos`, `huespedes` y `tipoHabitacion` (Alojamiento; huéspedes, tipo y precio máximo los debe cumplir una misma unidad, D1), `menuVegetariano` y `tipoCocina` (Gastronomía), `nivelDificultad` y `duracionMaxHoras` (Tour), `tipoVehiculoEquipo` (AlquilerEquipo). Los textos de estos filtros se comparan completos, sin distinguir mayúsculas.
-- **200** `{elementos, pagina, tamano, totalElementos, totalPaginas}`. Cada elemento: `tipo` (`Servicio` o `Atractivo`), `id`, `nombre`, `categoria`, `descripcionCorta`, `precio` (el «desde»: con filtros de unidad, el menor `precioNoche` de las unidades que los cumplen; null en un atractivo), `imagen`, `coordenada` `{longitud, latitud}`, `distanciaKm` (dos decimales; null sin ubicación), `accesibilidad` y `estadoOperativo` (solo en atractivos, RF33).
+- **200** `{elementos, pagina, tamano, totalElementos, totalPaginas}`. Cada elemento: `tipo` (`Servicio` o `Atractivo`), `id`, `nombre`, `categoria`, `descripcionCorta`, `precio` (el «desde»: con filtros de unidad, el menor `precioNoche` de las unidades que los cumplen; null en un atractivo), `imagen`, `coordenada` `{longitud, latitud}`, `distanciaKm` (dos decimales; null sin ubicación), `accesibilidad`, `estadoOperativo` (solo en atractivos, RF33), `calificacion` (el promedio visible de RF17 que llega de ms-analytics, de 1 a 5; null sin calificaciones; DEC-302) y `cantidadCalificaciones` (0 sin calificaciones).
 - **400 `CRITERIOS_INVALIDOS`** con un mensaje: `lat` sin `lng`, coordenadas fuera de rango, distancia u orden por distancia sin ubicación, precio negativo, texto de más de 100, `tamano` fuera de 1 a 10, página negativa, un filtro de «Más filtros» sin su categoría o con otra, un servicio incluido desconocido. Es una excepción explícita a «`DATOS_INVALIDOS` con `campos`».
 
 ## Opciones de «Más filtros»
@@ -248,6 +248,8 @@ CU [«Registrar servicio comercial»](../../casos-de-uso/CU-registrar-servicio.m
 ### Registrar
 
 `POST /api/v1/catalogo/prestador/servicios`
+
+**Con fotos (DEC-318):** `multipart/form-data` con la parte `datos` (el JSON de abajo) y de 1 a 5 partes `imagenes` (JPEG o PNG por firma, 5 MB cada una), como el registro de atractivos. Los errores de las fotos van en el mismo 400: `campos.imagenes` (`REQUERIDO`, `CANTIDAD_MAXIMA`) y `campos["imagenes[i]"]` (`FORMATO`, `TAMANO_MAXIMO`); más de 30 MB en total → 413 `CARGA_DEMASIADO_GRANDE`. Las imágenes se guardan en GridFS antes del servicio y se borran si algo falla; `imagenes` del servicio lleva sus rutas públicas. El cuerpo JSON sin fotos (abajo) sigue aceptado por compatibilidad.
 
 ```json
 {
@@ -496,6 +498,8 @@ Lo que fija el servidor se ignora si llega: `gestorId` (el `sub`) y `fechaRegist
 | `LIMITE_FAVORITOS` | 409 | El turista ya tiene 100 favoritos |
 | `ESTADO_CAMBIADO` | 409 | El aviso ya estaba despublicado (`estadoActual: "Inactivo"`), el servicio ya no estaba Pendiente (`estadoActual`: `Publicado` o `Rechazado`) o el Prestador quiso editar un servicio Rechazado |
 | `SERVICIO_MODIFICADO` | 409 | La `version` enviada al editar el precio o los datos comerciales ya no es la del servicio; lleva `versionActual` (DEC-186) |
+| `LIMITE_IMAGENES` | 409 | RF48: la galería del servicio ya tiene 5 imágenes (DEC-313) |
+| `IMAGEN_MINIMA` | 409 | RF48: quitar dejaría la galería sin imágenes (DEC-313) |
 | `ATRACTIVO_MODIFICADO` | 409 | La `version` enviada al editar un atractivo o cambiar su estado ya no es la del atractivo; lleva `versionActual` (DEC-207) |
 | `CARGA_DEMASIADO_GRANDE` | 413 | Registro de un atractivo con una parte de más de 6 MB o una petición de más de 30 MB (ADR-009) |
 | `ERROR_INTERNO` | 500 | Cualquier otro error |
@@ -534,3 +538,29 @@ Sin semilla propia: el turista de la demostración crea sus favoritos y su histo
 `atractivos` en su esquema v2 (M012; [`modelo-nosql/atractivos.schema.json`](../modelo-nosql/atractivos.schema.json), DEC-207): suma `horarioAtencion` (RF58, cierra HC4), `version` y `fechaRegistro` (obligatorias; M012 las rellena: 0 y la fecha del `_id`), `fechaActualizacion`, `categoria` como enum (`Naturaleza`, `Cultura`; DEC-214), el `enum` de accesibilidad de RF27, límites de longitud, capacidad de 1 a 100 000 e `imagenes` de 5 como máximo. `descripcion`, `categoria`, `estadoOperativo` e `imagenes` (de 1 a 5) son opcionales en el validador y obligatorios en el dominio para los registros nuevos, como DEC-148. M012 no normaliza datos: si un atractivo no cumple el v2, se detiene con la lista de `_id`. Sin índices nuevos.
 
 Bucket GridFS `imagenes` (`imagenes.files` e `imagenes.chunks`; ADR-009): el formato detectado va en `metadata.formato` (`JPEG` o `PNG`). Sin validador: lo escribe solo `ImagenGridFsAdapter`.
+
+## Calificaciones (iteración H; DEC-302)
+
+ms-catalog consume `PromedioActualizado` de ms-analytics en la cola `ms-catalog.eventos.v1` (ADR-011; [`eventos.md`](eventos.md)) y lo copia en el campo opcional `calificacion {promedio, cantidad, version}` del servicio o el atractivo con un UPDATE condicional (solo si no tiene o su versión es menor; no toca la `version` de la edición). Una entidad que ya no existe se ignora; un mensaje fuera del contrato va a `ms-catalog.eventos.v1.dlq` sin reintentos; otros tipos de evento se ignoran. **M015** instala los validadores v5 de `servicios` y v3 de `atractivos` con ese campo y el índice `servicios_calificacion`. La búsqueda lo expone y ordena por él (RF61); las reseñas de la ficha se leen de ms-analytics.
+
+## Afluencia (iteración J; DEC-304, DEC-305)
+
+- **Registrar** (solo el Gestor): `POST /api/v1/catalogo/gestor/atractivos/{id}/ocupacion` `{ocupacion}` (entero de 0 a 1 000 000) → **200** `{nivel, porcentaje, ocupacion, limite, fecha, limiteAlcanzado}`. Guarda `ocupacionActual {valor, fecha}` en el atractivo (sin subir su `version`), agrega la lectura a `ocupaciones` y encola `OcupacionRegistrada` ([`eventos.md`](eventos.md)) en una transacción. 400 `DATOS_INVALIDOS` con `campos.ocupacion` (`REQUERIDO`, `VALOR_MINIMO`, `VALOR_MAXIMO`, o `NO_PERMITIDO` si el atractivo no tiene `limiteCapacidadCarga`); 404 `ATRACTIVO_NO_ENCONTRADO`.
+- **Consultar** (público): `GET /api/v1/catalogo/atractivos/{id}/afluencia` → **200** `{afluencia, alternativos}`. `afluencia`: el nivel vigente (`Bajo` por debajo del 40 %, `Medio` del 40 % al 80 %, `Alto` por encima; `limiteAlcanzado` al 100 %, RF08) o `null` si no hay lectura del día en Santa Marta. `alternativos`: hasta 3 `{id, nombre, categoria, imagen, nivel, porcentaje, distanciaKm}` de la misma categoría, abiertos y de menor ocupación (si el de origen tiene nivel), ordenados por ocupación y distancia (RF51).
+- **Búsqueda:** cada atractivo de `/oferta` lleva `afluencia` (`Bajo`, `Medio`, `Alto` o `null`; RF39).
+- **M016:** validador v4 de `atractivos` (`ocupacionActual`), colección `ocupaciones` (`{atractivoId, ocupacion, limite, fecha, gestorId}`) e índices `ocupaciones_atractivo` y `atractivos_categoria`.
+
+## Consultas a las fichas (iteración K; DEC-283, DEC-307)
+
+`GET /api/v1/catalogo/servicios/{id}` y `GET /api/v1/catalogo/atractivos/{id}` cuentan en memoria cada respuesta 200 que llega por el gateway (con `X-Forwarded-For`; las de ms-booking por la red interna no se cuentan) y un programador (`samaria360.consultas.cada`, un minuto) encola `ConsultasAgregadas` ([`eventos.md`](eventos.md)) con el nombre de la ficha y, en los servicios, el Prestador. Sin datos de quien consulta. Los conteos del minuto en curso se pierden si ms-catalog se detiene sin apagarse ordenadamente.
+
+## Historial de modificaciones y galería (iteración I; DEC-311, DEC-313)
+
+Rol **Prestador**; el prestador es el `sub` del JWT.
+
+- **Historial (RF41):** `GET /api/v1/catalogo/prestador/historial-modificaciones?servicio=&pagina=0` → `{elementos, pagina, tamano: 20, totalElementos}`, los **últimos 30 días**, de la más reciente a la más antigua. Cada elemento: `{idServicio, nombreServicio, tipo, detalle, valorAnterior, valorNuevo, fecha}`; `tipo` es `Precio` (RF32: el `precioBase`, o el `precioNoche` de cada unidad que cambió, con su nombre en `detalle`), `Cupos`, `Apertura`, `Cierre` o `Plantilla` (RF19, de `OfertaModificada` de ms-booking; `detalle` es `yyyy-MM-dd HH:mm` o `yyyy-MM-dd · unidad`). `servicio` que no es un ObjectId → 400 `campos.servicio = FORMATO`. Los precios se guardan en la misma transacción que la edición; los eventos se deduplican por `idEvento` y uno de un servicio ajeno o inexistente se ignora (fuera del contrato: `.dlq`). Con `Plantilla`, ms-catalog fija además `oferta.diasOperacion` y `oferta.salidas` del servicio (sin subir su `version`).
+- **Galería (RF48):** solo servicios **Publicados** propios; de 1 a 5 imágenes JPEG o PNG (por firma) de hasta 5 MB, en GridFS como las de los atractivos (ADR-009), sin nueva aprobación y sin subir la `version`.
+  - `POST /api/v1/catalogo/prestador/servicios/{id}/imagenes` (multipart, parte `imagen`) → **201** `{imagenes}`. Imagen inválida → 400 `campos.imagen` (`REQUERIDO`, `FORMATO`, `TAMANO_MAXIMO`); ya hay 5 → 409 `LIMITE_IMAGENES` (si otra subida ganó la carrera, la imagen guardada se borra).
+  - `DELETE /api/v1/catalogo/prestador/servicios/{id}/imagenes?ruta=` → **200** `{imagenes}`. Ruta que no está en la galería → 400 `campos.ruta = NO_PERMITIDO`; quedaría vacía → 409 `IMAGEN_MINIMA`. La imagen se borra de GridFS.
+  - Servicio ajeno o inexistente → 404 `SERVICIO_NO_ENCONTRADO`; no Publicado → 409 `ESTADO_CAMBIADO` con `estadoActual`.
+- **M017:** colección `historial_modificaciones` (`{servicioId, prestadorId, nombreServicio, tipo, detalle, valorAnterior, valorNuevo, fecha, idEvento}`; [esquema](../modelo-nosql/historial_modificaciones.schema.json)) con los índices `historial_prestador` y `historial_id_evento` (único, parcial).
