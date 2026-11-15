@@ -1,0 +1,79 @@
+{
+  "$jsonSchema": {
+    "bsonType": "object",
+    "required": [
+      "turistaId",
+      "nombre",
+      "items",
+      "fechaCreacion",
+      "fechaActualizacion"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "_id": {
+        "bsonType": "objectId"
+      },
+      "turistaId": {
+        "bsonType": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+        "description": "UUID — referencia a Auth Service"
+      },
+      "nombre": {
+        "bsonType": "string",
+        "minLength": 1,
+        "maxLength": 100
+      },
+      "items": {
+        "bsonType": "array",
+        "minItems": 1,
+        "maxItems": 30,
+        "items": {
+          "bsonType": "object",
+          "required": [
+            "orden",
+            "tipo",
+            "refId",
+            "tituloActividad",
+            "diaSugerido"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "orden": {
+              "bsonType": "int",
+              "minimum": 1
+            },
+            "tipo": {
+              "enum": [
+                "atractivo",
+                "servicio"
+              ]
+            },
+            "refId": {
+              "bsonType": "string",
+              "pattern": "^[0-9a-f]{24}$",
+              "description": "ObjectId — referencia a Catalog Service"
+            },
+            "tituloActividad": {
+              "bsonType": "string",
+              "minLength": 1,
+              "maxLength": 120,
+              "description": "Snapshot del nombre"
+            },
+            "diaSugerido": {
+              "bsonType": "int",
+              "minimum": 1,
+              "maximum": 7
+            }
+          }
+        }
+      },
+      "fechaCreacion": {
+        "bsonType": "date"
+      },
+      "fechaActualizacion": {
+        "bsonType": "date",
+        "description": "Ampliación (DEC-297): RF35, modificarlo después"
+      }
+    }
+  }
+}

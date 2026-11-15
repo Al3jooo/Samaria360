@@ -1,0 +1,71 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: ms-chatbot
+  config:
+    # .env de la raíz del monorepo (ms-chatbot se ejecuta desde su propia carpeta)
+    import: optional:file:../.env[.properties]
+  data:
+    mongodb:
+      # Usuario propio con readWrite solo en chatbot_db (como DEC-275), creado por mongo-migraciones. Réplica rs0
+      # (DEC-281): con ./mvnw desde el host, directConnection=true; en Compose, replicaSet=rs0.
+      uri: mongodb://${CHATBOT_DB_USER:${MONGO_USER}}:${CHATBOT_DB_PASSWORD:${MONGO_PASSWORD}}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/chatbot_db?authSource=admin${MONGO_OPCIONES:&directConnection=true}
+      database: chatbot_db
+  # Solo CuentaActualizada, para validar el claim ver (DEC-280): usuario propio que solo lee su cola.
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ms-chatbot
+    password: ${RABBITMQ_CHATBOT_PASSWORD:}
+    virtual-host: samaria360
+    connection-timeout: 2s
+    listener:
+      simple:
+        default-requeue-rejected: false
+        missing-queues-fatal: false
+
+samaria360:
+  seguridad:
+    jwk-set-uri: ${AUTH_JWKS_URI:http://localhost:8081/api/v1/auth/.well-known/jwks.json}
+    emisor: samaria360-auth
+    audiencia: ms-chatbot
+  # Búsqueda pública de ms-catalog, sin token (DEC-280).
+  catalogo:
+    url: ${CATALOG_INTERNO_URI:http://localhost:8082}
+  # Redactor (decisión 5 del equipo, DEC-297): reglas por defecto; gemini con GEMINI_API_KEY (nunca en el repo ni en
+  # los logs). Tope de tokens por respuesta.
+  llm:
+    proveedor: ${LLM_PROVEEDOR:reglas}
+    maximo-tokens: 400
+    gemini:
+      llave: ${GEMINI_API_KEY:}
+      modelo: ${GEMINI_MODELO:gemini-3.5-flash-lite}
+
+# Solo /actuator/health; RabbitMQ no cuenta para la salud.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    rabbit:
+      enabled: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
