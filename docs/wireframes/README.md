@@ -51,12 +51,12 @@
 | WF-25-eventos-gestor.puml (+ `.png`) | Eventos, panel del gestor, y Registrar evento **(nuevo)** | Registrar evento en agenda (con el flujo «Consultar eventos registrados») | RF25 | **Sí** (iteración E, sesión B2; `/gestor/eventos` y `/gestor/eventos/nuevo`). **Propuesto por arquitectura y validado por el equipo** |
 | WF-26-agenda-eventos.puml (+ `.png`) | Agenda de eventos **(nuevo)** | Consultar agenda de eventos | RF25 | **Sí** (iteración E, sesión B2; `/agenda`, pública). **Propuesto por arquitectura y validado por el equipo** |
 | WF-06-detalle-atractivo.puml (+ `.png`) | Ficha pública de un atractivo **(nuevo)** | Consultar detalle de atractivo | RF06, RF07, RF24, RF27, RF33, RF58 | **Sí** (iteración E, sesión B1; `/atractivos/:id`). **Propuesto por arquitectura y validado por el equipo** |
-| WF-27-28-recuperar-contrasena.puml (+ `.png`) | Recuperar y restablecer contraseña **(nuevo)** | Recuperar contraseña | RF34 | **Sí** (iteración F; `/recuperar` y `/restablecer`). **Propuesto por arquitectura** |
-| WF-29-30-notificaciones-auditoria.puml (+ `.png`) | Campana de notificaciones y Auditoría **(nuevo)** | Notificar cambios de reserva; Consultar log de auditoría | RF63, RF30, RF13 | **Sí** (iteración G; campana en el encabezado y `/admin/auditoria`). **Propuesto por arquitectura** |
-| WF-31-32-itinerarios-conocimiento.puml (+ `.png`) | Mis itinerarios y Base de conocimientos **(nuevo)** | Guardar itinerario; Gestionar base de conocimientos | RF35, RF05 | **Sí** (iteración L; `/perfil/itinerarios` y `/admin/conocimiento`). **Propuesto por arquitectura** |
-| WF-33-34-calificaciones-moderacion.puml (+ `.png`) | Calificaciones recibidas y Moderación **(nuevo)** | Consultar calificaciones recibidas; Moderar calificaciones; Reportar información falsa | RF56, RF29, RF57 | **Sí** (iteración H; `/prestador/calificaciones` y `/admin/moderacion`). **Propuesto por arquitectura** |
-| WF-35-37-tableros.puml (+ `.png`) | Tableros, Mi panel y Reporte de afluencia **(nuevo)** | Consultar tableros; Consultar panel del prestador; Consultar reporte de afluencia | RF14, RF31, RF64 | **Sí** (iteración K; `/tableros`, `/prestador/panel` y `/gestor/afluencia`). **Propuesto por arquitectura** |
-| WF-38-40-oferta-prestador.puml (+ `.png`) | Oferta y disponibilidad, Historial de modificaciones, Asistentes y galería de WF-18 **(nuevo)** | Modificar oferta; Consultar historial de modificaciones; Exportar asistentes; Editar galería del servicio | RF19, RF41, RF42, RF48 | **Sí** (iteración I; `/prestador/servicios/:id/oferta`, `/prestador/historial-modificaciones`, `/prestador/asistentes` y el detalle de WF-18). **Propuesto por arquitectura** |
+| WF-27-28-recuperar-contrasena.puml (+ `.png`) | Recuperar y restablecer contraseña **(nuevo)** | Recuperar contraseña | RF34 | **Sí** (iteración F; `/recuperar` y `/restablecer`). **Propuesto por arquitectura y validado por el equipo** (DEC-319) |
+| WF-29-30-notificaciones-auditoria.puml (+ `.png`) | Campana de notificaciones y Auditoría **(nuevo)** | Notificar cambios de reserva; Consultar log de auditoría | RF63, RF30, RF13 | **Sí** (iteración G; campana en el encabezado y `/admin/auditoria`). **Propuesto por arquitectura y validado por el equipo** (DEC-319) |
+| WF-31-32-itinerarios-conocimiento.puml (+ `.png`) | Mis itinerarios y Base de conocimientos **(nuevo)** | Guardar itinerario; Gestionar base de conocimientos | RF35, RF05 | **Sí** (iteración L; `/perfil/itinerarios` y `/admin/conocimiento`). **Propuesto por arquitectura y validado por el equipo** (DEC-319) |
+| WF-33-34-calificaciones-moderacion.puml (+ `.png`) | Calificaciones recibidas y Moderación **(nuevo)** | Consultar calificaciones recibidas; Moderar calificaciones; Reportar información falsa | RF56, RF29, RF57 | **Sí** (iteración H; `/prestador/calificaciones` y `/admin/moderacion`). **Propuesto por arquitectura y validado por el equipo** (DEC-319) |
+| WF-35-37-tableros.puml (+ `.png`) | Tableros, Mi panel y Reporte de afluencia **(nuevo)** | Consultar tableros; Consultar panel del prestador; Consultar reporte de afluencia | RF14, RF31, RF64 | **Sí** (iteración K; `/tableros`, `/prestador/panel` y `/gestor/afluencia`). **Propuesto por arquitectura y validado por el equipo** (DEC-319) |
+| WF-38-40-oferta-prestador.puml (+ `.png`) | Oferta y disponibilidad, Historial de modificaciones, Asistentes y galería de WF-18 **(nuevo)** | Modificar oferta; Consultar historial de modificaciones; Exportar asistentes; Editar galería del servicio | RF19, RF41, RF42, RF48 | **Sí** (iteración I; `/prestador/servicios/:id/oferta`, `/prestador/historial-modificaciones`, `/prestador/asistentes` y el detalle de WF-18). **Propuesto por arquitectura y validado por el equipo** (DEC-319) |
 | WF-05-06-11-cambios-turista.puml (+ `.png`) | Cambios en WF-05, WF-06 y WF-11 **(nuevo)** | Consultar historial de búsquedas, Guardar favoritos, Compartir reserva completada | RF60, RF54, RF49 | **Sí** (sesión B de B1). **Propuesto por arquitectura y validado por el equipo** |
 
 ## WF-01 — Inicio de sesión
@@ -223,13 +223,13 @@ Migas: Inicio y búsqueda › Panel del gestor › Registrar atractivo. Seccione
 
 ## WF-27 y WF-28 — Recuperar y restablecer la contraseña (nuevos)
 
-**Estado: propuestos por arquitectura** (plan del 100 %, iteración F, DEC-288). Wireframe en Salt (`WF-27-28-recuperar-contrasena.puml`), solo de estructura. CU «Recuperar contraseña» (RF34). Pantallas públicas con el encabezado y el pie reducidos de WF-01, sin imagen; se llega desde «¿Olvidaste tu contraseña?» de WF-01, que deja de estar deshabilitado.
+**Estado: propuestos por arquitectura y validados por el equipo** (DEC-319; plan del 100 %, iteración F, DEC-288). Wireframe en Salt (`WF-27-28-recuperar-contrasena.puml`), solo de estructura. CU «Recuperar contraseña» (RF34). Pantallas públicas con el encabezado y el pie reducidos de WF-01, sin imagen; se llega desde «¿Olvidaste tu contraseña?» de WF-01, que deja de estar deshabilitado.
 - **WF-27** (`/recuperar`): tarjeta «Recuperar contraseña» con el correo, «Enviar enlace» y «Volver a iniciar sesión». Al enviar, el mismo mensaje exista o no la cuenta (ADR-006), con la vigencia de 30 minutos y el uso único.
 - **WF-28** (`/restablecer#token=…`): tarjeta «Elige una contraseña nueva» con la contraseña y su confirmación (mínimo 8 caracteres). El token llega en el fragmento y se quita de la URL al leerlo. Éxito: el cambio y que las sesiones abiertas se cerraron, con «Iniciar sesión». Enlace usado, vencido o sin token: alerta con «Pedir otro enlace».
 
 ## WF-29 y WF-30 — Campana de notificaciones y Auditoría (nuevos)
 
-**Estado: propuestos por arquitectura** (plan del 100 %, iteración G, DEC-294). Wireframe en Salt (`WF-29-30-notificaciones-auditoria.puml`), solo de estructura.
+**Estado: propuestos por arquitectura y validados por el equipo** (DEC-319; plan del 100 %, iteración G, DEC-294). Wireframe en Salt (`WF-29-30-notificaciones-auditoria.puml`), solo de estructura.
 - **WF-29, campana** (encabezado común, entre ES/EN y el avatar; solo el Turista y el Prestador; RF63): botón con el contador de no leídas (9+ como máximo). El panel tiene el título, «Marcar todas como leídas» y la lista de las 20 más recientes, con el texto en el idioma activo y la fecha; las no leídas se distinguen. Cada una lleva a «Mis reservas» (Turista) o al historial de reservas (Prestador). Estados: vacía y «no responden en este momento».
 - **WF-30, Auditoría** (`/admin/auditoria`, menú del avatar del Administrador; RF13): filtros de acción y rango de fechas con «Filtrar» (en la URL); tabla con fecha y hora, usuario (los 12 últimos caracteres del id, precedidos de «…»; el id completo en el título), acción y detalle; por debajo de 40 rem, tarjetas. 20 por página.
 
@@ -239,7 +239,7 @@ Migas: Inicio y búsqueda › Panel del gestor › Registrar atractivo. Seccione
 
 ## WF-38 a WF-40 — Oferta y disponibilidad, Historial de modificaciones y Asistentes (nuevos)
 
-**Estado: propuestos por arquitectura** (plan del 100 %, iteración I, DEC-310 a DEC-313). Wireframe en Salt (`WF-38-40-oferta-prestador.puml`), solo de estructura.
+**Estado: propuestos por arquitectura y validados por el equipo** (DEC-319; plan del 100 %, iteración I, DEC-310 a DEC-313). Wireframe en Salt (`WF-38-40-oferta-prestador.puml`), solo de estructura.
 - **WF-38, Oferta y disponibilidad** (`/prestador/servicios/:id/oferta`, con «Gestionar disponibilidad» del detalle de un servicio Publicado con oferta en WF-18; RF19): rango de fechas en la URL; tabla con fecha, salida o unidad, cupos totales (editables), reservados, disponibles, estado y «Guardar cupos», «Cerrar» o «Abrir»; «Agregar una salida» (Tour) o «Agregar una fecha» (Alojamiento); «Días y horarios habituales» (plantilla de las fechas sin inventario). Los 409 se explican junto a la tabla.
 - **WF-39, Historial de modificaciones** (`/prestador/historial-modificaciones`, menú del avatar del Prestador; RF41): filtro de servicio y página en la URL; tabla con fecha y hora, servicio, tipo de cambio, fecha o unidad, valor anterior y valor nuevo, 20 por página.
 - **WF-40, Asistentes** (`/prestador/asistentes`, menú del avatar del Prestador; RF42): servicio (solo Tour y Alojamiento), fecha y salida opcional en la URL; total de personas, «Descargar CSV», «Descargar PDF» (impresión de una hoja con el listado) y la tabla con nombre, correo, teléfono, personas, salida o unidad y fechas.
@@ -248,7 +248,7 @@ Migas: Inicio y búsqueda › Panel del gestor › Registrar atractivo. Seccione
 
 ## WF-35 a WF-37 — Tableros, Mi panel y Reporte de afluencia (nuevos)
 
-**Estado: propuestos por arquitectura** (plan del 100 %, iteración K, DEC-309). Wireframe en Salt (`WF-35-37-tableros.puml`), solo de estructura.
+**Estado: propuestos por arquitectura y validados por el equipo** (DEC-319; plan del 100 %, iteración K, DEC-309). Wireframe en Salt (`WF-35-37-tableros.puml`), solo de estructura.
 - **WF-35, Tableros** (`/tableros`, menú del avatar del Administrador y del Gestor; RF14): rango de fechas con «Aplicar» (en la URL), total de reservas del periodo, reservas por día, top 3 de atractivos más consultados y turistas registrados por país.
 - **WF-36, Mi panel** (`/prestador/panel`, menú del avatar del Prestador; RF31): «Últimos 7 días» o «Últimos 30 días» (en la URL), tabla por servicio con consultas y reservas, y una barra por servicio para cada medida.
 - **WF-37, Reporte de afluencia** (`/gestor/afluencia`, menú del avatar del Gestor; RF64): rango de fechas y atractivo con «Aplicar» (en la URL), tabla por atractivo (lecturas, promedio, máximo y último nivel) y ocupación promedio por día.
@@ -256,7 +256,7 @@ Migas: Inicio y búsqueda › Panel del gestor › Registrar atractivo. Seccione
 
 ## WF-33 y WF-34 — Calificaciones recibidas y Moderación (nuevos)
 
-**Estado: propuestos por arquitectura** (plan del 100 %, iteración H, DEC-303). Wireframe en Salt (`WF-33-34-calificaciones-moderacion.puml`), solo de estructura.
+**Estado: propuestos por arquitectura y validados por el equipo** (DEC-319; plan del 100 %, iteración H, DEC-303). Wireframe en Salt (`WF-33-34-calificaciones-moderacion.puml`), solo de estructura.
 - **WF-33, Calificaciones recibidas** (`/prestador/calificaciones`, menú del avatar del Prestador; RF56): filtros de servicio y rango de fechas con «Filtrar» (en la URL), promedio general, resumen por servicio y la lista (servicio, estrellas, fecha y comentario), 20 por página. Sin datos del turista.
 - **WF-34, Moderación** (`/admin/moderacion`, menú del avatar del Administrador; RF29 y RF57): pestañas «Calificaciones» (filtro de estado; «Ocultar» o «Volver a mostrar» y «Eliminar», cada una con su motivo) y «Reportes» (filtro de estado; motivo, enlace a la ficha, fecha, descripción y «Marcar revisado»). La pestaña y el estado van en la URL.
 
@@ -264,7 +264,7 @@ Migas: Inicio y búsqueda › Panel del gestor › Registrar atractivo. Seccione
 
 ## WF-31 y WF-32 — Mis itinerarios y Base de conocimientos (nuevos)
 
-**Estado: propuestos por arquitectura** (plan del 100 %, iteración L, DEC-297 y DEC-298). Wireframe en Salt (`WF-31-32-itinerarios-conocimiento.puml`), solo de estructura.
+**Estado: propuestos por arquitectura y validados por el equipo** (DEC-319; plan del 100 %, iteración L, DEC-297 y DEC-298). Wireframe en Salt (`WF-31-32-itinerarios-conocimiento.puml`), solo de estructura.
 - **WF-31, Mis itinerarios** (`/perfil/itinerarios`, menú del avatar del Turista; RF35): «Volver a Mi perfil», contador «n de 20», una tarjeta por itinerario con el nombre, la fecha y los pasos por día (enlazados a su ficha), «Editar» (nombre, día de cada paso y «Quitar») y «Eliminar» con confirmación. Vacío: enlace al asistente.
 - **WF-32, Base de conocimientos** (`/admin/conocimiento`, menú del avatar del Administrador; RF05): formulario con categoría y contenido (contador de caracteres), lista de entradas de 10 en 10 con «Editar» y «Eliminar» (con confirmación).
 

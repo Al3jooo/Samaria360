@@ -95,10 +95,13 @@ analytics ..> auth #blue : HTTP «DEC-280»\n(JWKS; contacto del Prestador, RF30
 booking ..> auth #blue : HTTP «DEC-280»\n(contactos de asistentes, RF42)
 broker ..> chatbot #blue : AMQP «DEC-280»\n(CuentaActualizada)
 chatbot ..> auth #blue : HTTP «DEC-280»\n(JWKS)
+catalog ..> broker #blue : AMQP «DEC-321»\n(publica: ServicioDecidido,\nConsultasAgregadas, OcupacionRegistrada)
+analytics ..> broker #blue : AMQP «DEC-321»\n(publica: PromedioActualizado)
 
 note bottom of broker
   ms-catalog y ms-analytics también publican
-  (ConsultasAgregadas, PromedioActualizado; ADR-011).
+  (ServicioDecidido, ConsultasAgregadas, OcupacionRegistrada
+  y PromedioActualizado; ADR-011, DEC-321).
   El relevo HTTP de cuentas de ms-auth hacia
   ms-catalog y ms-booking se mantiene (ADR-008).
 end note
