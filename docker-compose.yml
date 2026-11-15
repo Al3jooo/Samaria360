@@ -217,7 +217,7 @@ services:
       CORREO_REMITENTE: ${CORREO_REMITENTE:-no-responder@samaria360.local}
       # Secretos de los clientes internos (DEC-280): ms-analytics lee contactos de prestadores (RF30).
       SERVICIO_ANALYTICS_SECRETO: ${SERVICIO_ANALYTICS_SECRETO:?Falta SERVICIO_ANALYTICS_SECRETO en .env}
-      SERVICIO_BOOKING_SECRETO: ${SERVICIO_BOOKING_SECRETO:-}
+      SERVICIO_BOOKING_SECRETO: ${SERVICIO_BOOKING_SECRETO:?Falta SERVICIO_BOOKING_SECRETO en .env}
       # Origen del enlace del correo de RF34 (la SPA): en la demo, https://samaria360.duckdns.org.
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8000}
       JWT_LLAVE_PRIVADA: /run/secrets/jwt_llave_privada
@@ -290,7 +290,7 @@ services:
       RABBITMQ_BOOKING_PASSWORD: ${RABBITMQ_BOOKING_PASSWORD:?Falta RABBITMQ_BOOKING_PASSWORD en .env}
       # Contactos de los turistas para el listado de asistentes de RF42 (DEC-280, DEC-312), con su secreto de cliente.
       AUTH_INTERNO_URI: http://ms-auth:8081
-      SERVICIO_BOOKING_SECRETO: ${SERVICIO_BOOKING_SECRETO:-}
+      SERVICIO_BOOKING_SECRETO: ${SERVICIO_BOOKING_SECRETO:?Falta SERVICIO_BOOKING_SECRETO en .env}
     expose:
       - "8083"
     # Con el contenedor de ms-catalog detenido, su nombre no resuelve y el DNS de Docker tarda varios segundos en
@@ -421,6 +421,8 @@ services:
     image: samaria360/frontend:0.1.0
     container_name: samaria360-frontend
     <<: *reinicio
+    # nginx sirve archivos estáticos y hace de proxy: con 64m le sobra (en reposo usa ~13 MB).
+    mem_limit: 64m
     ports:
       # Solo en 127.0.0.1, como el gateway y las bases (DEC-266): el perfil dev y los usuarios de prueba no quedan
       # expuestos a la red local. nginx sin root escucha en 8080 dentro del contenedor (frontend/Dockerfile).
