@@ -12,14 +12,15 @@ npm run build    # tsc -b + build de producción en dist/
 npm run lint     # ESLint (eslint.config.js)
 ```
 
-Para usar la app de punta a punta: `docker compose up -d` en la raíz y `./mvnw spring-boot:run -Dspring-boot.run.profiles=dev` en `ms-auth/`.
+Para usar la app de punta a punta: `docker compose up -d --build` en la raíz levanta todo el backend
+(http://localhost:8000), o solo las bases con `./mvnw` en cada servicio y Vite (README de la raíz, «Arranque local»).
 
 ## Estructura
 
 | Carpeta | Contenido |
 |---|---|
 | `src/app/` | Rutas, diseños de la plataforma y de acceso (encabezado y pie), ruta protegida, **`estilos.css` (tokens)** |
-| `src/features/<caso de uso>/` | Páginas, estado y llamadas de cada caso de uso: `auth/`, `catalogo/` (con `detalle/`, WF-06), `reservas/` (WF-10 y WF-11), `contenido/` (WF-13 y WF-15 públicas y el banner de WF-14) y `admin/` (WF-12 y la gestión de WF-13 y WF-14) |
+| `src/features/<caso de uso>/` | Páginas, estado y llamadas de cada caso de uso: `auth/` (con `registro/` y `recuperacion/`), `catalogo/` (con `detalle/`, WF-06), `reservas/` (WF-10 y WF-11), `contenido/` (WF-13 y WF-15 públicas y el banner de WF-14), `agenda/` (WF-26), `perfil/` y `favoritos/` (WF-16 y WF-17), `servicios/` (detalle común de un servicio), `prestador/` (WF-08, WF-18, WF-20 a WF-23), `oferta/` (WF-38 a WF-40), `gestor/` (WF-09, WF-24, WF-25), `afluencia/` (RF39, RF08, RF51), `calificaciones/` (RF17, WF-33, WF-34), `notificaciones/` (campana WF-29), `tableros/` (WF-35 a WF-37), `asistente/` (WF-07, WF-31, WF-32) y `admin/` (WF-12, WF-19, WF-30 y la gestión de WF-13 y WF-14) |
 | `src/shared/api/` | Cliente HTTP (`fetch` + token Bearer solo en las llamadas autenticadas, DEC-47) y almacenamiento del token y su vencimiento |
 | `src/shared/components/` | Componentes reutilizables (entre ellos `Paginacion`, `BotonNoDisponible` y `SinPermiso`), iconos e ilustraciones |
 | `src/i18n/` | Textos en `es.json` y `en.json` (RF03, RNF08) |
@@ -54,6 +55,41 @@ Versiones instaladas (`package-lock.json`) y licencias leídas de `node_modules`
 - se envía el `Referer` por defecto del navegador.
 
 Es adecuado para el prototipo; para un despliegue con tráfico real hace falta un proveedor de teselas propio o contratado. En las pruebas, Leaflet se reemplaza por `src/test/leafletSimulado.ts` (jsdom no dibuja mapas), así que no se pide ninguna tesela.
+
+## Pantallas por ruta
+
+Todas las rutas de `src/app/App.tsx`. Las privadas usan `RutaProtegida` con el rol indicado; las demás pantallas se
+cargan de forma diferida salvo el inicio y el acceso. Contratos en [`docs/sad/api/`](../docs/sad/api/); decisiones en
+`docs/trazabilidad.md` y `docs/trazabilidad/`.
+
+| Ruta | Pantalla | Componente | Acceso |
+|---|---|---|---|
+| `/login`, `/registro` | WF-01, WF-02 y WF-03 | `auth/LoginPage`, `auth/registro/RegistroPage` | Pública |
+| `/recuperar`, `/restablecer` | WF-27 y WF-28 (RF34) | `auth/recuperacion/RecuperarPage`, `RestablecerPage` | Pública |
+| `/` y `/explorar` | WF-04 y WF-05 | `catalogo/InicioPage`, `catalogo/ExplorarPage` | Pública |
+| `/servicios/:id`, `/atractivos/:id` | WF-06 | `catalogo/detalle/DetalleServicioPage`, `DetalleAtractivoPage` | Pública |
+| `/servicios/:id/reservar` | WF-10 | `reservas/ReservaPage` | Pública; reservar exige sesión de Turista |
+| `/preguntas-frecuentes`, `/terminos`, `/agenda` | WF-13, WF-15 y WF-26 | `contenido/…`, `agenda/AgendaPage` | Pública |
+| `/mis-reservas` | WF-11 | `reservas/MisReservasPage` | Turista |
+| `/perfil`, `/perfil/favoritos` | WF-16 y WF-17 | `perfil/PerfilPage`, `perfil/MisFavoritosPage` | Turista |
+| `/asistente`, `/perfil/itinerarios` | WF-07 y WF-31 (RF04, RF35, RF36, RF59) | `asistente/AsistentePage`, `asistente/MisItinerariosPage` | Turista |
+| `/prestador/servicios`, `…/nuevo`, `…/:id` | WF-18 y WF-08 (con la galería de RF48) | `prestador/MisServiciosPage`, `RegistrarServicioPage`, `DetalleMiServicioPage` | Prestador |
+| `/prestador/servicios/:id/precio`, `…/datos-comerciales` | WF-20 y WF-21 | `prestador/ActualizarPrecioPage`, `DatosComercialesPage` | Prestador |
+| `/prestador/perfil`, `/prestador/reservas` | WF-22 y WF-23 | `prestador/PerfilComercialPage`, `HistorialReservasPage` | Prestador |
+| `/prestador/servicios/:id/oferta`, `/prestador/historial-modificaciones`, `/prestador/asistentes` | WF-38, WF-39 y WF-40 (RF19, RF41, RF42) | `oferta/OfertaServicioPage`, `HistorialModificacionesPage`, `AsistentesPage` | Prestador |
+| `/prestador/calificaciones`, `/prestador/panel` | WF-33 y WF-36 (RF56, RF31) | `calificaciones/CalificacionesRecibidasPage`, `tableros/PanelPrestadorPage` | Prestador |
+| `/gestor/atractivos`, `…/nuevo`, `…/:id` | WF-24 y WF-09 (con «Registrar ocupación», RF39) | `gestor/AtractivosGestorPage`, `RegistrarAtractivoPage`, `EditarAtractivoPage` | Gestor |
+| `/gestor/eventos`, `…/nuevo` | WF-25 | `gestor/EventosGestorPage`, `RegistrarEventoPage` | Gestor |
+| `/gestor/afluencia` | WF-37 (RF64) | `tableros/ReporteAfluenciaPage` | Gestor |
+| `/tableros` | WF-35 (RF14) | `tableros/TableroGeneralPage` | Administrador y Gestor |
+| `/admin/cuentas` | WF-12 | `admin/AdministrarCuentasPage` | Administrador |
+| `/admin/servicios`, `…/:id` | WF-19 | `admin/servicios/AprobarServiciosPage`, `RevisarServicioPage` | Administrador |
+| `/admin/preguntas-frecuentes`, `/admin/avisos` | WF-13 y WF-14 (gestión) | `admin/AdministrarPreguntasPage`, `AdministrarAvisosPage` | Administrador |
+| `/admin/moderacion`, `/admin/auditoria`, `/admin/conocimiento` | WF-34, WF-30 y WF-32 (RF29, RF57, RF13, RF05) | `calificaciones/ModeracionPage`, `admin/AuditoriaPage`, `asistente/ConocimientoAdminPage` | Administrador |
+
+Elementos comunes: la campana de notificaciones (WF-29, RF63; `notificaciones/CampanaNotificaciones`) en el
+encabezado para el Turista y el Prestador, el banner de avisos (WF-14) y el selector de idioma (RF03). La sesión se
+renueva en el último minuto si hubo actividad, hasta 8 horas (DEC-317).
 
 ## Reservas (WF-06, WF-10 y WF-11)
 
