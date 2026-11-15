@@ -96,6 +96,8 @@ export function ReporteAfluenciaPage() {
             <p>{t('tableros.afluencia.vacio')}</p>
           ) : (
             <>
+              {/* Desplazable con el teclado (tabIndex) para que la tabla no ensanche la página a 360 px. */}
+              <div className="tablero__tabla-contenedor" role="region" aria-label={t('tableros.afluencia.tabla')} tabIndex={0}>
               <table>
                 <caption className="solo-lector">{t('tableros.afluencia.tabla')}</caption>
                 <thead>
@@ -132,6 +134,7 @@ export function ReporteAfluenciaPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
               <Columnas
                 titulo={t('tableros.afluencia.porDia')}
                 unidad={t('tableros.afluencia.porcentaje')}

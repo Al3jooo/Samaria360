@@ -676,9 +676,11 @@
 
   .admin__tabla td {
     display: grid;
-    grid-template-columns: 7rem 1fr;
+    /* minmax(0, 1fr): los ids largos del detalle (UUID, ObjectId) no ensanchan la tarjeta a 360 px. */
+    grid-template-columns: 7rem minmax(0, 1fr);
     gap: var(--espacio-2);
     border: 0;
+    overflow-wrap: anywhere;
     padding-block: var(--espacio-1);
   }
 

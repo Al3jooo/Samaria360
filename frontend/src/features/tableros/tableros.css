@@ -122,6 +122,12 @@
   font-size: var(--texto-sm);
 }
 
+/* Tablas de varias columnas (WF-36, WF-37): a 360 px se desplazan dentro de su contenedor, sin ensanchar la página. */
+.tablero__tabla-contenedor {
+  max-inline-size: 100%;
+  overflow-x: auto;
+}
+
 .grafico__tabla th,
 .grafico__tabla td,
 .tablero table th,
