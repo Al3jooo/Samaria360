@@ -20,7 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
         "samaria360.limite-tasa.login.maximo=2",
         "samaria360.limite-tasa.login.ventana=1m",
         "samaria360.limite-tasa.registro.maximo=1",
-        "samaria360.limite-tasa.registro.ventana=10m"})
+        "samaria360.limite-tasa.registro.ventana=10m",
+        "samaria360.limite-tasa.recuperacion.maximo=1",
+        "samaria360.limite-tasa.recuperacion.ventana=10m"})
 class LimiteTasaTest {
 
     static final ServicioSimulado AUTH = ServicioSimulado.iniciar("ms-auth").responder(200, "{\"token\":\"t\"}");
@@ -96,6 +98,22 @@ class LimiteTasaTest {
 
         // El login de la misma dirección no se ve afectado por el cupo del registro.
         login("10.0.0.4").expectStatus().isOk();
+    }
+
+    /** RF34 (DEC-285): pedir el enlace y restablecer comparten un cupo propio, distinto del registro. */
+    @Test
+    void laRecuperacionTieneSuPropioCupoYCubreLosDosPasos() {
+        cliente.post().uri("/api/v1/auth/recuperacion").header("X-Forwarded-For", "10.0.0.6")
+                .contentType(MediaType.APPLICATION_JSON).bodyValue("{}").exchange()
+                .expectStatus().isOk();
+        cliente.post().uri("/api/v1/auth/recuperacion/restablecimiento").header("X-Forwarded-For", "10.0.0.6")
+                .contentType(MediaType.APPLICATION_JSON).bodyValue("{}").exchange()
+                .expectStatus().isEqualTo(429)
+                .expectBody().jsonPath("$.codigo").isEqualTo("DEMASIADAS_SOLICITUDES");
+
+        cliente.post().uri("/api/v1/auth/registro/turista").header("X-Forwarded-For", "10.0.0.6")
+                .contentType(MediaType.APPLICATION_JSON).bodyValue("{}").exchange()
+                .expectStatus().isOk();
     }
 
     @Test

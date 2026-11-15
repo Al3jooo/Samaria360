@@ -28,12 +28,16 @@ class EnrutamientoTest {
     static final ServicioSimulado AUTH = ServicioSimulado.iniciar("ms-auth").responder(200, "{\"token\":\"t\"}");
     static final ServicioSimulado CATALOGO = ServicioSimulado.iniciar("ms-catalog").responder(200, "{\"elementos\":[]}");
     static final ServicioSimulado RESERVAS = ServicioSimulado.iniciar("ms-booking").responder(201, "{\"estado\":\"Confirmada\"}");
+    static final ServicioSimulado ANALITICA = ServicioSimulado.iniciar("ms-analytics").responder(200, "{\"elementos\":[]}");
+    static final ServicioSimulado ASISTENTE = ServicioSimulado.iniciar("ms-chatbot").responder(200, "{\"respuesta\":\"hola\"}");
 
     @DynamicPropertySource
     static void destinos(DynamicPropertyRegistry registro) {
         registro.add("AUTH_URI", AUTH::uri);
         registro.add("CATALOG_URI", CATALOGO::uri);
         registro.add("BOOKING_URI", RESERVAS::uri);
+        registro.add("ANALYTICS_URI", ANALITICA::uri);
+        registro.add("CHATBOT_URI", ASISTENTE::uri);
     }
 
     @AfterAll
@@ -41,6 +45,8 @@ class EnrutamientoTest {
         AUTH.close();
         CATALOGO.close();
         RESERVAS.close();
+        ANALITICA.close();
+        ASISTENTE.close();
     }
 
     @Autowired
@@ -54,6 +60,29 @@ class EnrutamientoTest {
         AUTH.limpiar();
         CATALOGO.limpiar();
         RESERVAS.limpiar();
+        ANALITICA.limpiar();
+        ASISTENTE.limpiar();
+    }
+
+    /** DEC-297: el prefijo de ms-chatbot llega sin reescribir, con el cuerpo y el token. */
+    @Test
+    void elPrefijoDelAsistenteLlegaAMsChatbot() {
+        cliente.post().uri("/api/v1/chatbot/mensajes").header(HttpHeaders.AUTHORIZATION, "Bearer a.b.c")
+                .contentType(MediaType.APPLICATION_JSON).bodyValue("{\"mensaje\":\"hola\"}")
+                .exchange().expectStatus().isOk();
+
+        assertThat(ASISTENTE.ultima().uri()).isEqualTo("/api/v1/chatbot/mensajes");
+        assertThat(ASISTENTE.ultima().cabecera(HttpHeaders.AUTHORIZATION)).isEqualTo("Bearer a.b.c");
+    }
+
+    /** DEC-292: el prefijo de ms-analytics llega sin reescribir, con su query string y el token. */
+    @Test
+    void elPrefijoDeAnaliticaLlegaAMsAnalytics() {
+        cliente.get().uri("/api/v1/analytics/notificaciones?pagina=1").header(HttpHeaders.AUTHORIZATION, "Bearer x.y.z")
+                .exchange().expectStatus().isOk();
+
+        assertThat(ANALITICA.ultima().uri()).isEqualTo("/api/v1/analytics/notificaciones?pagina=1");
+        assertThat(ANALITICA.ultima().cabecera(HttpHeaders.AUTHORIZATION)).isEqualTo("Bearer x.y.z");
     }
 
     @Test
@@ -154,9 +183,8 @@ class EnrutamientoTest {
 
     @Test
     void unaRutaDesconocidaDa404SinLlegarANingunServicio() {
-        // El chatbot todavía no existe: su prefijo no tiene ruta.
-        cliente.get().uri("/api/v1/chatbot/mensajes").exchange().expectStatus().isNotFound();
         cliente.get().uri("/otra-cosa").exchange().expectStatus().isNotFound();
+        cliente.get().uri("/api/v1/otro-servicio/x").exchange().expectStatus().isNotFound();
 
         assertThat(AUTH.solicitudes()).isEmpty();
         assertThat(CATALOGO.solicitudes()).isEmpty();
@@ -224,6 +252,22 @@ class EnrutamientoTest {
         String generado = resultado.getResponseHeaders().getFirst(CORRELACION);
         assertThat(UUID.fromString(generado)).isNotNull();
         assertThat(CATALOGO.ultima().cabecera(CORRELACION)).isEqualTo(generado);
+    }
+
+    /**
+     * DEC-314: X-Forwarded-For (el de nginx) llega al servicio. ms-catalog cuenta solo las consultas que lo traen
+     * (DEC-307); sin trusted-proxies el gateway lo quitaba y RF14 y RF31 quedaban sin datos.
+     */
+    @Test
+    void elXForwardedForDeNginxLlegaAlServicio() {
+        cliente.get().uri("/api/v1/catalogo/atractivos/6ad2be3e06a2d5c9d602cec9")
+                .header("X-Forwarded-For", "203.0.113.7")
+                .exchange()
+                .expectStatus().isOk();
+
+        // El gateway agrega la dirección del proxy de confianza que llamó (nginx; aquí, loopback). Las direcciones que
+        // no son de confianza no se reenvían: a ms-catalog le basta con que la cabecera exista.
+        assertThat(CATALOGO.ultima().cabecera("X-Forwarded-For")).isEqualTo("127.0.0.1");
     }
 
     @Test

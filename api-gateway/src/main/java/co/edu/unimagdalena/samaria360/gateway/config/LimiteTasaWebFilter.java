@@ -49,6 +49,8 @@ public class LimiteTasaWebFilter implements WebFilter, Ordered {
     private static final Logger LOG = LoggerFactory.getLogger(LimiteTasaWebFilter.class);
     private static final String LOGIN = "/api/v1/auth/login";
     private static final String REGISTRO = "/api/v1/auth/registro/";
+    /** RF34 (DEC-285): pedir el enlace y restablecer comparten un cupo propio, como el registro (ADR-006). */
+    private static final String RECUPERACION = "/api/v1/auth/recuperacion";
 
     private final LimiteTasaPropiedades propiedades;
     private final ObjectMapper json;
@@ -79,6 +81,9 @@ public class LimiteTasaWebFilter implements WebFilter, Ordered {
         } else if (ruta != null && ruta.startsWith(REGISTRO)) {
             grupo = "registro";
             regla = propiedades.registro();
+        } else if (RECUPERACION.equals(ruta) || (ruta != null && ruta.startsWith(RECUPERACION + "/"))) {
+            grupo = "recuperacion";
+            regla = propiedades.recuperacion();
         } else {
             return chain.filter(exchange);
         }

@@ -25,7 +25,7 @@ public class FallbackController {
 
     private static final Logger LOG = LoggerFactory.getLogger(FallbackController.class);
     private static final Map<String, String> SERVICIOS = Map.of("auth", "ms-auth", "catalogo", "ms-catalog",
-            "reservas", "ms-booking");
+            "reservas", "ms-booking", "analitica", "ms-analytics", "asistente", "ms-chatbot");
 
     @RequestMapping("/fallback/{ruta}")
     public ResponseEntity<ProblemDetail> servicioNoDisponible(@PathVariable String ruta, ServerWebExchange exchange) {
