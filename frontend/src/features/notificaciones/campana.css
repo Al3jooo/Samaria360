@@ -55,6 +55,21 @@
   box-shadow: var(--sombra-3);
 }
 
+/*
+ * En pantallas angostas la campana no está en el borde derecho: alineado a ella, el panel se salía por la izquierda
+ * (a 360 px quedaba en -40 px). Ahí se ancla al encabezado (sticky, contenedor del panel), con los márgenes laterales.
+ */
+@media (max-width: 30rem) {
+  .campana {
+    position: static;
+  }
+
+  .campana__panel {
+    inset-inline: var(--espacio-4);
+    inline-size: auto;
+  }
+}
+
 .campana__cabecera {
   display: flex;
   align-items: center;

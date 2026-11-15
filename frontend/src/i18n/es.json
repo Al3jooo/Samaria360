@@ -1661,7 +1661,7 @@
     "titulo": "Asistente Virtual IA",
     "enLinea": "En línea",
     "subtitulo": "responde en segundos con los datos de Samaria360: atractivos, servicios publicados y la información oficial del municipio.",
-    "beta": "Asistente en versión beta: las recomendaciones usan solo el catálogo de Samaria360 y la base de conocimientos del municipio. Confirma el aforo y el estado de los senderos antes de salir.",
+    "beta": "Asistente en versión beta: las recomendaciones usan solo el catálogo de Samaria360 y la base de conocimientos del municipio. Confirma la afluencia y el estado de los senderos antes de salir.",
     "cerrarBeta": "Cerrar el aviso",
     "conversacion": "Conversación con el asistente",
     "autorAsistente": "Asistente IA",
@@ -1675,7 +1675,7 @@
     "verItinerarios": "Ver mis itinerarios",
     "sugerenciasRapidas": "Preguntas rápidas",
     "chips": {
-      "aforo": "Aforo en vivo",
+      "aforo": "Afluencia en vivo",
       "rutas": "Rutas alternas",
       "toursManana": "Tours mañana",
       "alquiler": "Alquiler de equipos"
@@ -1711,7 +1711,7 @@
     "sinPrestadores": "Los servicios que sugiera el asistente aparecerán aquí.",
     "ayuda": {
       "titulo": "El asistente también puede ayudarte con",
-      "aforosTitulo": "Aforos en vivo",
+      "aforosTitulo": "Afluencia en vivo",
       "aforos": "Qué atractivos están abiertos y cuáles conviene visitar según su estado.",
       "rutasTitulo": "Rutas y clima",
       "rutas": "Recomendaciones y normas del municipio de la base de conocimientos, como el clima o los cierres.",
