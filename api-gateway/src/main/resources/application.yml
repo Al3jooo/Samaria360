@@ -19,6 +19,12 @@ spring:
     gateway:
       server:
         webflux:
+          # Desde Spring Cloud Gateway 4.1 las cabeceras X-Forwarded-* solo se conservan y se agregan si quien llama es
+          # un proxy de confianza; sin esto el gateway las quitaba y ms-catalog no contaba ninguna consulta a las fichas
+          # (DEC-307: cuenta solo lo que llega con X-Forwarded-For, RF14 y RF31). De confianza: nginx y el host, es
+          # decir, las direcciones privadas y de loopback de la red de Docker (DEC-314). Se ajusta con
+          # GATEWAY_PROXIES_CONFIABLES.
+          trusted-proxies: ${GATEWAY_PROXIES_CONFIABLES:10\..*|172\.(1[6-9]|2[0-9]|3[01])\..*|192\.168\..*|127\..*|0:0:0:0:0:0:0:1|::1}
           httpclient:
             connect-timeout: 2000 # ms
             response-timeout: 5s
@@ -59,6 +65,28 @@ spring:
                     # no responde, y debe llegar tal cual. Si ms-booking no responde (conexión rechazada o tiempo
                     # agotado), sí va al fallback (servicio: ms-booking).
                     statusCodes: [502, 504]
+            # ms-analytics (plan del 100 %, DEC-292): auditoría, notificaciones y, después, calificaciones y tableros.
+            - id: analitica
+              uri: ${ANALYTICS_URI:http://localhost:8084}
+              predicates:
+                - Path=/api/v1/analytics/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: analitica
+                    fallbackUri: forward:/fallback/analitica
+                    statusCodes: [502, 503, 504]
+            # ms-chatbot (plan del 100 %, DEC-297): asistente virtual, itinerarios y base de conocimientos.
+            - id: asistente
+              uri: ${CHATBOT_URI:http://localhost:8085}
+              predicates:
+                - Path=/api/v1/chatbot/**
+              filters:
+                - name: CircuitBreaker
+                  args:
+                    name: asistente
+                    fallbackUri: forward:/fallback/asistente
+                    statusCodes: [502, 503, 504]
           globalcors:
             cors-configurations:
               '[/**]':
@@ -78,6 +106,10 @@ samaria360:
       maximo: 10
       ventana: 1m
     registro:
+      maximo: 5
+      ventana: 10m
+    # RF34 (DEC-285): pedir el enlace de recuperación y restablecer, con el mismo cupo que el registro.
+    recuperacion:
       maximo: 5
       ventana: 10m
 

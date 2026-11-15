@@ -14,11 +14,12 @@ import java.util.Objects;
  * @param registro {@code POST /api/v1/auth/registro/**} (turista y prestador comparten el cupo)
  */
 @ConfigurationProperties(prefix = "samaria360.limite-tasa")
-public record LimiteTasaPropiedades(Regla login, Regla registro) {
+public record LimiteTasaPropiedades(Regla login, Regla registro, Regla recuperacion) {
 
     public LimiteTasaPropiedades {
         Objects.requireNonNull(login, "samaria360.limite-tasa.login");
         Objects.requireNonNull(registro, "samaria360.limite-tasa.registro");
+        Objects.requireNonNull(recuperacion, "samaria360.limite-tasa.recuperacion");
     }
 
     /**
