@@ -47,8 +47,11 @@
   inset-inline-end: 0;
   z-index: 30;
   inline-size: min(22rem, calc(100vw - 2rem));
-  max-block-size: 26rem;
+  /* Encabezado sticky: en un celular horizontal el panel no puede pasar del alto de la ventana. */
+  max-block-size: min(26rem, calc(100vh - var(--alto-encabezado) - var(--espacio-6)));
+  max-block-size: min(26rem, calc(100dvh - var(--alto-encabezado) - var(--espacio-6)));
   overflow-y: auto;
+  overscroll-behavior: contain;
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-md);
   background: var(--color-superficie);
