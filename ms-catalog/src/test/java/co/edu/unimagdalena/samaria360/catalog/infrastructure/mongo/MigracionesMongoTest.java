@@ -70,7 +70,7 @@ class MigracionesMongoTest {
             "M005__faq-avisos", "M006__semilla-faq-avisos", "M007__favoritos-historial", "M008__registro-servicios",
             "M009__semilla-direccion-rnt", "M010__coordenadas-rodadero", "M011__servicios-version",
             "M012__atractivos-gestion", "M013__eventos", "M014__outbox-eventos", "M015__calificacion", "M016__afluencia",
-            "M017__historial-modificaciones");
+            "M017__historial-modificaciones", "M018__horario-tour-minca");
     /** Fuera del plano básico: un punto de código, dos unidades UTF-16. */
     private static final String EMOJI = "🌴";
     private static final int VALIDACION_DOCUMENTO_FALLIDA = 121;
@@ -124,6 +124,18 @@ class MigracionesMongoTest {
             if (cliente != null) {
                 cliente.close();
             }
+        }
+    }
+
+    @Test
+    void elHorarioDeMincaCoincideConLaOfertaEnVolumenNuevoYExistente() {
+        for (MongoDatabase base : List.of(nuevo, existente)) {
+            Document tour = base.getCollection("servicios")
+                    .find(Filters.eq("nombreComercial", "Tour de Café en Minca")).first();
+            assertThat(tour).isNotNull();
+            assertThat(tour.getString("horarioAtencion")).isEqualTo("Salidas diarias a las 8:00 a. m. y 2:00 p. m.");
+            assertThat(tour.get("oferta", Document.class).getList("salidas", String.class))
+                    .containsExactly("08:00", "14:00");
         }
     }
 
@@ -548,12 +560,13 @@ class MigracionesMongoTest {
         }
     }
 
-    /** M011 (DEC-186): todos los servicios anteriores reciben la versión 0, como int32. */
+    /** M011 recibe int32; M018 sube la versión del único servicio cuyo texto corrige. */
     @Test
     void m011RellenaLaVersionEnTodosLosServiciosEnVolumenNuevoYExistente() {
         for (MongoDatabase base : List.of(nuevo, existente)) {
             for (Document servicio : base.getCollection("servicios").find()) {
-                assertThat(servicio.get("version")).as(servicio.getString("nombreComercial")).isEqualTo(0);
+                int esperada = "Tour de Café en Minca".equals(servicio.getString("nombreComercial")) ? 1 : 0;
+                assertThat(servicio.get("version")).as(servicio.getString("nombreComercial")).isEqualTo(esperada);
             }
         }
     }
