@@ -60,6 +60,16 @@ marcha. Pico de memoria del sistema durante la carga: unos 2,8 GB (`docker stats
 |---|---|---|---|
 | Local, nginx con una conexión nueva por petición | 203 012 | **11,97 %** (503 de nginx: `connect() failed (99: Address not available)`) | 35 a 40 ms |
 | Local, nginx con conexiones persistentes al gateway (DEC-325) | 207 702 (454/s) | **0 %** | avisos 5,8 · oferta 7,8 · resumen 6,3 · detalle 6,1 · calificaciones 8,7 · disponibilidad 6,0 · atractivo 5,8 · afluencia 7,0 ms |
+| Demo pública (perfil `demo`, 2026-11-16), primera corrida | 59 474 | 68,2 % (`connect: connection refused` desde el primer segundo, con 10 usuarios) | 560 a 861 ms (solo las que respondieron) |
+| Demo pública (perfil `demo`, 2026-11-16), segunda corrida | 83 111 (383/s) | **0,01 %** (11) | 206 a 261 ms |
+
+**La primera corrida en la demo** se descarta como medición: los rechazos empezaron con 10 usuarios, cuando la VM
+estaba casi ociosa (CPU máxima del 60 % en el gateway, 2,2 GB en uso) y sin reinicios ni errores en Caddy. Fue un
+corte transitorio en la red de salida del equipo que ejecutaba k6: a continuación, 200 conexiones paralelas desde
+Docker y la segunda corrida completa pasaron sin problema. En la demo el p95 incluye la ida y vuelta por internet; la
+VM (2 vCPU, 12 GB) usó como máximo 2,2 GB durante la carga. Después de las corridas se restauró la colección
+`consultas` de analytics_db en la VM con un respaldo previo, para que los tableros (RF14, RF31) no queden con las
+consultas de k6.
 
 **Defecto encontrado (DEC-325).** nginx abría una conexión TCP nueva hacia el gateway en cada petición. A unas
 440 peticiones/s, los sockets en `TIME_WAIT` agotaban los puertos efímeros del contenedor (32768 a 60999, 60 s cada
@@ -109,6 +119,30 @@ Resultado (2026-11-15, local, sistema completo): **9 de 9 por debajo de 2 s** (c
 
 Las fichas siguen con el menor margen: ahora cargan además las calificaciones (y, en el atractivo, la afluencia y
 los alternativos); una de las tres corridas de `/servicios/:id` pasó de 2 s.
+
+**Demo pública (2026-11-16, `bash infra/carga/rnf02-carga-pagina.sh https://samaria360.duckdns.org`):** con HTTPS,
+Caddy y la latencia real por internet. 7 de 9 por debajo de 2 s en la primera pasada; las dos que fallaron se
+repitieron con 3 corridas más:
+
+| Página | LCP mediano (máx.) | TTI | Peso |
+|---|---|---|---|
+| `/` | 1,68 s (1,77) | 1,88 s | 668 KB |
+| `/explorar?texto=playa` | 1,79 s (1,80) | 1,97 s | 349 KB |
+| `/servicios/:id` | 1,91 s (1,91) | 1,82 s | 385 KB |
+| `/servicios/:id/reservar` | 1,97 s (1,99) | 1,86 s | 276 KB |
+| `/atractivos/:id` | 2,34 s (2,38); repetida: **1,98 s** (2,04) | 2,24 s; repetida: 1,79 s | 564 KB |
+| `/agenda` | 1,53 s (1,60) | 1,41 s | 260 KB |
+| `/preguntas-frecuentes` | 1,62 s (2,53) | 1,59 s | 259 KB |
+| `/login` | 1,39 s (1,55) | 1,36 s | 256 KB |
+| `/recuperar` | 3,52 s (3,75); repetida: **1,32 s** (1,37) | 3,64 s; repetida: 1,43 s | 256 KB |
+
+- **`/recuperar`:** en la primera pasada el propio documento HTML tardó de 0,75 a 2,67 s en llegar, cuando en
+  `/login` (el mismo `index.html`) tardó 0,26 s. Fue una variación de red de ese momento: repetida, 1,32 s.
+- **`/atractivos/:id` queda en el límite** en la demo: LCP de 1,91 a 2,38 s según la corrida (mediana 1,98 s al
+  repetir). Es la ficha más pesada (fotos, afluencia, alternativos y calificaciones). Para tener margen haría falta
+  aligerarla, por ejemplo con imágenes más livianas o diferidas.
+- La resiliencia (RNF01) no se corre en la demo: detendría servicios de la demo pública; el mecanismo se probó en
+  local con la misma imagen de Compose.
 
 Resultado anterior (2026-11-14, local, sistema del 62 %): 8 de 8 por debajo de 2 s. LCP mediano de 1,21 s (`/login`) a 1,64 s
 (`/servicios/:id/reservar`); TTI máximo 1,61 s. Las fichas de detalle tienen el menor margen (una corrida aislada de
