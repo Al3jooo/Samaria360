@@ -53,6 +53,7 @@ export function MapaSoloLectura({
       capa.current = null
     }
     // El mapa se crea una vez; el pin y el encuadre siguen a las coordenadas (efecto de abajo).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

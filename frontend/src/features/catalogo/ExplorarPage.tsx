@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect, useId, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { AccionNoDisponible } from '../../shared/components/BotonNoDisponible'
@@ -10,7 +10,7 @@ import type { CriteriosBusqueda, Orden, PaginaOferta, ResultadoOferta, Ubicacion
 import { BotonUbicacion } from './componentes/BotonUbicacion'
 import { EstadoCatalogo } from './componentes/EstadoCatalogo'
 import { FiltrosOferta, type CambiosFiltros } from './componentes/FiltrosOferta'
-import { MapaOferta, claveResultado, type FavoritoPopup } from './componentes/MapaOferta'
+import { claveResultado, type FavoritoPopup } from './componentes/contratoMapa'
 import { Paginacion } from '../../shared/components/Paginacion'
 import { TarjetaOferta } from './componentes/TarjetaOferta'
 import { UltimasBusquedas, type EstadoRepetir } from './componentes/UltimasBusquedas'
@@ -26,6 +26,8 @@ import './catalogo.css'
 const ORDENES_DISPONIBLES: Orden[] = ['Calificacion', 'PrecioAscendente', 'PrecioDescendente', 'Nombre']
 
 const SIN_RESULTADOS: ResultadoOferta[] = []
+// La lista y sus filtros pueden mostrarse mientras se descarga Leaflet.
+const MapaOferta = lazy(() => import('./componentes/MapaOferta').then((m) => ({ default: m.MapaOferta })))
 
 type Vista = 'lista' | 'mapa'
 
@@ -331,17 +333,19 @@ export function ExplorarPage() {
           <h2 id={`${id}-mapa`} className="explorar__mapa-titulo">
             {t('explorar.mapa')}
           </h2>
-          <MapaOferta
-            resultados={resultadosMapa}
-            ubicacion={ubicacion}
-            ubicacionLejana={geo.estado === 'disponible' && geo.lejos}
-            centrado={geo.centrado}
-            visible={esEscritorio || vista === 'mapa'}
-            resaltada={resaltada}
-            onSeleccionar={seleccionarDesdeMapa}
-            onVerDetalle={verDetalle}
-            favorito={favoritoPopup}
-          />
+          <Suspense fallback={<EstadoCatalogo tipo="cargando" />}>
+            <MapaOferta
+              resultados={resultadosMapa}
+              ubicacion={ubicacion}
+              ubicacionLejana={geo.estado === 'disponible' && geo.lejos}
+              centrado={geo.centrado}
+              visible={esEscritorio || vista === 'mapa'}
+              resaltada={resaltada}
+              onSeleccionar={seleccionarDesdeMapa}
+              onVerDetalle={verDetalle}
+              favorito={favoritoPopup}
+            />
+          </Suspense>
           <div className="leyenda-afluencia">
             <p className="leyenda-afluencia__titulo">
               {t('explorar.leyendaAfluencia')}

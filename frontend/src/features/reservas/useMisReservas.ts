@@ -52,7 +52,8 @@ export function useMisReservas(criterios: CriteriosReservas, habilitado: boolean
     return () => {
       vigente = false
     }
-    // La clave resume los criterios.
+    // La clave incluye fechas, estados y página; objetos equivalentes no deben repetir la petición.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clave, habilitado, intento])
 
   const recargar = useCallback(() => setIntento((n) => n + 1), [])

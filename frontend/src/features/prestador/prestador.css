@@ -4,6 +4,7 @@
 
 .prestador {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--espacio-5);
   width: min(100%, 60rem);
   margin: 0 auto;
@@ -105,11 +106,13 @@
 /* Formulario de WF-08: una sola página con secciones (DEC-163). */
 .prestador__formulario {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--espacio-5);
 }
 
 .prestador__seccion {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--espacio-4);
   padding: var(--espacio-5);
 }

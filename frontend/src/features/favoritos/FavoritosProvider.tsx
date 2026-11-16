@@ -50,7 +50,10 @@ export function FavoritosProvider({ children }: { children: ReactNode }) {
   const dueno = modo === 'turista' && sesion.estado === 'autenticado' ? sesion.usuario.idUsuario : null
 
   const [guardados, setDatos] = useState<Datos>({ dueno: null, estado: 'sinCargar', elementos: [] })
-  const datos: Datos = guardados.dueno === dueno ? guardados : { dueno, estado: 'sinCargar', elementos: [] }
+  const datos = useMemo<Datos>(
+    () => guardados.dueno === dueno ? guardados : { dueno, estado: 'sinCargar', elementos: [] },
+    [guardados, dueno],
+  )
   const [pendientes, setPendientes] = useState<ReadonlySet<string>>(new Set())
   const [anuncio, setAnuncio] = useState<AnuncioFavoritos | null>(null)
 
@@ -71,7 +74,7 @@ export function FavoritosProvider({ children }: { children: ReactNode }) {
       setPendientes(new Set())
       setAnuncio(null)
     }
-  })
+  }, [datos, dueno])
 
   const anunciar = useCallback((clave: string, error = false) => {
     numeroAnuncio.current += 1

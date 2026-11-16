@@ -10,12 +10,12 @@ describe('Cambio de idioma (RF03, RNF08)', () => {
     const { usuario } = renderApp('/login')
 
     await usuario.type(screen.getByLabelText('Correo electrónico'), 'turista@samaria360.test')
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
 
     expect(screen.getByLabelText('Email')).toHaveValue('turista@samaria360.test')
     expect(screen.getByLabelText('Password')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: 'EN · English' })).toHaveAttribute('aria-pressed', 'true')
     expect(document.documentElement.lang).toBe('en')
   }, 15_000)
 
@@ -29,7 +29,7 @@ describe('Cambio de idioma (RF03, RNF08)', () => {
     await usuario.click(screen.getByRole('button', { name: 'Iniciar sesión' }))
     expect(await screen.findByText('Correo o contraseña incorrectos.')).toBeInTheDocument()
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
 
     expect(screen.getByText('Incorrect email or password.')).toBeInTheDocument()
     expect(screen.getByLabelText('Password')).toHaveValue('incorrecta')
@@ -49,7 +49,7 @@ describe('Cambio de idioma (RF03, RNF08)', () => {
     await screen.findByRole('button', { name: /Ana Pérez/ })
     fireEvent.change(screen.getByLabelText('Precio máximo'), { target: { value: '150000' } })
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
 
     expect(await screen.findByRole('heading', { level: 2, name: /15 places found/ })).toBeInTheDocument()
     expect(screen.getByText(HOTEL.nombre)).toBeInTheDocument()

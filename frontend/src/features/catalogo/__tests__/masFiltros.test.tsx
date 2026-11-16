@@ -252,7 +252,7 @@ describe('«Más filtros» (WF-05, RF10)', () => {
     const { usuario } = renderApp('/explorar?categoria=Alojamiento&serviciosIncluidos=Desayuno&huespedes=1')
     await screen.findByRole('heading', { name: 'Hotel Casa Tayrona' })
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
     expect(screen.getByRole('button', { name: 'Remove the filter Breakfast' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Remove the filter 1 guest' })).toBeInTheDocument()
 

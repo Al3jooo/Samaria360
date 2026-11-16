@@ -10,6 +10,8 @@ import type { ResultadoOferta, Ubicacion } from '../catalogoApi'
 import { rutaDetalleOferta } from '../detalle/navegacionDetalle'
 import { CENTRO_SANTA_MARTA } from '../geo'
 import { imagenDeCategoria } from './etiquetas'
+import { claveResultado, type FavoritoPopup } from './contratoMapa'
+export { claveResultado, type FavoritoPopup } from './contratoMapa'
 
 // La política de uso de las teselas de OpenStreetMap está en shared/mapa/mapaBase.ts.
 const ZOOM_MAXIMO_ENCUADRE = 15
@@ -25,11 +27,6 @@ const SVG_UBICACION =
   '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">' +
   '<circle class="marcador__punto" cx="12" cy="12" r="8.5"/></svg>'
 
-/** Clave de un resultado en la página (la misma que usa la lista para el resaltado marcador↔tarjeta). */
-export function claveResultado(resultado: Pick<ResultadoOferta, 'tipo' | 'id'>): string {
-  return `${resultado.tipo}-${resultado.id}`
-}
-
 /** Los atractivos con afluencia vigente toman el color de su nivel (la leyenda de WF-05; RF39, DEC-306). */
 function iconoResultado(tipo: ResultadoOferta['tipo'], afluencia?: ResultadoOferta['afluencia']): L.DivIcon {
   const nivel = tipo === 'Atractivo' && afluencia ? ` marcador--afluencia-${afluencia.toLowerCase()}` : ''
@@ -44,20 +41,6 @@ function iconoResultado(tipo: ResultadoOferta['tipo'], afluencia?: ResultadoOfer
 
 function iconoUbicacion(): L.DivIcon {
   return L.divIcon({ className: 'marcador marcador--ubicacion', html: SVG_UBICACION, iconSize: [24, 24], iconAnchor: [12, 12] })
-}
-
-/**
- * Corazón del popup (RF54, DEC-94), con las mismas reglas que el de la tarjeta (DEC-93): el Turista marca o desmarca;
- * un visitante va al login; con otro rol no hay `FavoritoPopup` y no se muestra.
- */
-export interface FavoritoPopup {
-  modo: 'turista' | 'visitante'
-  /** La lista de favoritos ya cargó (si no, el corazón queda con aria-disabled). */
-  listo: boolean
-  esFavorito: (resultado: ResultadoOferta) => boolean
-  /** Resuelve con el estado final (true = es favorito). */
-  alternar: (resultado: ResultadoOferta) => Promise<boolean>
-  irALogin: () => void
 }
 
 /**
@@ -247,6 +230,7 @@ export function MapaOferta({
   })
 
   useEffect(() => {
+    const marcadoresDelMapa = marcadores.current
     const nuevo = L.map(contenedor.current!, {
       center: [CENTRO_SANTA_MARTA.latitud, CENTRO_SANTA_MARTA.longitud],
       zoom: ZOOM_INICIAL,
@@ -267,7 +251,7 @@ export function MapaOferta({
       mapa.current = null
       capaResultados.current = null
       capaUbicacion.current = null
-      marcadores.current.clear()
+      marcadoresDelMapa.clear()
     }
   }, [])
 
@@ -304,7 +288,8 @@ export function MapaOferta({
     if (ubicacion && !ubicacionLejana) puntos.push([ubicacion.latitud, ubicacion.longitud])
     puntosEncuadre.current = puntos
     encuadrar(mapa.current, puntos)
-    // Solo cuando cambian los resultados: la ubicación cambia antes que ellos (la consulta la incluye).
+    // Solo al llegar los resultados: la ubicación cambia antes que ellos (la consulta la incluye).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultados])
 
   useEffect(() => {
@@ -320,7 +305,8 @@ export function MapaOferta({
   useEffect(() => {
     if (centrado === 0 || !ubicacion || ubicacionLejana || !mapa.current) return
     mapa.current.setView([ubicacion.latitud, ubicacion.longitud], Math.max(mapa.current.getZoom(), ZOOM_UBICACION))
-    // Solo ante una nueva petición de centrar.
+    // Solo ante una petición explícita de centrar: actualizar la ubicación no debe mover el mapa del usuario.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [centrado])
 
   // Al mostrarse (selector «Lista / Mapa»), el contenedor cambió de tamaño estando oculto.

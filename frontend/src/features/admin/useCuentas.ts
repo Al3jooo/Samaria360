@@ -82,7 +82,8 @@ export function useCuentas(criterios: CriteriosAdmin) {
     return () => {
       vigente = false
     }
-    // La clave resume los criterios.
+    // La clave incluye todos los criterios; una nueva referencia equivalente no debe repetir la petición.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clave, intento])
 
   useEffect(() => {

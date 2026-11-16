@@ -134,7 +134,7 @@ describe('Asistente virtual IA (WF-07; RF04, RF35, RF36, RF59)', () => {
     const { solicitudes } = sesionTurista({ [MENSAJES]: () => respuestaJson(200, { ...RESPUESTA, itinerario: [] }) })
     const { usuario } = renderApp('/asistente')
 
-    await usuario.click(await screen.findByRole('button', { name: 'Inglés' }))
+    await usuario.click(await screen.findByRole('button', { name: 'EN · Inglés' }))
     await usuario.type(screen.getByLabelText('Your question'), 'beaches')
     await usuario.click(screen.getByRole('button', { name: 'Send' }))
 

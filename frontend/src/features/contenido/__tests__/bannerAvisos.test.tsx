@@ -42,7 +42,7 @@ describe('Banner de avisos del municipio (RF40, WF-14; DEC-67, DEC-72)', () => {
     // Debajo del encabezado y fuera del contenido principal.
     expect(screen.getByRole('banner').nextElementSibling).toBe(region)
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
     const enIngles = screen.getByRole('region', { name: 'Notices from the municipality' })
     expect(within(enIngles).getByText('Closure')).toBeInTheDocument()
     expect(within(enIngles).getByText('Weather')).toBeInTheDocument()

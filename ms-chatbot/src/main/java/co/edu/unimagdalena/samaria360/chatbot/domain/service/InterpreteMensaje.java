@@ -28,7 +28,15 @@ public class InterpreteMensaje {
             "cual", "cuales", "santa", "marta", "the", "an", "of", "in", "and", "or", "to", "for", "with", "my", "i", "want",
             "is", "are", "there", "where", "what", "which", "how", "some", "dame", "recomienda", "recomiendame",
             "recommend", "show", "muestrame", "puedes", "can", "you", "please", "favor", "hola", "hello", "hi");
-    private static final Pattern DIAS = Pattern.compile("(\\d{1,2})\\s*(dias|dia|days|day)");
+    private static final Map<String, Integer> NUMEROS = Map.ofEntries(
+            Map.entry("un", 1), Map.entry("uno", 1), Map.entry("una", 1), Map.entry("one", 1),
+            Map.entry("dos", 2), Map.entry("two", 2), Map.entry("tres", 3), Map.entry("three", 3),
+            Map.entry("cuatro", 4), Map.entry("four", 4), Map.entry("cinco", 5), Map.entry("five", 5),
+            Map.entry("seis", 6), Map.entry("six", 6), Map.entry("siete", 7), Map.entry("seven", 7),
+            Map.entry("ocho", 8), Map.entry("eight", 8), Map.entry("nueve", 9), Map.entry("nine", 9),
+            Map.entry("diez", 10), Map.entry("ten", 10));
+    private static final Pattern DIAS = Pattern.compile(
+            "(?<![a-z0-9])(\\d{1,2}|" + String.join("|", NUMEROS.keySet()) + ")[\\s-]*(?:dias?|days?)\\b");
 
     static {
         for (String clave : List.of("alojamiento", "hotel", "hostal", "hospedaje", "dormir", "habitacion", "lodging",
@@ -62,7 +70,8 @@ public class InterpreteMensaje {
         String categoriaAtractivo = null;
         boolean itinerario = false;
         List<String> palabras = new ArrayList<>();
-        for (String palabra : normal.split("[^a-z0-9]+")) {
+        // La duración es una instrucción, no un término para buscar lugares en el catálogo.
+        for (String palabra : DIAS.matcher(normal).replaceAll(" ").split("[^a-z0-9]+")) {
             if (palabra.isBlank()) {
                 continue;
             }
@@ -83,7 +92,9 @@ public class InterpreteMensaje {
         Matcher coincidencia = DIAS.matcher(normal);
         if (coincidencia.find()) {
             itinerario = true;
-            dias = Math.max(1, Math.min(Interpretacion.DIAS_MAXIMOS, Integer.parseInt(coincidencia.group(1))));
+            String numero = coincidencia.group(1);
+            int cantidad = NUMEROS.containsKey(numero) ? NUMEROS.get(numero) : Integer.parseInt(numero);
+            dias = Math.max(1, Math.min(Interpretacion.DIAS_MAXIMOS, cantidad));
         } else if (normal.contains("fin de semana") || normal.contains("weekend")) {
             dias = 2;
         }

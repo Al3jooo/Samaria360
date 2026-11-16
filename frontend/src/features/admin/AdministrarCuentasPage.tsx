@@ -149,8 +149,7 @@ export function AdministrarCuentasPage() {
     if (elementos.length === 0 && criterios.pagina > 1 && totalPaginas >= 1 && criterios.pagina > totalPaginas) {
       setParametros(escribirCriteriosAdmin({ ...criterios, pagina: totalPaginas }), { replace: true })
     }
-    // Solo cuando cambia la lista.
-  }, [estado])
+  }, [estado, criterios, setParametros])
 
   if (sinPermiso || (estado.estado === 'error' && estado.error === 'sinPermiso')) {
     return <SinPermiso />

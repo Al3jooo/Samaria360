@@ -15,7 +15,7 @@ describe('Pie de página', () => {
       ),
     ).toBeInTheDocument()
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
 
     expect(
       within(pie).getByText(
@@ -33,7 +33,7 @@ describe('Pie de página', () => {
     expect(municipio.queryByRole('link', { name: /Noticias/ })).not.toBeInTheDocument()
     expect(municipio.getByText('Noticias')).toHaveClass('enlace-deshabilitado')
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
     expect(
       within(screen.getByRole('region', { name: 'Municipality' })).getByRole('link', { name: 'Events calendar' }),
     ).toHaveAttribute('href', '/agenda')

@@ -334,7 +334,7 @@ describe('Exploración WF-05: mapa', () => {
     expect(mapaVivo().controles.map((c) => c.opciones)).toEqual([
       { position: 'topright', zoomInTitle: 'Acercar', zoomOutTitle: 'Alejar' },
     ])
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
 
     expect(mapaVivo().controles.map((c) => c.opciones)).toEqual([
       { position: 'topright', zoomInTitle: 'Zoom in', zoomOutTitle: 'Zoom out' },

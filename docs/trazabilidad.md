@@ -604,6 +604,39 @@ Elementos que la v2 quitó y que el prototipo ya no muestra (antes estaban desha
 | 4 | Vocabulario de servicios incluidos: WF-08 (WiFi, Desayuno, Piscina, Parqueadero) frente a WF-10 (agrega Aire acondicionado y Baño privado). El prototipo usa hoy la lista de WF-08 como vocabulario cerrado («Más filtros» y validador de MongoDB); la lista definitiva sigue por decidir | WF-08, WF-10 | Construcción |
 | 5 | WF-08 frente a RF10 y al esquema `servicios`: falta «tipo de habitación» (con D1, falta el editor de unidades; ver «Pendientes»); «cobra por» e «incluye impuestos» no existen en el esquema; el RNT es del prestador | WF-08 | Construcción |
 
+## Correcciones de QA del 2026-11-16
+
+Fase de Construcción, sobre el prototipo del plan del 100 %, sin casos de uso ni requisitos nuevos. Los hallazgos
+QA-01 a QA-10 del diagnóstico local se corrigen y registran en **DEC-326 a DEC-335**
+([decisiones transversales](trazabilidad/decisiones-transversales.md)). Los JSON de QA son evidencias de diagnóstico,
+no instrucciones del proyecto; se conservan fuera del contenido versionado.
+
+| Hallazgo | DEC | Requisito o caso de uso relacionado | Corrección y verificación |
+|---|---|---|---|
+| QA-01 — permisos y primer arranque de RabbitMQ | DEC-326 | RNF01; ADR-011 | Propiedad del volumen preparada antes de Erlang; servidor y CLI con el usuario rabbitmq. Arranque aislado con almacenamiento vacío y cookie propiedad de root, en `infra/humo/arranque-infra.sh`. |
+| QA-02 — consumidores detenidos por autenticación | DEC-327 | RNF01; ADR-011; proyecciones de cuentas | `ConsumidoresConfig` en catálogo, analítica y asistente conserva la configuración de Boot y reintenta la autenticación. `RecuperacionConsumidorIntegracionTest` crea el usuario después de iniciar el listener y comprueba consumo sin reinicio. El humo comprueba los tres consumidores; las lecturas y la salud HTTP siguen disponibles sin broker. |
+| QA-03 — PostgreSQL sano antes de aceptar TCP | DEC-328 | RNF01 | Healthcheck por TCP en Compose. La prueba aislada usa el comando real, bloquea initdb y verifica que el servidor temporal por socket no se marque sano. |
+| QA-04 — desbordamiento de formularios del Gestor | DEC-329 | RNF04; [Registrar atractivo](casos-de-uso/CU-registrar-atractivo.md), [Actualizar atractivo](casos-de-uso/CU-actualizar-atractivo.md); WF-09 | Columnas `minmax(0, 1fr)` en los grids compartidos. Alta y edición con datos a 360×800 en Chromium con barra de desplazamiento: `clientWidth=345` y `scrollWidth=345`. |
+| QA-05 — rendimiento de las tres páginas confirmadas | DEC-330 | RNF02; [Buscar oferta](casos-de-uso/CU-buscar-oferta.md), [Consultar detalle](casos-de-uso/CU-consultar-detalle-oferta.md), [Consultar FAQs](casos-de-uso/CU-gestionar-faqs.md); WF-05, WF-06, WF-13 | Carga separada de Leaflet, fuentes precargadas y portada del servicio prioritaria. Tres corridas por página con la configuración del diagnóstico: LCP/TTI medianos de 1544/1784 ms en explorar, 1782/1595 ms en el Tour y 1570/1498 ms en FAQs; ambas métricas por debajo de 2000 ms. |
+| QA-06 — nombre accesible del selector de idioma | DEC-331 | RF03, RNF08; encabezado común | Nombres accesibles con ES/EN literales y nombre traducido. Pruebas de frontend y comprobación en Chromium en ambos idiomas. |
+| QA-07 — anidamiento HTML del reporte | DEC-332 | RF57; [Reportar información](casos-de-uso/CU-reportar-informacion.md); WF-06 | Contenedores `div` en las dos fichas. Pruebas de frontend y DOM en Chromium con formulario abierto y mensaje de confirmación, simulando el envío. |
+| QA-08 — horario contradictorio del Tour de Minca | DEC-333 | RF58; [Consultar detalle](casos-de-uso/CU-consultar-detalle-oferta.md); WF-06 | M018 nueva, solo semilla, alinea el texto con las salidas de 08:00 y 14:00. Filtro estricto, incremento de versión int32 e idempotencia; conserva oferta, inventario y datos personalizados no coincidentes. `MigracionesMongoTest` verifica volúmenes nuevos y existentes; API confirma el horario. Próxima migración: M019. |
+| QA-09 — advertencias de hooks | DEC-334 | Mantenibilidad; sin requisito funcional nuevo | Referencias y dependencias revisadas, con excepciones puntuales explicadas. Build y 878 pruebas de frontend aprobados; ESLint con 0 errores y 0 advertencias. |
+| QA-10 — números escritos en el asistente | DEC-335 | RF04, RF59; [Interactuar con el asistente](casos-de-uso/CU-interactuar-asistente.md); WF-07 | `InterpreteDuracionTest` cubre números escritos, cifras y guiones con el límite de siete días. API del proveedor de reglas confirma «dos días» y «two-day» como dos días. «un día» activa el itinerario igual que «1 día»; la ambigüedad contextual de frases como «un día de lluvia» se conserva. |
+
+**Verificación de las correcciones:** `./mvnw verify` en ms-catalog (902 pruebas), ms-analytics (55) y ms-chatbot
+(64), más 878 pruebas de frontend: **1899 pruebas aprobadas en los componentes modificados**. Las 92 de migraciones
+forman parte de las 902 de catálogo. También pasaron build y lint de frontend, el arranque aislado, **22 comprobaciones
+de humo** (incluidos los consumidores) y **32 de resiliencia**. M018 se aplicó al entorno local conservando sus datos.
+Las condiciones de Lighthouse y la comparación con los tres fallos confirmados están en DEC-330; las otras alertas
+preliminares descartadas no se consideran hallazgos vigentes.
+
+**Límites:** resultados locales y móvil emulado en Chromium; sin dispositivo físico ni Safari/iOS. Asistente probado
+por reglas, sin Gemini. CSV verificado en el diagnóstico; descarga efectiva de PDF y compartir nativo pendientes.
+No se repitieron la carga de 500 usuarios virtuales ni las suites de los servicios sin cambios (ms-auth, ms-booking
+y api-gateway). Esta verificación no acredita disponibilidad mensual del 99 % ni sustituye los resultados históricos
+de DEC-325.
+
 ## Decisiones por iteración
 
 Las decisiones (DEC), hallazgos y verificaciones de cada sesión están en `docs/trazabilidad/`. Cuando un documento cita una sección de «`docs/trazabilidad.md`» que no está en este archivo, la tabla dice en qué archivo quedó:
@@ -636,6 +669,7 @@ Las decisiones (DEC), hallazgos y verificaciones de cada sesión están en `docs
 | Revisión de documentación y código — decisiones (DEC-262 a DEC-275) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Pruebas de los RNF — decisiones (DEC-276 y DEC-277) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Revisión previa al redespliegue de la demo — decisiones (DEC-319 a DEC-325) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
+| Correcciones de QA del 2026-11-16 — decisiones (DEC-326 a DEC-335; QA-01 a QA-10) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Plan del 100 % — decisiones (DEC-278 a DEC-284) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Plan del 100 %, iteración F «Mensajería y correo» — decisiones (DEC-285 a DEC-290; RF34) | [`trazabilidad/decisiones-plan-100-iteracion-f.md`](trazabilidad/decisiones-plan-100-iteracion-f.md) |
 | Plan del 100 %, iteración G «Análisis y notificaciones» — decisiones (DEC-291 a DEC-296; RF13, RF30, RF63) | [`trazabilidad/decisiones-plan-100-iteracion-g.md`](trazabilidad/decisiones-plan-100-iteracion-g.md) |

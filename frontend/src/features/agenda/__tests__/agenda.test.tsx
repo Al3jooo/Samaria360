@@ -123,7 +123,7 @@ describe('WF-26 «Agenda de eventos»', () => {
     const { usuario } = renderApp('/agenda')
 
     await screen.findByRole('heading', { name: 'Fiestas del Mar' }, LENTO)
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
 
     expect(await screen.findByRole('heading', { level: 1, name: 'Events calendar' })).toBeInTheDocument()
     expect(plano(screen.getByText(/Nov 20/).textContent)).toBe('Nov 20 – 22, 2026')

@@ -62,7 +62,7 @@ describe('WF-15, términos y condiciones (RF46)', () => {
     const { usuario } = renderApp('/terminos')
     await screen.findByRole('heading', { level: 1, name: 'Términos y condiciones' })
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Terms and conditions' })).toBeInTheDocument()
     expect(screen.getByText(/It is not a legally binding document/)).toBeInTheDocument()
     expect(screen.getByRole('region', { name: '4. Personal data (Colombian Law 1581 of 2012)' })).toHaveAttribute(

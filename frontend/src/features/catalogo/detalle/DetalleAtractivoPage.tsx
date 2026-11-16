@@ -202,9 +202,9 @@ function FichaAtractivo({ atractivo }: { atractivo: DetalleAtractivo }) {
 
       <SeccionCalificaciones tipo="atractivo" id={atractivo.id} {...calificaciones} />
       {/* RF57 (DEC-301): también en la ficha del atractivo. */}
-      <p className="detalle__reportar">
+      <div className="detalle__reportar">
         <BotonReportar tipo="atractivo" id={atractivo.id} />
-      </p>
+      </div>
 
       <DestinosAlternativos resultado={afluencia} />
     </article>

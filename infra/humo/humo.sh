@@ -72,6 +72,25 @@ encabezado() {
 
 esperar_sanos
 
+# La salud HTTP no depende del broker (RNF01). En el arranque completo sí deben existir los tres consumidores:
+# un error de autenticación no recuperado dejaba servicios sanos con sus proyecciones detenidas (QA-02).
+inicio_consumidores=$SECONDS
+while true; do
+  colas=$(docker compose exec -T --user rabbitmq rabbitmq rabbitmqctl -q list_queues -p samaria360 name consumers 2>/dev/null || true)
+  pendientes=""
+  for servicio in ms-catalog ms-analytics ms-chatbot; do
+    if ! awk -v cola="$servicio.eventos.v1" '$1 == cola && $2 > 0 { encontrado=1 } END { exit !encontrado }' <<< "$colas"; then
+      pendientes="$pendientes $servicio"
+    fi
+  done
+  [ -z "$pendientes" ] && { echo "ok     consumidores de eventos activos"; break; }
+  if (( SECONDS - inicio_consumidores > ESPERA_MAXIMA )); then
+    echo "FALLA  consumidores ausentes:$pendientes" >&2
+    exit 1
+  fi
+  sleep 5
+done
+
 comprobar "SPA servida por nginx"                    200 /                                   '<div id="root">'
 comprobar "ruta de la SPA (recarga)"                 200 /explorar                           '<div id="root">'
 comprobar "países (ms-auth, público)"                200 /api/v1/auth/paises                 '"CO"'

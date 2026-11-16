@@ -298,7 +298,7 @@ describe('CU Registrarse (RF01, RF02; WF-02, WF-03)', () => {
       'Estados Unidos',
     ])
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
     const country = screen.getByRole('combobox', { name: 'Country of origin' })
     expect(within(country).getAllByRole('option').map((o) => o.textContent)).toEqual([
       'Select your country',
@@ -327,7 +327,7 @@ describe('CU Registrarse (RF01, RF02; WF-02, WF-03)', () => {
   it('funciona en inglés: formulario y errores traducidos', async () => {
     simular()
     const { usuario } = renderApp('/registro')
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
 
     expect(screen.getByRole('heading', { name: 'Form – Tourist' })).toBeInTheDocument()
     await usuario.click(screen.getByRole('button', { name: 'Create tourist account' }))

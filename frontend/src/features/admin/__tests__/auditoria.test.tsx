@@ -55,7 +55,7 @@ describe('Auditoría (RF13, WF-30)', () => {
 
     const tabla = await screen.findByRole('table')
     expect(within(tabla).getByText(cambio.detalle)).toBeInTheDocument()
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
 
     expect(
       await within(tabla).findByText('Account 00000000-0000-4000-8000-000000000009: Tourist → Destination manager'),

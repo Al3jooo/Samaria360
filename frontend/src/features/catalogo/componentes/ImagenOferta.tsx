@@ -12,7 +12,13 @@ const ALTO = 400
  * de escritorio) y la imagen lo llena con object-fit: cover. width y height se mantienen para la carga diferida.
  * Es decorativa (alt vacío): el nombre del lugar ya está en el título de la tarjeta o del detalle, y no es un enlace.
  */
-export function ImagenOferta({ resultado }: { resultado: Pick<ResultadoOferta, 'imagen' | 'categoria' | 'tipo'> }) {
+export function ImagenOferta({
+  resultado,
+  prioritaria = false,
+}: {
+  resultado: Pick<ResultadoOferta, 'imagen' | 'categoria' | 'tipo'>
+  prioritaria?: boolean
+}) {
   const respaldo = imagenDeCategoria(resultado.categoria, resultado.tipo)
   const [origen, setOrigen] = useState(resultado.imagen ?? respaldo)
 
@@ -22,7 +28,8 @@ export function ImagenOferta({ resultado }: { resultado: Pick<ResultadoOferta, '
         className="imagen-oferta__foto"
         src={origen}
         alt=""
-        loading="lazy"
+        loading={prioritaria ? 'eager' : 'lazy'}
+        fetchPriority={prioritaria ? 'high' : undefined}
         decoding="async"
         width={ANCHO}
         height={ALTO}
