@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# RNF02, «carga de página»: primera carga (sin caché) de las pantallas públicas con Lighthouse, en un móvil simulado
+# RNF02, «carga de página»: primera carga (sin caché) de las 9 pantallas públicas (desde DEC-325, también
+# /recuperar, WF-27) con Lighthouse, en un móvil simulado
 # (CPU ×4) con red 4G (9 Mbps de bajada, 3 Mbps de subida, 70 ms de latencia; «condiciones normales» definidas por el
 # equipo, DEC-276). Criterio: mediana de 3 corridas de LCP (contenido principal visible) e interactivo (TTI) por debajo de 2 s.
 # Las teselas de OpenStreetMap se bloquean (sin descargas automatizadas, política de uso de OSM).
@@ -24,7 +25,7 @@ atractivo=$(curl -s "$BASE/api/v1/catalogo/oferta?tamano=10&pagina=1" "$BASE/api
 [ -n "$tour" ] && [ -n "$atractivo" ] || { echo "Sin datos de la semilla en $BASE" >&2; exit 1; }
 
 RUTAS=("/" "/explorar?texto=playa" "/servicios/$tour" "/servicios/$tour/reservar" "/atractivos/$atractivo"
-       "/agenda" "/preguntas-frecuentes" "/login")
+       "/agenda" "/preguntas-frecuentes" "/login" "/recuperar")
 fallos=0
 i=0
 for ruta in "${RUTAS[@]}"; do
