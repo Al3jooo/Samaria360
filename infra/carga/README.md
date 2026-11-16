@@ -60,6 +60,16 @@ marcha. Pico de memoria del sistema durante la carga: unos 2,8 GB (`docker stats
 |---|---|---|---|
 | Local, nginx con una conexión nueva por petición | 203 012 | **11,97 %** (503 de nginx: `connect() failed (99: Address not available)`) | 35 a 40 ms |
 | Local, nginx con conexiones persistentes al gateway (DEC-325) | 207 702 (454/s) | **0 %** | avisos 5,8 · oferta 7,8 · resumen 6,3 · detalle 6,1 · calificaciones 8,7 · disponibilidad 6,0 · atractivo 5,8 · afluencia 7,0 ms |
+| Demo pública (perfil `demo`, 2026-11-16), primera corrida | 59 474 | 68,2 % (`connect: connection refused` desde el primer segundo, con 10 usuarios) | 560 a 861 ms (solo las que respondieron) |
+| Demo pública (perfil `demo`, 2026-11-16), segunda corrida | 83 111 (383/s) | **0,01 %** (11) | 206 a 261 ms |
+
+**La primera corrida en la demo** se descarta como medición: los rechazos empezaron con 10 usuarios, cuando la VM
+estaba casi ociosa (CPU máxima del 60 % en el gateway, 2,2 GB en uso) y sin reinicios ni errores en Caddy. Fue un
+corte transitorio en la red de salida del equipo que ejecutaba k6: a continuación, 200 conexiones paralelas desde
+Docker y la segunda corrida completa pasaron sin problema. En la demo el p95 incluye la ida y vuelta por internet; la
+VM (2 vCPU, 12 GB) usó como máximo 2,2 GB durante la carga. Después de las corridas se restauró la colección
+`consultas` de analytics_db en la VM con un respaldo previo, para que los tableros (RF14, RF31) no queden con las
+consultas de k6.
 
 **Defecto encontrado (DEC-325).** nginx abría una conexión TCP nueva hacia el gateway en cada petición. A unas
 440 peticiones/s, los sockets en `TIME_WAIT` agotaban los puertos efímeros del contenedor (32768 a 60999, 60 s cada
