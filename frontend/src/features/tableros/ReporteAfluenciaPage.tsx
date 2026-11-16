@@ -140,7 +140,7 @@ export function ReporteAfluenciaPage() {
                 unidad={t('tableros.afluencia.porcentaje')}
                 datos={datos.porDia.map((d) => ({
                   clave: d.dia,
-                  etiqueta: diaCorto(d.dia),
+                  etiqueta: diaCorto(d.dia, i18n.language),
                   valor: d.porcentajePromedio ?? 0,
                   texto: d.porcentajePromedio === null ? '—' : `${d.porcentajePromedio} %`,
                 }))}

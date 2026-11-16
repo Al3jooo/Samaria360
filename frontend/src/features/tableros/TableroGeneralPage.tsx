@@ -8,10 +8,10 @@ import './tableros.css'
 
 type Estado = { estado: 'cargando' } | { estado: 'error' } | { estado: 'ok'; datos: TableroGeneral }
 
-/** «2030-03-10» → «10/03». */
-export function diaCorto(dia: string): string {
+/** «2030-03-10» → «10/03» en español y «03/10» en inglés (mes primero). */
+export function diaCorto(dia: string, idioma: string): string {
   const [, mes, d] = dia.split('-')
-  return `${d}/${mes}`
+  return idioma.startsWith('en') ? `${mes}/${d}` : `${d}/${mes}`
 }
 
 /** Nombre del país en el idioma de la interfaz (ISO 3166-1 alfa-2). */
@@ -101,7 +101,7 @@ export function TableroGeneralPage() {
           <Columnas
             titulo={t('tableros.general.reservasPorDia')}
             unidad={t('tableros.general.reservas')}
-            datos={estado.datos.reservasPorDia.map((d) => ({ clave: d.dia, etiqueta: diaCorto(d.dia), valor: d.reservas }))}
+            datos={estado.datos.reservasPorDia.map((d) => ({ clave: d.dia, etiqueta: diaCorto(d.dia, i18n.language), valor: d.reservas }))}
           />
           <div className="tablero__cuadricula">
             <Barras

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ApiError } from '../../shared/api/httpClient'
+import { formatearDia } from '../../shared/formato'
 import {
   CATEGORIA_CONOCIMIENTO_MAXIMA,
   CONOCIMIENTO_MAXIMO,
@@ -20,7 +21,7 @@ type Estado = 'cargando' | 'ok' | 'error'
  * las entradas (contenido de 1 a 2000 y categoría de 1 a 50) que el asistente usa para responder, de 10 en 10.
  */
 export function ConocimientoAdminPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [estado, setEstado] = useState<Estado>('cargando')
   const [pagina, setPagina] = useState(0)
   const [datos, setDatos] = useState<PaginaConocimiento | null>(null)
@@ -173,7 +174,7 @@ export function ConocimientoAdminPage() {
                   <header>
                     <h2>{entrada.categoria}</h2>
                     <p className="tarjeta-conocimiento__fecha">
-                      {new Date(entrada.fechaActualizacion).toLocaleDateString()}
+                      {formatearDia(entrada.fechaActualizacion, i18n.language)}
                     </p>
                   </header>
                   <p>{entrada.contenido}</p>
