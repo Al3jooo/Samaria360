@@ -1,5 +1,6 @@
-import type { TFunction } from 'i18next'
+import i18n, { type TFunction } from 'i18next'
 import { longitudTexto } from '../admin/textoAcotado'
+import { localeDe } from '../catalogo/formato'
 import { aNumero } from '../prestador/borradorServicio'
 import { rutaSinIndices, type ErroresServicio, type MotivoServicio } from '../prestador/rutasCampos'
 import type { AtractivoGestion, DatosAtractivo } from './atractivosGestorApi'
@@ -138,7 +139,7 @@ export function rutasConControl(conEstado: boolean, imagenes?: number): string[]
 export function textoErrorAtractivo(t: TFunction, ruta: string, motivo: MotivoServicio | undefined): string | undefined {
   if (!motivo) return undefined
   if (motivo === 'VALOR_MAXIMO' && ruta === 'limiteCapacidadCarga') {
-    return t('gestor.errores.capacidadMaxima', { maximo: CAPACIDAD_MAXIMA.toLocaleString() })
+    return t('gestor.errores.capacidadMaxima', { maximo: CAPACIDAD_MAXIMA.toLocaleString(localeDe(i18n.language)) })
   }
   if (rutaSinIndices(ruta) === 'imagenes') {
     return t(`gestor.imagenes.errores.${motivo}`, { defaultValue: t(`prestador.errores.${motivo}`, { maximo: '' }) })

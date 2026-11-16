@@ -2,6 +2,7 @@ import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { formatearInstante } from '../reservas/fechasBogota'
+import { localeDe } from '../catalogo/formato'
 import { ImagenOferta } from '../catalogo/componentes/ImagenOferta'
 import type { EstadoAfluencia } from './afluenciaApi'
 import './afluencia.css'
@@ -49,7 +50,7 @@ export function AlertaAfluencia({ resultado }: { resultado: EstadoAfluencia }) {
 
 /** «Destinos alternativos con menor afluencia» de WF-06 (RF51; DEC-305): hasta 3 tarjetas de la misma categoría. */
 export function DestinosAlternativos({ resultado }: { resultado: EstadoAfluencia }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const id = useId()
   const alternativos = resultado.estado === 'ok' ? resultado.datos.alternativos : []
   return (
@@ -69,7 +70,7 @@ export function DestinosAlternativos({ resultado }: { resultado: EstadoAfluencia
                   ? t('afluencia.alternativo', { nivel: t(`afluencia.niveles.${a.nivel}`), porcentaje: a.porcentaje })
                   : t('afluencia.sinDatos')}
                 {' · '}
-                {t('afluencia.distancia', { km: a.distanciaKm.toLocaleString() })}
+                {t('afluencia.distancia', { km: new Intl.NumberFormat(localeDe(i18n.language), { maximumFractionDigits: 2 }).format(a.distanciaKm) })}
               </span>
             </li>
           ))}

@@ -128,3 +128,11 @@ describe('WF-37 «Reporte de afluencia» (RF64)', () => {
     expect(solicitudes.at(-1)?.url).toContain('atractivo=6a0000000000000000000001')
   })
 })
+
+describe('diaCorto', () => {
+  it('pone el día primero en español y el mes primero en inglés', async () => {
+    const { diaCorto } = await import('../TableroGeneralPage')
+    expect(diaCorto('2030-03-11', 'es')).toBe('11/03')
+    expect(diaCorto('2030-03-11', 'en')).toBe('03/11')
+  })
+})

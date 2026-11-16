@@ -398,8 +398,8 @@
     "mapa": "Interactive crowd-level and attractions map",
     "leyendaAfluencia": "Crowd level",
     "nivelBajo": "Low (< 40%)",
-    "nivelMedio": "Medium (40–75%)",
-    "nivelAlto": "High (> 75%)",
+    "nivelMedio": "Medium (40–80%)",
+    "nivelAlto": "High (> 80%)",
     "sinDatosAfluencia": "No crowd-level data"
   },
   "mapa": {
@@ -1929,16 +1929,16 @@
       "Medio": "Medium crowd",
       "Alto": "High crowd"
     },
-    "detalle": "({{porcentaje}} % of capacity: {{ocupacion}} of {{limite}} people, updated {{hora}})",
+    "detalle": "({{porcentaje}}% of capacity: {{ocupacion}} of {{limite}} people, updated {{hora}})",
     "limiteAlcanzado": "This attraction reached its capacity limit. We suggest other similar places with fewer visitors.",
     "verAlternativos": "See alternative destinations",
     "sinAlternativos": "There are no similar destinations with fewer visitors right now.",
-    "alternativo": "{{nivel}} ({{porcentaje}} %)",
+    "alternativo": "{{nivel}} ({{porcentaje}}%)",
     "distancia": "{{km}} km away",
     "registro": {
       "campo": "People now at {{nombre}}",
       "boton": "Record occupancy",
-      "hecho": "{{nivel}} ({{porcentaje}} %)",
+      "hecho": "{{nivel}} ({{porcentaje}}%)",
       "invalida": "Enter a whole number from 0 to 1,000,000.",
       "sinLimite": "The attraction has no carrying capacity limit.",
       "error": "The occupancy could not be recorded."

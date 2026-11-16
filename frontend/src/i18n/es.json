@@ -398,8 +398,8 @@
     "mapa": "Mapa interactivo de afluencia y atractivos",
     "leyendaAfluencia": "Afluencia",
     "nivelBajo": "Bajo (< 40 %)",
-    "nivelMedio": "Medio (40–75 %)",
-    "nivelAlto": "Alto (> 75 %)",
+    "nivelMedio": "Medio (40–80 %)",
+    "nivelAlto": "Alto (> 80 %)",
     "sinDatosAfluencia": "Sin datos de afluencia"
   },
   "mapa": {
