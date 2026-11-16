@@ -416,6 +416,14 @@ svg {
   right: 0;
   z-index: 15;
   min-width: 15rem;
+  /*
+   * El encabezado es sticky: si el panel es más alto que la ventana (celular horizontal, ~360 px, con las 9 opciones
+   * del Prestador o del Administrador), lo que sobra no se alcanzaba con el scroll de la página. Se desplaza dentro.
+   */
+  max-height: calc(100vh - var(--alto-encabezado) - var(--espacio-6));
+  max-height: calc(100dvh - var(--alto-encabezado) - var(--espacio-6));
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--espacio-4);
   border: 1px solid var(--color-borde);
   border-radius: var(--radio-md);

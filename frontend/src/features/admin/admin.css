@@ -21,12 +21,14 @@
 /* Pestañas de la página (tablist WAI-ARIA): no cambian de página, solo el panel. */
 .pestanas-cuentas {
   display: flex;
-  gap: var(--espacio-2);
+  /*
+   * Las cuatro pestañas pasan a otra fila en lugar de desplazarse: a 375 px «Turistas» y «Personal» quedaban fuera
+   * de la vista en un scroll horizontal sin ninguna señal (recorrido en celular del 2026-11-16).
+   */
+  flex-wrap: wrap;
+  gap: 0 var(--espacio-2);
   margin-bottom: var(--espacio-5);
   border-bottom: 1px solid var(--color-borde);
-  overflow-x: auto;
-  /* Como en perfil.css: sin esto asoma una barra vertical de 1 px junto a las pestañas (recorrido del 2026-11-13). */
-  overflow-y: hidden;
 }
 
 .pestanas-cuentas [role='tab'] {

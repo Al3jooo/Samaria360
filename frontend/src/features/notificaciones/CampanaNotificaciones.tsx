@@ -51,16 +51,16 @@ export function CampanaNotificaciones() {
 
   useEffect(() => {
     if (!abierta) return
-    const alPulsarFuera = (evento: MouseEvent) => {
+    const alPulsarFuera = (evento: PointerEvent) => {
       if (contenedor.current && !contenedor.current.contains(evento.target as Node)) setAbierta(false)
     }
     const alEscape = (evento: KeyboardEvent) => {
       if (evento.key === 'Escape') setAbierta(false)
     }
-    document.addEventListener('mousedown', alPulsarFuera)
+    document.addEventListener('pointerdown', alPulsarFuera)
     document.addEventListener('keydown', alEscape)
     return () => {
-      document.removeEventListener('mousedown', alPulsarFuera)
+      document.removeEventListener('pointerdown', alPulsarFuera)
       document.removeEventListener('keydown', alEscape)
     }
   }, [abierta])

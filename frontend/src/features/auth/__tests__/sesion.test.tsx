@@ -197,9 +197,22 @@ describe('Menú del avatar', () => {
     expect(avatar).toHaveAttribute('aria-expanded', 'true')
     expect(screen.getByRole('menu')).toBeInTheDocument()
 
-    fireEvent.mouseDown(document.body)
+    fireEvent.pointerDown(document.body)
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
     expect(avatar).toHaveAttribute('aria-expanded', 'false')
     expect(avatar).not.toHaveAttribute('aria-controls')
+  })
+
+  it('en el celular, un toque que quita el foco sin dárselo a la opción no cierra el menú antes del clic', async () => {
+    const { usuario, avatar } = await abrirMenu()
+    await usuario.click(avatar)
+    const opcion = screen.getByRole('menuitem', { name: 'Mi perfil' })
+
+    // Safari de iOS no enfoca enlaces ni botones al tocarlos: el blur llega sin relatedTarget.
+    fireEvent.blur(opcion, { relatedTarget: null })
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+
+    fireEvent.click(opcion)
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument())
   })
 })

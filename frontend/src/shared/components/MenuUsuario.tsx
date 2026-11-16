@@ -85,11 +85,13 @@ export function MenuUsuario({ usuario, onCerrarSesion }: { usuario: UsuarioEncab
   useEffect(() => {
     if (!abierto) return
     primeraOpcion.current?.focus()
-    const alPulsarFuera = (evento: MouseEvent) => {
+    // pointerdown cubre ratón, tacto y lápiz: en Safari de iOS un toque fuera de un elemento pulsable no dispara
+    // mousedown y el menú no se cerraba.
+    const alPulsarFuera = (evento: PointerEvent) => {
       if (!contenedor.current?.contains(evento.target as Node)) setAbierto(false)
     }
-    document.addEventListener('mousedown', alPulsarFuera)
-    return () => document.removeEventListener('mousedown', alPulsarFuera)
+    document.addEventListener('pointerdown', alPulsarFuera)
+    return () => document.removeEventListener('pointerdown', alPulsarFuera)
   }, [abierto])
 
   const cerrarMenu = () => {
@@ -108,7 +110,12 @@ export function MenuUsuario({ usuario, onCerrarSesion }: { usuario: UsuarioEncab
         }
       }}
       onBlur={(evento) => {
-        if (abierto && !contenedor.current?.contains(evento.relatedTarget as Node | null)) setAbierto(false)
+        // Solo cierra si el foco pasa a otro elemento fuera del menú (Tab). Con relatedTarget nulo no: en el celular,
+        // tocar una opción quita el foco sin dárselo a la opción (Safari no enfoca enlaces ni botones al tocarlos) y
+        // el menú se desmontaba antes del click, así que las opciones no respondían. Los toques fuera los cierra
+        // pointerdown.
+        const destino = evento.relatedTarget as Node | null
+        if (abierto && destino && !contenedor.current?.contains(destino)) setAbierto(false)
       }}
     >
       <button
