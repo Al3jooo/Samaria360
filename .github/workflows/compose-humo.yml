@@ -54,6 +54,9 @@ jobs:
           openssl rsa -in jwt-privada.pem -pubout -out jwt-publica.pem
           chmod 644 jwt-*.pem
 
+      - name: Verificar el primer arranque aislado de la infraestructura
+        run: bash infra/humo/arranque-infra.sh
+
       - name: Levantar el sistema
         run: docker compose up -d --build
 

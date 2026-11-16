@@ -5,8 +5,15 @@
 # su cola. Las contraseñas llegan por variables de entorno (.env), nunca en el repositorio.
 set -eu
 
-# Los comandos rabbitmqctl corren como root: usan la cookie de Erlang del servidor (la del usuario rabbitmq).
-export HOME=/var/lib/rabbitmq
+# Preparar el volumen antes de lanzar cualquier proceso de Erlang. Servidor y CLI deben crear y leer la cookie
+# como el mismo usuario: un diagnóstico como root podía crearla entre el chown del entrypoint y el servidor.
+if [ "$(id -u)" = 0 ]; then
+  find /var/lib/rabbitmq ! -user rabbitmq -exec chown rabbitmq '{}' +
+  if [ -f /var/lib/rabbitmq/.erlang.cookie ]; then
+    chmod 600 /var/lib/rabbitmq/.erlang.cookie
+  fi
+  exec su-exec rabbitmq sh "$0" "$@"
+fi
 VHOST=samaria360
 EXCHANGE='^samaria360\.eventos\.v1$'
 
