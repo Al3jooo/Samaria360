@@ -71,11 +71,11 @@ samaria360/
 │   ├── postgres/init/            # 01-crear-bases.sql (auth_db, reservas_db), solo con el volumen vacío
 │   ├── postgres/asegurar-bases.sql   # lo ejecuta postgres-bases en cada arranque (bases que falten)
 │   ├── mongo/init/               # línea base congelada (v1) de catalog_db: validadores, índices y semilla
-│   ├── mongo/migraciones/        # catalog_db: aplicar.js + esquema/ y semilla/ (M001…M017)
+│   ├── mongo/migraciones/        # catalog_db: aplicar.js + esquema/ y semilla/ (M001…M018)
 │   ├── mongo/analytics/          # analytics_db: A001…A006, cada una con su copia del validador
 │   ├── mongo/chatbot/            # chatbot_db: C001
 │   ├── rabbitmq/                 # definiciones.json (exchange, colas y .dlq) e iniciar.sh (un usuario por servicio)
-│   ├── humo/                     # humo.sh: prueba de humo del sistema completo (CI y local)
+│   ├── humo/                     # arranque-infra.sh (primer arranque aislado) y humo.sh (sistema completo)
 │   ├── carga/                    # k6, Lighthouse y resiliencia (RNF01 a RNF03)
 │   └── keys/                     # llaves RSA del JWT (no se versionan)
 ├── frontend/                     # React + Vite + TypeScript
@@ -112,6 +112,10 @@ samaria360/
 
 Los servicios no comparten bases: ms-analytics arma sus vistas con los eventos de RabbitMQ y ms-chatbot consulta la
 búsqueda pública de ms-catalog ([DEC-280](docs/trazabilidad/decisiones-transversales.md)).
+
+M018 corrige únicamente el texto del horario de la semilla del Tour de Café en Minca para alinearlo con las salidas
+reservables de 08:00 y 14:00; no cambia el inventario ni los validadores
+([modelo NoSQL](docs/sad/modelo-nosql/README.md), DEC-333).
 
 ## Reglas de dependencia (verificadas con ArchUnit)
 
@@ -272,9 +276,11 @@ cd frontend && npm test        # y npm run build (tipos) y npm run lint (ESLint)
 
 En GitHub Actions (`.github/workflows/`) corren las mismas pruebas en cada *push* a `main` y en cada PR, solo para los
 servicios cuyas carpetas cambiaron. El informe de cobertura de cada servicio Java queda como artefacto del workflow.
-`compose-humo.yml` levanta el sistema completo y corre la prueba de humo `infra/humo/humo.sh` cuando cambian
-`docker-compose.yml`, `infra/`, un `Dockerfile` o `frontend/nginx/`. La misma prueba sirve en local, con el sistema
-arriba: `bash infra/humo/humo.sh`. Las pruebas de los RNF de operación (k6, Lighthouse y resiliencia) están fuera del
+`compose-humo.yml` verifica primero el arranque aislado de PostgreSQL y RabbitMQ con `infra/humo/arranque-infra.sh`
+(Docker y Node.js; almacenamiento temporal, sin puertos publicados ni volúmenes de la aplicación), levanta el sistema
+completo y corre `infra/humo/humo.sh`, que también comprueba los tres consumidores de eventos. Se ejecuta cuando cambian
+`docker-compose.yml`, `infra/`, un `Dockerfile` o `frontend/nginx/`. En local: `bash infra/humo/arranque-infra.sh` y,
+con el sistema arriba, `bash infra/humo/humo.sh`. Las pruebas de los RNF de operación (k6, Lighthouse y resiliencia) están fuera del
 CI, en [`infra/carga/`](infra/carga/README.md).
 
 ## Equipo
