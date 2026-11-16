@@ -154,7 +154,7 @@ describe('Pantallas de acceso (WF-01 a WF-03)', () => {
     expect(within(pie).queryByRole('region')).not.toBeInTheDocument()
     expect(within(pie).getByText(/^Prototipo académico/)).toBeInTheDocument()
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
     expect(within(pie).getByText('© 2026 Samaria360 · Verified tourism platform')).toBeInTheDocument()
     expect(within(pie).getByText('Help / Support')).toBeInTheDocument()
   })

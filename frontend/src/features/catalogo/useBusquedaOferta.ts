@@ -36,7 +36,8 @@ export function useBusquedaOferta(criterios: CriteriosBusqueda) {
     return () => {
       vigente = false
     }
-    // La clave resume los criterios: evita volver a consultar por una referencia nueva con el mismo contenido.
+    // consultaApi incluye todos los criterios: una referencia nueva equivalente no repite la petición.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clave, intento])
 
   const reintentar = useCallback(() => setIntento((n) => n + 1), [])

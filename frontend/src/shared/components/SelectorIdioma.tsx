@@ -17,7 +17,7 @@ export function SelectorIdioma() {
           type="button"
           lang={idioma}
           aria-pressed={i18n.language === idioma}
-          aria-label={t(nombre)}
+          aria-label={`${corto} · ${t(nombre)}`}
           onClick={() => void cambiarIdioma(idioma)}
         >
           {corto}

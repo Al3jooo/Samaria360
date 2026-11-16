@@ -120,7 +120,7 @@ export function SelectorUbicacion({
       mapa.current.setView([latitud, longitud], Math.max(mapa.current.getZoom(), ZOOM_PIN))
     }
     desdeMapa.current = false
-  }, [valida, latitud, longitud])
+  }, [valida, latitud, longitud, tipo])
 
   const errorGrupo = textoErrorServicio(t, 'coordenadas', errores.coordenadas)
   const error = (ruta: string) => textoErrorServicio(t, ruta, errores[ruta])

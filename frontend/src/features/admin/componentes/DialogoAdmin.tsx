@@ -26,7 +26,7 @@ export function DialogoAdmin({
     if (elemento && !elemento.open) elemento.showModal()
     focoInicial.current?.focus()
     // Solo al abrirse.
-  }, [])
+  }, [focoInicial])
 
   return (
     <dialog

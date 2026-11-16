@@ -46,7 +46,8 @@ export function AprobarServiciosPage() {
     if (!anuncio) return
     titulo.current?.focus()
     navegar({ pathname: ubicacion.pathname, search: ubicacion.search }, { replace: true, state: null })
-    // Solo al montar.
+    // Consume el anuncio inicial una sola vez; cambiar filtros no debe volver a limpiar el historial ni mover el foco.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {

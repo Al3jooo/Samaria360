@@ -183,7 +183,7 @@ function FichaServicio({ servicio, volverA }: { servicio: DetalleServicio; volve
 
       <div className="detalle__galeria">
         <div className="detalle__portada">
-          <ImagenOferta resultado={{ imagen: portada ?? null, categoria: servicio.categoria, tipo: 'Servicio' }} />
+          <ImagenOferta prioritaria resultado={{ imagen: portada ?? null, categoria: servicio.categoria, tipo: 'Servicio' }} />
         </div>
         {miniaturas.length > 0 && (
           <ul className="detalle__miniaturas">
@@ -235,9 +235,9 @@ function FichaServicio({ servicio, volverA }: { servicio: DetalleServicio; volve
             )}
             {datoContacto(t('detalle.rnt'), rnt || undefined)}
           </dl>
-          <p className="detalle__reportar">
+          <div className="detalle__reportar">
             <BotonReportar tipo="servicio" id={servicio.id} />
-          </p>
+          </div>
         </section>
 
         <section aria-labelledby={`${idTitulo}-precio`} className="detalle__precios">

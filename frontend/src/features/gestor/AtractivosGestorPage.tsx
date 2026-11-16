@@ -72,7 +72,8 @@ export function AtractivosGestorPage() {
     if ((ubicacion.state as EstadoAnuncioGestor | null)?.anuncio) {
       navegarRuta(ubicacion.pathname + ubicacion.search, { replace: true, state: null })
     }
-    // Solo al llegar.
+    // Consume el anuncio inicial; los filtros posteriores no deben volver a reemplazar el historial.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Una página que no es válida se normaliza en la URL.

@@ -18,12 +18,12 @@ describe('Fallo de la carga diferida de /explorar', () => {
     const aviso = await screen.findByRole('alert')
     expect(aviso).toHaveTextContent('No pudimos cargar esta sección. Revisa tu conexión.')
     expect(screen.getByRole('link', { name: 'Inicio de sesión' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Inglés' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'EN · Inglés' })).toBeInTheDocument()
 
     await usuario.click(within(aviso).getByRole('button', { name: 'Reintentar' }))
     expect(recargar).toHaveBeenCalledTimes(1)
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
     expect(screen.getByRole('alert')).toHaveTextContent("We couldn't load this section. Check your connection.")
     expect(within(screen.getByRole('alert')).getByRole('button', { name: 'Retry' })).toBeInTheDocument()
   })

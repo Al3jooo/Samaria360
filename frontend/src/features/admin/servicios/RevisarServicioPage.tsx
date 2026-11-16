@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ApiError, ERROR_RED, servicioNoDisponible } from '../../../shared/api/httpClient'
@@ -62,10 +62,10 @@ export function RevisarServicioPage() {
   const titulo = useRef<HTMLHeadingElement>(null)
   const botonRechazar = useRef<HTMLButtonElement>(null)
 
-  const volverALaCola = (anuncio: string) => {
+  const volverALaCola = useCallback((anuncio: string) => {
     const estado: EstadoVueltaCola = { anuncio }
     navegar(cola, { replace: true, state: estado })
-  }
+  }, [navegar, cola])
 
   useEffect(() => {
     let vigente = true
@@ -85,8 +85,7 @@ export function RevisarServicioPage() {
     return () => {
       vigente = false
     }
-    // volverALaCola y t no cambian el servicio que se consulta.
-  }, [idServicio, intento])
+  }, [idServicio, intento, volverALaCola, t])
 
   const cargado = carga.estado === 'ok'
   useEffect(() => {

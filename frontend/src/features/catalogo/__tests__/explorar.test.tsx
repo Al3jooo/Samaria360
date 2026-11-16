@@ -127,7 +127,7 @@ describe('Exploración WF-05', () => {
     const precio = await screen.findByText(normalizar(`Desde ${espanol.format(150000)}`))
     expect(precio.textContent).toMatch(/^Desde \$\s150\.000$/)
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
 
     expect(screen.getByText(normalizar(`From ${ingles.format(150000)}`)).textContent).toMatch(/^From COP\s150,000$/)
   })
@@ -197,7 +197,7 @@ describe('Exploración WF-05', () => {
     const { usuario } = renderApp('/explorar')
 
     expect(await screen.findByRole('heading', { name: 'Resultados en Santa Marta (1 lugar encontrado)' })).toBeInTheDocument()
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
     expect(screen.getByRole('heading', { name: 'Results in Santa Marta (1 place found)' })).toBeInTheDocument()
   })
 

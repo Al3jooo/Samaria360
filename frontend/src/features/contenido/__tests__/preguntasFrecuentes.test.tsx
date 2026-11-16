@@ -146,7 +146,7 @@ describe('WF-13, sección pública de preguntas frecuentes (RF26)', () => {
     const { usuario } = montar()
     await screen.findByRole('searchbox', { name: 'Buscar' })
 
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
     expect(screen.getByRole('heading', { level: 1, name: 'Frequently asked questions' })).toBeInTheDocument()
     expect(screen.getByRole('searchbox', { name: 'Search' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Hasta cuándo puedo cancelar/ })).toBeInTheDocument()

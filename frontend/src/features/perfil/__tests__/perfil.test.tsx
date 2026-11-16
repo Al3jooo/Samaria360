@@ -261,7 +261,7 @@ describe('WF-16 «Mi perfil» (RF53)', () => {
     const { usuario } = await abrirPerfil()
 
     await usuario.type(screen.getByLabelText('Primer nombre'), 'beth')
-    await usuario.click(screen.getByRole('button', { name: 'Inglés' }))
+    await usuario.click(screen.getByRole('button', { name: 'EN · Inglés' }))
 
     expect(await screen.findByRole('heading', { level: 1, name: 'My profile' })).toBeInTheDocument()
     expect(screen.getByLabelText('First name')).toHaveValue('Anabeth')
