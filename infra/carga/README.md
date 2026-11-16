@@ -120,6 +120,30 @@ Resultado (2026-11-15, local, sistema completo): **9 de 9 por debajo de 2 s** (c
 Las fichas siguen con el menor margen: ahora cargan además las calificaciones (y, en el atractivo, la afluencia y
 los alternativos); una de las tres corridas de `/servicios/:id` pasó de 2 s.
 
+**Demo pública (2026-11-16, `bash infra/carga/rnf02-carga-pagina.sh https://samaria360.duckdns.org`):** con HTTPS,
+Caddy y la latencia real por internet. 7 de 9 por debajo de 2 s en la primera pasada; las dos que fallaron se
+repitieron con 3 corridas más:
+
+| Página | LCP mediano (máx.) | TTI | Peso |
+|---|---|---|---|
+| `/` | 1,68 s (1,77) | 1,88 s | 668 KB |
+| `/explorar?texto=playa` | 1,79 s (1,80) | 1,97 s | 349 KB |
+| `/servicios/:id` | 1,91 s (1,91) | 1,82 s | 385 KB |
+| `/servicios/:id/reservar` | 1,97 s (1,99) | 1,86 s | 276 KB |
+| `/atractivos/:id` | 2,34 s (2,38); repetida: **1,98 s** (2,04) | 2,24 s; repetida: 1,79 s | 564 KB |
+| `/agenda` | 1,53 s (1,60) | 1,41 s | 260 KB |
+| `/preguntas-frecuentes` | 1,62 s (2,53) | 1,59 s | 259 KB |
+| `/login` | 1,39 s (1,55) | 1,36 s | 256 KB |
+| `/recuperar` | 3,52 s (3,75); repetida: **1,32 s** (1,37) | 3,64 s; repetida: 1,43 s | 256 KB |
+
+- **`/recuperar`:** en la primera pasada el propio documento HTML tardó de 0,75 a 2,67 s en llegar, cuando en
+  `/login` (el mismo `index.html`) tardó 0,26 s. Fue una variación de red de ese momento: repetida, 1,32 s.
+- **`/atractivos/:id` queda en el límite** en la demo: LCP de 1,91 a 2,38 s según la corrida (mediana 1,98 s al
+  repetir). Es la ficha más pesada (fotos, afluencia, alternativos y calificaciones). Para tener margen haría falta
+  aligerarla, por ejemplo con imágenes más livianas o diferidas.
+- La resiliencia (RNF01) no se corre en la demo: detendría servicios de la demo pública; el mecanismo se probó en
+  local con la misma imagen de Compose.
+
 Resultado anterior (2026-11-14, local, sistema del 62 %): 8 de 8 por debajo de 2 s. LCP mediano de 1,21 s (`/login`) a 1,64 s
 (`/servicios/:id/reservar`); TTI máximo 1,61 s. Las fichas de detalle tienen el menor margen (una corrida aislada de
 `/atractivos/:id` llegó a 2,02 s). La primera carga de `/explorar` transfiere 380 KB, de ellos 253 KB de JavaScript.
