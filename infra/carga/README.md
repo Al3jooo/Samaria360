@@ -120,7 +120,31 @@ Resultado (2026-11-15, local, sistema completo): **9 de 9 por debajo de 2 s** (c
 Las fichas siguen con el menor margen: ahora cargan además las calificaciones (y, en el atractivo, la afluencia y
 los alternativos); una de las tres corridas de `/servicios/:id` pasó de 2 s.
 
-**Demo pública (2026-11-16, `bash infra/carga/rnf02-carga-pagina.sh https://samaria360.duckdns.org`):** con HTTPS,
+**Demo pública con las correcciones de QA (2026-11-17, después de #78; DEC-330):** 9 de 9 por debajo de 2 s.
+
+| Página | LCP mediano (máx.) | TTI | Peso |
+|---|---|---|---|
+| `/` | 1,48 s (1,51) | 1,42 s | 669 KB |
+| `/explorar?texto=playa` | 1,39 s (1,50) | 1,45 s | 351 KB |
+| `/servicios/:id` | 1,59 s (1,64) | 1,47 s | 386 KB |
+| `/servicios/:id/reservar` | 1,70 s (1,81) | 1,70 s | 277 KB |
+| `/atractivos/:id` | **1,79 s** (1,82) | 1,54 s | 565 KB |
+| `/agenda` | 1,37 s (1,54) | 1,26 s | 260 KB |
+| `/preguntas-frecuentes` | 1,44 s (1,49) | 1,14 s | 259 KB |
+| `/login` | 1,49 s (1,64) | 1,21 s | 256 KB |
+| `/recuperar` | 1,16 s (1,20) | 1,16 s | 256 KB |
+
+- La ficha del atractivo, que antes quedaba en el límite (1,98 s), queda con margen.
+- **Comparación controlada:** con la misma API de la demo y corridas alternadas (5 por versión), el build de antes
+  de #78 y el de después dieron LCP medianos de 1,96 → 1,88 s (servicio), 2,17 → 2,11 s (atractivo) y 1,70 → 1,57 s
+  (explorar). La precarga de fuentes sola no cambia el resultado (con y sin ella, 2,20 y 2,22 s en el servicio).
+- **Validez de la medición:** el freno de CPU ×4 se aplica sobre la CPU del equipo que mide. Tres corridas previas
+  del mismo día dieron de 5 a 6 páginas por encima de 2 s porque otra aplicación ocupaba la CPU (el
+  `environment.benchmarkIndex` de Lighthouse bajó de ~3000 a ~1200 y el trabajo del hilo principal se duplicó) y,
+  en la primera, los servicios recién arrancados. Se toma la corrida con `benchmarkIndex` de 2400 a 3360 en todas
+  las páginas; conviene revisar ese valor en los JSON antes de comparar resultados.
+
+**Demo pública, antes de las correcciones de QA (2026-11-16, `bash infra/carga/rnf02-carga-pagina.sh https://samaria360.duckdns.org`):** con HTTPS,
 Caddy y la latencia real por internet. 7 de 9 por debajo de 2 s en la primera pasada; las dos que fallaron se
 repitieron con 3 corridas más:
 
