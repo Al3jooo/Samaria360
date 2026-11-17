@@ -12,6 +12,10 @@ if [ "$(id -u)" = 0 ]; then
   if [ -f /var/lib/rabbitmq/.erlang.cookie ]; then
     chmod 600 /var/lib/rabbitmq/.erlang.cookie
   fi
+  # El marcador de listo de un arranque anterior puede ser de root (contenedor creado con la versión previa de este
+  # script, que corría como root, y reiniciado sin recrearlo): en /tmp, con sticky bit, el usuario rabbitmq no puede
+  # borrarlo y el rm de abajo detenía el arranque en un bucle de reinicios (DEC-336).
+  rm -f /tmp/rabbitmq-listo
   exec su-exec rabbitmq sh "$0" "$@"
 fi
 VHOST=samaria360

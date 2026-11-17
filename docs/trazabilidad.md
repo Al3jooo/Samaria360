@@ -637,6 +637,10 @@ No se repitieron la carga de 500 usuarios virtuales ni las suites de los servici
 y api-gateway). Esta verificación no acredita disponibilidad mensual del 99 % ni sustituye los resultados históricos
 de DEC-325.
 
+**Redespliegue de la demo (DEC-336):** al reiniciar RabbitMQ con el `iniciar.sh` de DEC-326, un marcador de listo
+que había quedado de root lo dejó en un bucle de reinicios. Se corrigió en el script y en `arranque-infra.sh`; en la
+demo, los tres consumidores se reconectaron solos después de recrear el contenedor (DEC-327 verificado ahí).
+
 ## Decisiones por iteración
 
 Las decisiones (DEC), hallazgos y verificaciones de cada sesión están en `docs/trazabilidad/`. Cuando un documento cita una sección de «`docs/trazabilidad.md`» que no está en este archivo, la tabla dice en qué archivo quedó:
@@ -670,6 +674,7 @@ Las decisiones (DEC), hallazgos y verificaciones de cada sesión están en `docs
 | Pruebas de los RNF — decisiones (DEC-276 y DEC-277) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Revisión previa al redespliegue de la demo — decisiones (DEC-319 a DEC-325) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Correcciones de QA del 2026-11-16 — decisiones (DEC-326 a DEC-335; QA-01 a QA-10) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
+| Redespliegue de la demo con las correcciones de QA — decisiones (DEC-336) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Plan del 100 % — decisiones (DEC-278 a DEC-284) | [`trazabilidad/decisiones-transversales.md`](trazabilidad/decisiones-transversales.md) |
 | Plan del 100 %, iteración F «Mensajería y correo» — decisiones (DEC-285 a DEC-290; RF34) | [`trazabilidad/decisiones-plan-100-iteracion-f.md`](trazabilidad/decisiones-plan-100-iteracion-f.md) |
 | Plan del 100 %, iteración G «Análisis y notificaciones» — decisiones (DEC-291 a DEC-296; RF13, RF30, RF63) | [`trazabilidad/decisiones-plan-100-iteracion-g.md`](trazabilidad/decisiones-plan-100-iteracion-g.md) |

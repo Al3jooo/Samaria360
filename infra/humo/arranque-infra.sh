@@ -45,10 +45,14 @@ test "$(docker inspect -f '{{.State.Health.Status}}' "$postgres")" = healthy
 docker exec "$postgres" psql -h 127.0.0.1 -U postgres -d postgres -c 'SELECT 1' >/dev/null
 echo 'ok     PostgreSQL solo está sano cuando acepta conexiones TCP'
 
-for caso in nuevo cookie-root; do
+for caso in nuevo cookie-root marcador-root; do
   preparar=''
   if [ "$caso" = cookie-root ]; then
     preparar='printf "%s" "cookie-aislada-exclusiva-de-prueba" > /var/lib/rabbitmq/.erlang.cookie; chmod 600 /var/lib/rabbitmq/.erlang.cookie;'
+  fi
+  if [ "$caso" = marcador-root ]; then
+    # Reinicio de un contenedor creado con la versión anterior de iniciar.sh: el marcador de listo quedó de root (DEC-336).
+    preparar='touch /tmp/rabbitmq-listo;'
   fi
   docker run -d --name "$rabbit" --hostname qa-rabbit --tmpfs /var/lib/rabbitmq \
     --mount "type=bind,source=$raiz/infra/rabbitmq,target=/qa,readonly" \
@@ -59,11 +63,13 @@ for caso in nuevo cookie-root; do
     -e RABBITMQ_CATALOG_PASSWORD=qa-aislada -e RABBITMQ_ANALYTICS_PASSWORD=qa-aislada \
     -e RABBITMQ_CHATBOT_PASSWORD=qa-aislada --entrypoint sh rabbitmq:4.1.4-management-alpine \
     -c "$preparar exec sh /qa/iniciar.sh" >/dev/null
+  # Listo = marcador creado por este arranque (de rabbitmq), no uno de root que quedó de antes.
+  listo() { [ "$(docker exec "$rabbit" stat -c %U /tmp/rabbitmq-listo 2>/dev/null)" = rabbitmq ]; }
   for intento in $(seq 1 90); do
-    docker exec "$rabbit" test -f /tmp/rabbitmq-listo && break
+    listo && break
     sleep 2
   done
-  docker exec "$rabbit" test -f /tmp/rabbitmq-listo
+  listo
   test "$(docker exec "$rabbit" stat -c %U /var/lib/rabbitmq/.erlang.cookie)" = rabbitmq
   docker exec --user rabbitmq "$rabbit" rabbitmq-diagnostics -q check_port_connectivity
   echo "ok     RabbitMQ arranca y prepara sus usuarios ($caso)"
